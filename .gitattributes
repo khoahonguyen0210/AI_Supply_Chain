@@ -3,3 +3,5 @@
 
 # Shell scripts must keep LF on Windows checkouts
 *.sh text eol=lf
+mvnw text eol=lf
+*.cmd text eol=crlf
