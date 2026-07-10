@@ -1,0 +1,5 @@
+# Generated and downloaded datasets are reproducible; only code and docs are tracked.
+*
+!.gitignore
+!.gitkeep
+!README.md
