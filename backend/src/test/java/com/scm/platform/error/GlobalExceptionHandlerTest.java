@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.scm.platform.support.PostgresContainerConfig;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(GlobalExceptionHandlerTest.FailingController.class)
+@Import({PostgresContainerConfig.class, GlobalExceptionHandlerTest.FailingController.class})
 class GlobalExceptionHandlerTest {
 
 	@Autowired

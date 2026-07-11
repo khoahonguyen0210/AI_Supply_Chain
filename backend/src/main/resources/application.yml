@@ -2,6 +2,13 @@ spring:
   application:
     name: scm-backend
 
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:scm}
+    username: ${POSTGRES_USER:scm}
+    password: ${POSTGRES_PASSWORD:change-me}
+  flyway:
+    locations: classpath:db/migration
+
 server:
   port: ${BACKEND_PORT:8080}
 
