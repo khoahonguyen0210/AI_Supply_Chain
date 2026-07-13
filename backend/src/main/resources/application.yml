@@ -21,3 +21,4 @@ management:
 scm:
   service-name: scm-backend
   version: "@project.version@"
+  ml-service-url: ${ML_SERVICE_URL:http://localhost:8001}

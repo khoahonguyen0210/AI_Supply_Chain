@@ -1,0 +1,41 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "asOf": {
+      "description": "Monday of the first week to forecast; history before it is used.",
+      "format": "date",
+      "title": "Asof",
+      "type": "string"
+    },
+    "horizonWeeks": {
+      "default": 8,
+      "maximum": 8,
+      "minimum": 1,
+      "title": "Horizonweeks",
+      "type": "integer"
+    },
+    "regionId": {
+      "minLength": 1,
+      "title": "Regionid",
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "1",
+      "default": "1",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "skuId": {
+      "minLength": 1,
+      "title": "Skuid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "skuId",
+    "regionId",
+    "asOf"
+  ],
+  "title": "ForecastRequest",
+  "type": "object"
+}

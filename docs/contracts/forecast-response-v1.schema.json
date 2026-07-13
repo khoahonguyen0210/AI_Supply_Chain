@@ -1,0 +1,102 @@
+{
+  "$defs": {
+    "ForecastPoint": {
+      "additionalProperties": false,
+      "properties": {
+        "horizon": {
+          "minimum": 1,
+          "title": "Horizon",
+          "type": "integer"
+        },
+        "lower": {
+          "minimum": 0,
+          "title": "Lower",
+          "type": "number"
+        },
+        "point": {
+          "minimum": 0,
+          "title": "Point",
+          "type": "number"
+        },
+        "upper": {
+          "minimum": 0,
+          "title": "Upper",
+          "type": "number"
+        },
+        "weekStart": {
+          "format": "date",
+          "title": "Weekstart",
+          "type": "string"
+        }
+      },
+      "required": [
+        "weekStart",
+        "horizon",
+        "point",
+        "lower",
+        "upper"
+      ],
+      "title": "ForecastPoint",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "asOf": {
+      "format": "date",
+      "title": "Asof",
+      "type": "string"
+    },
+    "datasetId": {
+      "title": "Datasetid",
+      "type": "string"
+    },
+    "intervalLevel": {
+      "exclusiveMaximum": 1,
+      "exclusiveMinimum": 0,
+      "title": "Intervallevel",
+      "type": "number"
+    },
+    "method": {
+      "title": "Method",
+      "type": "string"
+    },
+    "modelVersion": {
+      "title": "Modelversion",
+      "type": "string"
+    },
+    "points": {
+      "items": {
+        "$ref": "#/$defs/ForecastPoint"
+      },
+      "title": "Points",
+      "type": "array"
+    },
+    "regionId": {
+      "title": "Regionid",
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "1",
+      "default": "1",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "skuId": {
+      "title": "Skuid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "modelVersion",
+    "datasetId",
+    "skuId",
+    "regionId",
+    "asOf",
+    "intervalLevel",
+    "method",
+    "points"
+  ],
+  "title": "ForecastResponse",
+  "type": "object"
+}

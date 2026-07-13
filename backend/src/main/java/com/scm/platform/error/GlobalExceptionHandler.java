@@ -1,11 +1,13 @@
 package com.scm.platform.error;
 
+import com.scm.platform.mlservice.MlServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,6 +32,11 @@ public class GlobalExceptionHandler {
 		return build(HttpStatus.NOT_FOUND, "NOT_FOUND", "Resource not found", request, List.of());
 	}
 
+	@ExceptionHandler(MlServiceException.class)
+	public ResponseEntity<ApiError> handleMlService(MlServiceException ex, HttpServletRequest request) {
+		return build(HttpStatusCode.valueOf(ex.status()), ex.code(), ex.getMessage(), request, List.of());
+	}
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApiError> handleUnexpected(Exception ex, HttpServletRequest request) {
 		log.error("Unhandled exception on {}", request.getRequestURI(), ex);
@@ -37,7 +44,7 @@ public class GlobalExceptionHandler {
 				List.of());
 	}
 
-	private ResponseEntity<ApiError> build(HttpStatus status, String code, String message,
+	private ResponseEntity<ApiError> build(HttpStatusCode status, String code, String message,
 			HttpServletRequest request, List<ApiError.FieldViolation> violations) {
 		ApiError body = new ApiError(Instant.now(), status.value(), code, message, request.getRequestURI(),
 				violations);

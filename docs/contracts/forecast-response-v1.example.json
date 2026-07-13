@@ -1,0 +1,26 @@
+{
+  "asOf": "2024-12-30",
+  "datasetId": "synthetic-000000000000",
+  "intervalLevel": 0.8,
+  "method": "lightgbm-cqr",
+  "modelVersion": "lgbm-0000000000",
+  "points": [
+    {
+      "horizon": 1,
+      "lower": 0.0,
+      "point": 12.5,
+      "upper": 31.0,
+      "weekStart": "2024-12-30"
+    },
+    {
+      "horizon": 2,
+      "lower": 0.0,
+      "point": 13.0,
+      "upper": 33.5,
+      "weekStart": "2025-01-06"
+    }
+  ],
+  "regionId": "R1",
+  "schemaVersion": "1",
+  "skuId": "SKU-001"
+}
