@@ -1,0 +1,346 @@
+{
+  "as_of": "2024-12-30",
+  "benchmark_version": "1",
+  "cases": {
+    "base": {
+      "heuristic_cheapest": {
+        "allocation": {
+          "milp": {
+            "constraint_violations": {
+              "by_kind": {},
+              "count": 0
+            },
+            "fill_rate": 1.0,
+            "mean_transit_days": 1.37597016866843,
+            "objective": 25093.269,
+            "runtime_seconds": 0.04302429989911616,
+            "shipping_cost": 25093.269,
+            "stockout_penalty": 0.0,
+            "unmet_units": 0
+          },
+          "nearest_warehouse_rule": {
+            "constraint_violations": {
+              "by_kind": {},
+              "count": 0
+            },
+            "fill_rate": 1.0,
+            "mean_transit_days": 1.3777045484108745,
+            "objective": 25116.39000000001,
+            "runtime_seconds": 0.0019021001644432545,
+            "shipping_cost": 25116.39000000001,
+            "stockout_penalty": 0.0,
+            "unmet_units": 0
+          }
+        },
+        "constraint_violations": {
+          "by_kind": {
+            "SERVICE_LEVEL": 4
+          },
+          "count": 4
+        },
+        "cost": {
+          "fixed_order": 2400.0,
+          "holding": 2956.5062079999993,
+          "purchase": 274329.16000000003,
+          "safety_shortfall_penalty": 59690.01848999998,
+          "shipping": 6134.568,
+          "stockout_penalty": 3164.412289999994,
+          "total": 348674.66498800006
+        },
+        "fill_rate": 0.9966840529584791,
+        "objective": 348674.66498800006,
+        "orders": 96,
+        "runtime_seconds": 0.0012452001683413982,
+        "spend": 282863.72800000006,
+        "units_ordered": 10311,
+        "unmet_demand": 76.14699999999989
+      },
+      "heuristic_weighted": {
+        "allocation": {
+          "milp": {
+            "constraint_violations": {
+              "by_kind": {},
+              "count": 0
+            },
+            "fill_rate": 1.0,
+            "mean_transit_days": 1.3743658674066688,
+            "objective": 25065.692000000003,
+            "runtime_seconds": 0.04290639981627464,
+            "shipping_cost": 25065.692000000003,
+            "stockout_penalty": 0.0,
+            "unmet_units": 0
+          },
+          "nearest_warehouse_rule": {
+            "constraint_violations": {
+              "by_kind": {},
+              "count": 0
+            },
+            "fill_rate": 1.0,
+            "mean_transit_days": 1.37479946234228,
+            "objective": 25071.42700000001,
+            "runtime_seconds": 0.0018591000698506832,
+            "shipping_cost": 25071.42700000001,
+            "stockout_penalty": 0.0,
+            "unmet_units": 0
+          }
+        },
+        "constraint_violations": {
+          "by_kind": {
+            "SERVICE_LEVEL": 1
+          },
+          "count": 1
+        },
+        "cost": {
+          "fixed_order": 2300.0,
+          "holding": 3158.981159999999,
+          "purchase": 315604.33999999997,
+          "safety_shortfall_penalty": 30056.64357000003,
+          "shipping": 5378.8589999999995,
+          "stockout_penalty": 885.085500000001,
+          "total": 357383.90923
+        },
+        "fill_rate": 0.9986623774373987,
+        "objective": 357383.90923,
+        "orders": 92,
+        "runtime_seconds": 0.05299220001325011,
+        "spend": 323283.19899999996,
+        "units_ordered": 10374,
+        "unmet_demand": 30.717000000000013
+      },
+      "milp": {
+        "allocation": {
+          "milp": {
+            "constraint_violations": {
+              "by_kind": {},
+              "count": 0
+            },
+            "fill_rate": 1.0,
+            "mean_transit_days": 1.3731518015869575,
+            "objective": 25048.266,
+            "runtime_seconds": 0.043174799997359514,
+            "shipping_cost": 25048.266,
+            "stockout_penalty": 0.0,
+            "unmet_units": 0
+          },
+          "nearest_warehouse_rule": {
+            "constraint_violations": {
+              "by_kind": {},
+              "count": 0
+            },
+            "fill_rate": 1.0,
+            "mean_transit_days": 1.3731518015869575,
+            "objective": 25048.26600000001,
+            "runtime_seconds": 0.0018937999848276377,
+            "shipping_cost": 25048.26600000001,
+            "stockout_penalty": 0.0,
+            "unmet_units": 0
+          }
+        },
+        "constraint_violations": {
+          "by_kind": {},
+          "count": 0
+        },
+        "cost": {
+          "fixed_order": 2275.0,
+          "holding": 3034.7286719999997,
+          "purchase": 290447.26999999984,
+          "safety_shortfall_penalty": 1161.3751999999763,
+          "shipping": 5613.682999999998,
+          "stockout_penalty": 0.0,
+          "total": 302532.0568719998
+        },
+        "fill_rate": 1.0,
+        "mip_gap": 9.028889997635624e-05,
+        "objective": 302532.0568719998,
+        "orders": 91,
+        "runtime_seconds": 4.579466100083664,
+        "solver_status": "OPTIMAL",
+        "spend": 298335.95299999986,
+        "units_ordered": 10422,
+        "unmet_demand": 0.0
+      }
+    },
+    "tight_budget": {
+      "budget": 253585.56004999988,
+      "heuristic_cheapest": {
+        "allocation": {
+          "milp": {
+            "constraint_violations": {
+              "by_kind": {},
+              "count": 0
+            },
+            "fill_rate": 1.0,
+            "mean_transit_days": 1.37597016866843,
+            "objective": 25093.269,
+            "runtime_seconds": 0.04368690005503595,
+            "shipping_cost": 25093.269,
+            "stockout_penalty": 0.0,
+            "unmet_units": 0
+          },
+          "nearest_warehouse_rule": {
+            "constraint_violations": {
+              "by_kind": {},
+              "count": 0
+            },
+            "fill_rate": 1.0,
+            "mean_transit_days": 1.3777045484108745,
+            "objective": 25116.39000000001,
+            "runtime_seconds": 0.0023910999298095703,
+            "shipping_cost": 25116.39000000001,
+            "stockout_penalty": 0.0,
+            "unmet_units": 0
+          }
+        },
+        "constraint_violations": {
+          "by_kind": {
+            "BUDGET": 1,
+            "SERVICE_LEVEL": 4
+          },
+          "count": 5
+        },
+        "cost": {
+          "fixed_order": 2400.0,
+          "holding": 2956.5062079999993,
+          "purchase": 274329.16000000003,
+          "safety_shortfall_penalty": 59690.01848999998,
+          "shipping": 6134.568,
+          "stockout_penalty": 3164.412289999994,
+          "total": 348674.66498800006
+        },
+        "fill_rate": 0.9966840529584791,
+        "objective": 348674.66498800006,
+        "orders": 96,
+        "runtime_seconds": 0.0012678999919444323,
+        "spend": 282863.72800000006,
+        "units_ordered": 10311,
+        "unmet_demand": 76.14699999999989
+      },
+      "heuristic_weighted": {
+        "allocation": {
+          "milp": {
+            "constraint_violations": {
+              "by_kind": {},
+              "count": 0
+            },
+            "fill_rate": 1.0,
+            "mean_transit_days": 1.3743658674066688,
+            "objective": 25065.692000000003,
+            "runtime_seconds": 0.04658009996637702,
+            "shipping_cost": 25065.692000000003,
+            "stockout_penalty": 0.0,
+            "unmet_units": 0
+          },
+          "nearest_warehouse_rule": {
+            "constraint_violations": {
+              "by_kind": {},
+              "count": 0
+            },
+            "fill_rate": 1.0,
+            "mean_transit_days": 1.37479946234228,
+            "objective": 25071.42700000001,
+            "runtime_seconds": 0.0020300999749451876,
+            "shipping_cost": 25071.42700000001,
+            "stockout_penalty": 0.0,
+            "unmet_units": 0
+          }
+        },
+        "constraint_violations": {
+          "by_kind": {
+            "BUDGET": 1,
+            "SERVICE_LEVEL": 1
+          },
+          "count": 2
+        },
+        "cost": {
+          "fixed_order": 2300.0,
+          "holding": 3158.981159999999,
+          "purchase": 315604.33999999997,
+          "safety_shortfall_penalty": 30056.64357000003,
+          "shipping": 5378.8589999999995,
+          "stockout_penalty": 885.085500000001,
+          "total": 357383.90923
+        },
+        "fill_rate": 0.9986623774373987,
+        "objective": 357383.90923,
+        "orders": 92,
+        "runtime_seconds": 0.02632499998435378,
+        "spend": 323283.19899999996,
+        "units_ordered": 10374,
+        "unmet_demand": 30.717000000000013
+      },
+      "milp": {
+        "allocation": {
+          "milp": {
+            "constraint_violations": {
+              "by_kind": {},
+              "count": 0
+            },
+            "fill_rate": 0.9997832025321944,
+            "mean_transit_days": 1.3737965131407754,
+            "objective": 25192.484999999997,
+            "runtime_seconds": 0.047312699956819415,
+            "shipping_cost": 25052.244999999995,
+            "stockout_penalty": 140.24,
+            "unmet_units": 5
+          },
+          "nearest_warehouse_rule": {
+            "constraint_violations": {
+              "by_kind": {},
+              "count": 0
+            },
+            "fill_rate": 0.9997832025321944,
+            "mean_transit_days": 1.3743169398907105,
+            "objective": 25199.633000000013,
+            "runtime_seconds": 0.0018892001826316118,
+            "shipping_cost": 25059.39300000001,
+            "stockout_penalty": 140.24,
+            "unmet_units": 5
+          }
+        },
+        "constraint_violations": {
+          "by_kind": {},
+          "count": 0
+        },
+        "cost": {
+          "fixed_order": 1900.0,
+          "holding": 2520.3303039999996,
+          "purchase": 247289.32999999993,
+          "safety_shortfall_penalty": 70357.87201999995,
+          "shipping": 4395.886,
+          "stockout_penalty": 0.10289999999951646,
+          "total": 326463.5212239999
+        },
+        "fill_rate": 0.9999998693600388,
+        "mip_gap": 8.88125305096342e-05,
+        "objective": 326463.5212239999,
+        "orders": 76,
+        "runtime_seconds": 3.396354699973017,
+        "solver_status": "OPTIMAL",
+        "spend": 253585.21599999993,
+        "units_ordered": 8541,
+        "unmet_demand": 0.002999999999985903
+      }
+    }
+  },
+  "dataset_id": "synthetic-ef2dbee886f5",
+  "demand_source": "lightgbm point forecast summed over the planning horizon",
+  "forecast_model_version": "lgbm-1f6789b06e",
+  "procurement_params": {
+    "budget": null,
+    "derate_by_reliability": true,
+    "fixed_order_cost": 25.0,
+    "horizon_weeks": 4,
+    "max_lead_time_days": null,
+    "mip_rel_gap": 0.0001,
+    "safety_shortfall_penalty_fraction": 1.0,
+    "service_level_target": 0.95,
+    "stockout_penalty_multiplier": 1.0,
+    "time_limit_seconds": 60.0
+  },
+  "provenance": {
+    "code_revision": "5cf6e1a",
+    "created_at": "2026-10-06T23:16:13+00:00"
+  },
+  "tight_budget_fraction": 0.85,
+  "total_forecast_demand_units": 22963.877
+}
