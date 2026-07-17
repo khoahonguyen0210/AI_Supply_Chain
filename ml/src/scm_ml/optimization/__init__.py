@@ -1,5 +1,3 @@
-"""Procurement optimization, its baselines and the shared plan evaluator."""
-
 from .allocation import (
     AllocationMetrics,
     AllocationParams,
@@ -14,6 +12,7 @@ from .allocation import (
     solve_allocation,
     stock_after_procurement,
 )
+from .demand import serving_warehouse, warehouse_demand
 from .evaluate import CostBreakdown, PlanMetrics, Violation, ViolationKind, evaluate_plan
 from .heuristics import SupplierChoice, reorder_up_to
 from .problem import (
@@ -51,7 +50,9 @@ __all__ = [
     "problem_from_world",
     "regional_demand",
     "reorder_up_to",
+    "serving_warehouse",
     "solve_allocation",
     "solve_procurement",
     "stock_after_procurement",
+    "warehouse_demand",
 ]

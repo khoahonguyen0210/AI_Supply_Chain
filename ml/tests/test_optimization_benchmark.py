@@ -7,12 +7,8 @@ import pytest
 from scm_ml.forecast.model import ModelConfig, train_forecaster
 from scm_ml.forecast.panel import default_split, panel_from_world
 from scm_ml.forecast.uncertainty import QUANTILES, calibrate
-from scm_ml.optimization.benchmark import (
-    forecast_artifact_dirs,
-    run_benchmark,
-    serving_warehouse,
-    warehouse_demand,
-)
+from scm_ml.optimization.benchmark import forecast_artifact_dirs, run_benchmark
+from scm_ml.optimization.demand import serving_warehouse, warehouse_demand
 from scm_ml.service.forecasting import ForecastService
 from scm_ml.synthetic import SyntheticConfig, SyntheticWorld, generate_world
 

@@ -1,0 +1,1996 @@
+{
+  "as_of": "2024-12-30",
+  "baseline_objective": 302532.0568719998,
+  "dataset_id": "synthetic-ef2dbee886f5",
+  "forecast_model_version": "lgbm-1f6789b06e",
+  "outage_supplier": "SUP-002",
+  "procurement_params": {
+    "budget": null,
+    "derate_by_reliability": true,
+    "fixed_order_cost": 25.0,
+    "horizon_weeks": 4,
+    "max_lead_time_days": null,
+    "mip_rel_gap": 0.0001,
+    "safety_shortfall_penalty_fraction": 1.0,
+    "service_level_target": 0.95,
+    "stockout_penalty_multiplier": 1.0,
+    "time_limit_seconds": 60.0
+  },
+  "provenance": {
+    "code_revision": "29e60c7",
+    "created_at": "2026-10-06T23:24:01+00:00"
+  },
+  "scenarios": [
+    {
+      "baseline": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 1.0,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 302532.0568719998,
+        "orders": 91,
+        "shipping_cost": 25048.266,
+        "spend": 298335.95299999986,
+        "units_ordered": 10422,
+        "unmet_demand": 0.0,
+        "violations_by_kind": {}
+      },
+      "baseline_binding": {
+        "MOQ": 9,
+        "SUPPLIER_CAPACITY": 1,
+        "WAREHOUSE_STOCK": 2
+      },
+      "changed_allocations": {
+        "changed_purchase_lines": 107,
+        "changed_shipment_routes": 202,
+        "largest_changes": [
+          {
+            "baseline_units": 912,
+            "delta": 271,
+            "response_units": 1183,
+            "sku_id": "SKU-006",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 230,
+            "response_units": 230,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 228,
+            "response_units": 228,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-003",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 182,
+            "delta": -182,
+            "response_units": 0,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-003",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 108,
+            "delta": 164,
+            "response_units": 272,
+            "sku_id": "SKU-001",
+            "supplier_id": "SUP-003",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 556,
+            "delta": 153,
+            "response_units": 709,
+            "sku_id": "SKU-010",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 327,
+            "delta": -147,
+            "response_units": 180,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 51,
+            "delta": 146,
+            "response_units": 197,
+            "sku_id": "SKU-006",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 480,
+            "delta": 142,
+            "response_units": 622,
+            "sku_id": "SKU-004",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 30,
+            "delta": 141,
+            "response_units": 171,
+            "sku_id": "SKU-039",
+            "supplier_id": "SUP-004",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 10,
+            "delta": 138,
+            "response_units": 148,
+            "sku_id": "SKU-006",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 127,
+            "delta": 136,
+            "response_units": 263,
+            "sku_id": "SKU-029",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 73,
+            "delta": 135,
+            "response_units": 208,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 126,
+            "response_units": 126,
+            "sku_id": "SKU-027",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 113,
+            "response_units": 113,
+            "sku_id": "SKU-016",
+            "supplier_id": "SUP-008",
+            "warehouse_id": "WH-3"
+          }
+        ],
+        "shipment_units_moved": 4597,
+        "supplier_shifts": [
+          {
+            "baseline_units": 1213,
+            "response_units": 1727,
+            "supplier_id": "SUP-001"
+          },
+          {
+            "baseline_units": 2528,
+            "response_units": 3558,
+            "supplier_id": "SUP-002"
+          },
+          {
+            "baseline_units": 764,
+            "response_units": 1024,
+            "supplier_id": "SUP-003"
+          },
+          {
+            "baseline_units": 1533,
+            "response_units": 2206,
+            "supplier_id": "SUP-004"
+          },
+          {
+            "baseline_units": 2304,
+            "response_units": 3281,
+            "supplier_id": "SUP-005"
+          },
+          {
+            "baseline_units": 1152,
+            "response_units": 1591,
+            "supplier_id": "SUP-006"
+          },
+          {
+            "baseline_units": 52,
+            "response_units": 87,
+            "supplier_id": "SUP-007"
+          },
+          {
+            "baseline_units": 876,
+            "response_units": 1029,
+            "supplier_id": "SUP-008"
+          }
+        ],
+        "units_reallocated": 6389
+      },
+      "changes": [
+        {
+          "affected": 200,
+          "after": 27556.6524,
+          "assumption": "forecast demand (units over horizon)",
+          "before": 22963.877,
+          "scope": "all"
+        }
+      ],
+      "commitment_violations": {},
+      "disrupted": {
+        "customer_fill_rate": 0.9937811844674236,
+        "customer_unmet_units": 172,
+        "fill_rate": 0.9874304253298923,
+        "mean_transit_days": 1.3820490431492396,
+        "objective": 522233.41573999985,
+        "orders": 91,
+        "shipping_cost": 30010.108999999968,
+        "spend": 298335.95299999986,
+        "units_ordered": 10422,
+        "unmet_demand": 346.37539999999996,
+        "violations_by_kind": {
+          "SERVICE_LEVEL": 13
+        }
+      },
+      "name": "Demand +20%",
+      "newly_binding": [
+        {
+          "kind": "MOQ",
+          "subject": "SUP-002/SKU-007->WH-2",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-006/SKU-004->WH-1",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-006/SKU-023->WH-2",
+          "utilization": 1.0
+        },
+        {
+          "kind": "SUPPLIER_CAPACITY",
+          "subject": "SUP-003/SKU-031",
+          "utilization": 1.0
+        },
+        {
+          "kind": "SUPPLIER_CAPACITY",
+          "subject": "SUP-006/SKU-003",
+          "utilization": 1.0
+        }
+      ],
+      "no_longer_binding": [
+        {
+          "kind": "MOQ",
+          "subject": "SUP-001/SKU-036->WH-1",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-004/SKU-005->WH-1",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-005/SKU-006->WH-1",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-005/SKU-028->WH-1",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-008/SKU-036->WH-3",
+          "utilization": 1.0
+        },
+        {
+          "kind": "SUPPLIER_CAPACITY",
+          "subject": "SUP-002/SKU-029",
+          "utilization": 1.0
+        }
+      ],
+      "objective_delta_disrupted": {
+        "absolute": 219701.35886800004,
+        "percent": 72.62085252702819
+      },
+      "objective_delta_response": {
+        "absolute": 124311.42665800033,
+        "percent": 41.09033202739108
+      },
+      "resilience_cost": 124311.42665800033,
+      "response": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 0.9999909858426781,
+        "mean_transit_days": 1.3730566201460699,
+        "objective": 426843.48353000014,
+        "orders": 97,
+        "shipping_cost": 30037.350999999988,
+        "spend": 422362.0420000002,
+        "units_ordered": 14503,
+        "unmet_demand": 0.24840000000000373,
+        "violations_by_kind": {}
+      },
+      "response_benefit": 95389.93220999971,
+      "response_binding": {
+        "MOQ": 7,
+        "SUPPLIER_CAPACITY": 2,
+        "WAREHOUSE_STOCK": 2
+      },
+      "scenario_id": "SCN-DEMAND-20",
+      "scenario_type": "DEMAND_SHOCK",
+      "service_level_delta_disrupted": -0.006218815532576416,
+      "service_level_delta_response": 0.0
+    },
+    {
+      "baseline": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 1.0,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 302532.0568719998,
+        "orders": 91,
+        "shipping_cost": 25048.266,
+        "spend": 298335.95299999986,
+        "units_ordered": 10422,
+        "unmet_demand": 0.0,
+        "violations_by_kind": {}
+      },
+      "baseline_binding": {
+        "MOQ": 9,
+        "SUPPLIER_CAPACITY": 1,
+        "WAREHOUSE_STOCK": 2
+      },
+      "changed_allocations": {
+        "changed_purchase_lines": 47,
+        "changed_shipment_routes": 0,
+        "largest_changes": [
+          {
+            "baseline_units": 0,
+            "delta": 519,
+            "response_units": 519,
+            "sku_id": "SKU-004",
+            "supplier_id": "SUP-004",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 480,
+            "delta": -480,
+            "response_units": 0,
+            "sku_id": "SKU-004",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 266,
+            "response_units": 266,
+            "sku_id": "SKU-039",
+            "supplier_id": "SUP-004",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 245,
+            "delta": -245,
+            "response_units": 0,
+            "sku_id": "SKU-039",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 206,
+            "response_units": 206,
+            "sku_id": "SKU-023",
+            "supplier_id": "SUP-006",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 205,
+            "delta": -205,
+            "response_units": 0,
+            "sku_id": "SKU-023",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 186,
+            "delta": -186,
+            "response_units": 0,
+            "sku_id": "SKU-029",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 183,
+            "response_units": 183,
+            "sku_id": "SKU-039",
+            "supplier_id": "SUP-004",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 169,
+            "delta": -169,
+            "response_units": 0,
+            "sku_id": "SKU-039",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 165,
+            "response_units": 165,
+            "sku_id": "SKU-029",
+            "supplier_id": "SUP-008",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 162,
+            "response_units": 162,
+            "sku_id": "SKU-028",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 157,
+            "delta": -157,
+            "response_units": 0,
+            "sku_id": "SKU-024",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 150,
+            "delta": -150,
+            "response_units": 0,
+            "sku_id": "SKU-028",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 150,
+            "delta": -150,
+            "response_units": 0,
+            "sku_id": "SKU-029",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 141,
+            "response_units": 141,
+            "sku_id": "SKU-024",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-3"
+          }
+        ],
+        "shipment_units_moved": 0,
+        "supplier_shifts": [
+          {
+            "baseline_units": 1213,
+            "response_units": 1539,
+            "supplier_id": "SUP-001"
+          },
+          {
+            "baseline_units": 2528,
+            "response_units": 0,
+            "supplier_id": "SUP-002"
+          },
+          {
+            "baseline_units": 764,
+            "response_units": 785,
+            "supplier_id": "SUP-003"
+          },
+          {
+            "baseline_units": 1533,
+            "response_units": 2695,
+            "supplier_id": "SUP-004"
+          },
+          {
+            "baseline_units": 2304,
+            "response_units": 2526,
+            "supplier_id": "SUP-005"
+          },
+          {
+            "baseline_units": 1152,
+            "response_units": 1671,
+            "supplier_id": "SUP-006"
+          },
+          {
+            "baseline_units": 876,
+            "response_units": 1148,
+            "supplier_id": "SUP-008"
+          }
+        ],
+        "units_reallocated": 5500
+      },
+      "changes": [
+        {
+          "affected": 18,
+          "after": 0.0,
+          "assumption": "offers available",
+          "before": 18.0,
+          "scope": "supplier_id=SUP-002"
+        }
+      ],
+      "commitment_violations": {
+        "UNUSABLE_OFFER": 19
+      },
+      "disrupted": {
+        "customer_fill_rate": 0.9708190608333694,
+        "customer_unmet_units": 673,
+        "fill_rate": 0.9410598654573877,
+        "mean_transit_days": 1.4261723983921393,
+        "objective": 412044.57880599995,
+        "orders": 72,
+        "shipping_cost": 25054.467999999983,
+        "spend": 238932.11199999996,
+        "units_ordered": 7894,
+        "unmet_demand": 1353.494,
+        "violations_by_kind": {
+          "SERVICE_LEVEL": 15
+        }
+      },
+      "name": "Supplier outage (SUP-002)",
+      "newly_binding": [
+        {
+          "kind": "MOQ",
+          "subject": "SUP-001/SKU-028->WH-2",
+          "utilization": 1.0
+        },
+        {
+          "kind": "SUPPLIER_CAPACITY",
+          "subject": "SUP-005/SKU-018",
+          "utilization": 1.0
+        },
+        {
+          "kind": "SUPPLIER_CAPACITY",
+          "subject": "SUP-006/SKU-003",
+          "utilization": 1.0
+        }
+      ],
+      "no_longer_binding": [
+        {
+          "kind": "SUPPLIER_CAPACITY",
+          "subject": "SUP-002/SKU-029",
+          "utilization": 1.0
+        }
+      ],
+      "objective_delta_disrupted": {
+        "absolute": 109512.52193400013,
+        "percent": 36.19865050543536
+      },
+      "objective_delta_response": {
+        "absolute": 4217.461161999963,
+        "percent": 1.3940543047259137
+      },
+      "resilience_cost": 4217.461161999963,
+      "response": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 0.9999920745090213,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 306749.5180339998,
+        "orders": 91,
+        "shipping_cost": 25048.266,
+        "spend": 302287.98499999987,
+        "units_ordered": 10416,
+        "unmet_demand": 0.18200000000000216,
+        "violations_by_kind": {}
+      },
+      "response_benefit": 105295.06077200017,
+      "response_binding": {
+        "MOQ": 10,
+        "SUPPLIER_CAPACITY": 2,
+        "WAREHOUSE_STOCK": 2
+      },
+      "scenario_id": "SCN-OUTAGE",
+      "scenario_type": "SUPPLIER_OUTAGE",
+      "service_level_delta_disrupted": -0.02918093916663056,
+      "service_level_delta_response": 0.0
+    },
+    {
+      "baseline": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 1.0,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 302532.0568719998,
+        "orders": 91,
+        "shipping_cost": 25048.266,
+        "spend": 298335.95299999986,
+        "units_ordered": 10422,
+        "unmet_demand": 0.0,
+        "violations_by_kind": {}
+      },
+      "baseline_binding": {
+        "MOQ": 9,
+        "SUPPLIER_CAPACITY": 1,
+        "WAREHOUSE_STOCK": 2
+      },
+      "changed_allocations": {
+        "changed_purchase_lines": 20,
+        "changed_shipment_routes": 0,
+        "largest_changes": [
+          {
+            "baseline_units": 0,
+            "delta": 261,
+            "response_units": 261,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-003",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 327,
+            "delta": -260,
+            "response_units": 67,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 189,
+            "delta": -189,
+            "response_units": 0,
+            "sku_id": "SKU-010",
+            "supplier_id": "SUP-006",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 170,
+            "response_units": 170,
+            "sku_id": "SKU-010",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 165,
+            "delta": -165,
+            "response_units": 0,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-003",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 163,
+            "response_units": 163,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 78,
+            "delta": -78,
+            "response_units": 0,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-006",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 149,
+            "delta": 75,
+            "response_units": 224,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-006",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 73,
+            "delta": -73,
+            "response_units": 0,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 69,
+            "response_units": 69,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-007",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 50,
+            "delta": -50,
+            "response_units": 0,
+            "sku_id": "SKU-005",
+            "supplier_id": "SUP-004",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 30,
+            "delta": -30,
+            "response_units": 0,
+            "sku_id": "SKU-039",
+            "supplier_id": "SUP-004",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 28,
+            "response_units": 28,
+            "sku_id": "SKU-039",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 10,
+            "delta": -10,
+            "response_units": 0,
+            "sku_id": "SKU-036",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 556,
+            "delta": -1,
+            "response_units": 555,
+            "sku_id": "SKU-010",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-3"
+          }
+        ],
+        "shipment_units_moved": 0,
+        "supplier_shifts": [
+          {
+            "baseline_units": 1213,
+            "response_units": 1371,
+            "supplier_id": "SUP-001"
+          },
+          {
+            "baseline_units": 2528,
+            "response_units": 2556,
+            "supplier_id": "SUP-002"
+          },
+          {
+            "baseline_units": 764,
+            "response_units": 859,
+            "supplier_id": "SUP-003"
+          },
+          {
+            "baseline_units": 1533,
+            "response_units": 1453,
+            "supplier_id": "SUP-004"
+          },
+          {
+            "baseline_units": 2304,
+            "response_units": 2132,
+            "supplier_id": "SUP-005"
+          },
+          {
+            "baseline_units": 1152,
+            "response_units": 959,
+            "supplier_id": "SUP-006"
+          },
+          {
+            "baseline_units": 52,
+            "response_units": 121,
+            "supplier_id": "SUP-007"
+          }
+        ],
+        "units_reallocated": 1627
+      },
+      "changes": [
+        {
+          "affected": 206,
+          "after": 32.05345873786408,
+          "assumption": "mean offer unit price",
+          "before": 27.87257281553398,
+          "scope": "all"
+        }
+      ],
+      "commitment_violations": {},
+      "disrupted": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 1.0,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 346099.14737200004,
+        "orders": 91,
+        "shipping_cost": 25048.266,
+        "spend": 341903.0435000001,
+        "units_ordered": 10422,
+        "unmet_demand": 0.0,
+        "violations_by_kind": {}
+      },
+      "name": "Supplier price +15%",
+      "newly_binding": [],
+      "no_longer_binding": [
+        {
+          "kind": "MOQ",
+          "subject": "SUP-001/SKU-036->WH-1",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-004/SKU-005->WH-1",
+          "utilization": 1.0
+        }
+      ],
+      "objective_delta_disrupted": {
+        "absolute": 43567.090500000224,
+        "percent": 14.400817867189954
+      },
+      "objective_delta_response": {
+        "absolute": 43510.318406000326,
+        "percent": 14.382052221464047
+      },
+      "resilience_cost": 43510.318406000326,
+      "response": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 1.0,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 346042.37527800014,
+        "orders": 89,
+        "shipping_cost": 25048.266,
+        "spend": 340432.0615000001,
+        "units_ordered": 10327,
+        "unmet_demand": 0.0,
+        "violations_by_kind": {}
+      },
+      "response_benefit": 56.77209399989806,
+      "response_binding": {
+        "MOQ": 7,
+        "SUPPLIER_CAPACITY": 1,
+        "WAREHOUSE_STOCK": 2
+      },
+      "scenario_id": "SCN-PRICE-15",
+      "scenario_type": "PRICE_SHOCK",
+      "service_level_delta_disrupted": 0.0,
+      "service_level_delta_response": 0.0
+    },
+    {
+      "baseline": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 1.0,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 302532.0568719998,
+        "orders": 91,
+        "shipping_cost": 25048.266,
+        "spend": 298335.95299999986,
+        "units_ordered": 10422,
+        "unmet_demand": 0.0,
+        "violations_by_kind": {}
+      },
+      "baseline_binding": {
+        "MOQ": 9,
+        "SUPPLIER_CAPACITY": 1,
+        "WAREHOUSE_STOCK": 2
+      },
+      "changed_allocations": {
+        "changed_purchase_lines": 34,
+        "changed_shipment_routes": 0,
+        "largest_changes": [
+          {
+            "baseline_units": 229,
+            "delta": -229,
+            "response_units": 0,
+            "sku_id": "SKU-028",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 212,
+            "response_units": 212,
+            "sku_id": "SKU-028",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 108,
+            "delta": 196,
+            "response_units": 304,
+            "sku_id": "SKU-001",
+            "supplier_id": "SUP-003",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 178,
+            "delta": -178,
+            "response_units": 0,
+            "sku_id": "SKU-001",
+            "supplier_id": "SUP-008",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 165,
+            "delta": -165,
+            "response_units": 0,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-003",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 164,
+            "response_units": 164,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 162,
+            "response_units": 162,
+            "sku_id": "SKU-028",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 150,
+            "delta": -150,
+            "response_units": 0,
+            "sku_id": "SKU-028",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 150,
+            "delta": -150,
+            "response_units": 0,
+            "sku_id": "SKU-029",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 149,
+            "delta": -149,
+            "response_units": 0,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-006",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 73,
+            "delta": 144,
+            "response_units": 217,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 127,
+            "delta": 135,
+            "response_units": 262,
+            "sku_id": "SKU-029",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 126,
+            "response_units": 126,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-003",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 327,
+            "delta": -126,
+            "response_units": 201,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 205,
+            "delta": -100,
+            "response_units": 105,
+            "sku_id": "SKU-023",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-2"
+          }
+        ],
+        "shipment_units_moved": 0,
+        "supplier_shifts": [
+          {
+            "baseline_units": 1213,
+            "response_units": 1372,
+            "supplier_id": "SUP-001"
+          },
+          {
+            "baseline_units": 2528,
+            "response_units": 2436,
+            "supplier_id": "SUP-002"
+          },
+          {
+            "baseline_units": 764,
+            "response_units": 882,
+            "supplier_id": "SUP-003"
+          },
+          {
+            "baseline_units": 1533,
+            "response_units": 1343,
+            "supplier_id": "SUP-004"
+          },
+          {
+            "baseline_units": 2304,
+            "response_units": 2467,
+            "supplier_id": "SUP-005"
+          },
+          {
+            "baseline_units": 1152,
+            "response_units": 1086,
+            "supplier_id": "SUP-006"
+          },
+          {
+            "baseline_units": 52,
+            "response_units": 62,
+            "supplier_id": "SUP-007"
+          },
+          {
+            "baseline_units": 876,
+            "response_units": 750,
+            "supplier_id": "SUP-008"
+          }
+        ],
+        "units_reallocated": 3336
+      },
+      "changes": [
+        {
+          "affected": 206,
+          "after": 16499.0,
+          "assumption": "total weekly supplier capacity (units)",
+          "before": 23679.0,
+          "scope": "all"
+        }
+      ],
+      "commitment_violations": {
+        "SUPPLIER_CAPACITY": 13
+      },
+      "disrupted": {
+        "customer_fill_rate": 0.998135541776872,
+        "customer_unmet_units": 43,
+        "fill_rate": 0.9949878237024175,
+        "mean_transit_days": 1.3775412684622068,
+        "objective": 316968.40163799986,
+        "orders": 91,
+        "shipping_cost": 25069.207999999995,
+        "spend": 280460.2379999999,
+        "units_ordered": 9750,
+        "unmet_demand": 115.09899999999998,
+        "violations_by_kind": {
+          "BELOW_MOQ": 3,
+          "SERVICE_LEVEL": 3
+        }
+      },
+      "name": "Supplier capacity -30%",
+      "newly_binding": [
+        {
+          "kind": "MOQ",
+          "subject": "SUP-002/SKU-034->WH-1",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-006/SKU-023->WH-2",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-007/SKU-025->WH-3",
+          "utilization": 1.0
+        },
+        {
+          "kind": "SUPPLIER_CAPACITY",
+          "subject": "SUP-002/SKU-023",
+          "utilization": 1.0
+        },
+        {
+          "kind": "SUPPLIER_CAPACITY",
+          "subject": "SUP-003/SKU-031",
+          "utilization": 1.0
+        },
+        {
+          "kind": "SUPPLIER_CAPACITY",
+          "subject": "SUP-005/SKU-018",
+          "utilization": 1.0
+        }
+      ],
+      "no_longer_binding": [
+        {
+          "kind": "SUPPLIER_CAPACITY",
+          "subject": "SUP-002/SKU-029",
+          "utilization": 1.0
+        }
+      ],
+      "objective_delta_disrupted": {
+        "absolute": 14436.344766000053,
+        "percent": 4.771839690399493
+      },
+      "objective_delta_response": {
+        "absolute": 427.39280199992936,
+        "percent": 0.14127190566808517
+      },
+      "resilience_cost": 427.39280199992936,
+      "response": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 1.0,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 302959.44967399974,
+        "orders": 94,
+        "shipping_cost": 25048.266,
+        "spend": 298663.19799999974,
+        "units_ordered": 10398,
+        "unmet_demand": 0.0,
+        "violations_by_kind": {}
+      },
+      "response_benefit": 14008.951964000124,
+      "response_binding": {
+        "MOQ": 12,
+        "SUPPLIER_CAPACITY": 3,
+        "WAREHOUSE_STOCK": 2
+      },
+      "scenario_id": "SCN-CAPACITY-30",
+      "scenario_type": "CAPACITY_REDUCTION",
+      "service_level_delta_disrupted": -0.0018644582231279738,
+      "service_level_delta_response": 0.0
+    },
+    {
+      "baseline": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 1.0,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 302532.0568719998,
+        "orders": 91,
+        "shipping_cost": 25048.266,
+        "spend": 298335.95299999986,
+        "units_ordered": 10422,
+        "unmet_demand": 0.0,
+        "violations_by_kind": {}
+      },
+      "baseline_binding": {
+        "MOQ": 9,
+        "SUPPLIER_CAPACITY": 1,
+        "WAREHOUSE_STOCK": 2
+      },
+      "changed_allocations": {
+        "changed_purchase_lines": 117,
+        "changed_shipment_routes": 7,
+        "largest_changes": [
+          {
+            "baseline_units": 480,
+            "delta": -480,
+            "response_units": 0,
+            "sku_id": "SKU-004",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 328,
+            "response_units": 328,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-003",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 327,
+            "delta": -327,
+            "response_units": 0,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 314,
+            "delta": -314,
+            "response_units": 0,
+            "sku_id": "SKU-023",
+            "supplier_id": "SUP-006",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 282,
+            "response_units": 282,
+            "sku_id": "SKU-023",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 275,
+            "delta": -275,
+            "response_units": 0,
+            "sku_id": "SKU-018",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 249,
+            "response_units": 249,
+            "sku_id": "SKU-018",
+            "supplier_id": "SUP-007",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 245,
+            "delta": -245,
+            "response_units": 0,
+            "sku_id": "SKU-039",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 239,
+            "response_units": 239,
+            "sku_id": "SKU-039",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 206,
+            "delta": -206,
+            "response_units": 0,
+            "sku_id": "SKU-035",
+            "supplier_id": "SUP-004",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 205,
+            "delta": -205,
+            "response_units": 0,
+            "sku_id": "SKU-023",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 189,
+            "delta": -189,
+            "response_units": 0,
+            "sku_id": "SKU-010",
+            "supplier_id": "SUP-006",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 186,
+            "delta": -186,
+            "response_units": 0,
+            "sku_id": "SKU-029",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 185,
+            "response_units": 185,
+            "sku_id": "SKU-035",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 182,
+            "response_units": 182,
+            "sku_id": "SKU-023",
+            "supplier_id": "SUP-008",
+            "warehouse_id": "WH-2"
+          }
+        ],
+        "shipment_units_moved": 592,
+        "supplier_shifts": [
+          {
+            "baseline_units": 1213,
+            "response_units": 2798,
+            "supplier_id": "SUP-001"
+          },
+          {
+            "baseline_units": 2528,
+            "response_units": 0,
+            "supplier_id": "SUP-002"
+          },
+          {
+            "baseline_units": 764,
+            "response_units": 1161,
+            "supplier_id": "SUP-003"
+          },
+          {
+            "baseline_units": 1533,
+            "response_units": 0,
+            "supplier_id": "SUP-004"
+          },
+          {
+            "baseline_units": 2304,
+            "response_units": 2239,
+            "supplier_id": "SUP-005"
+          },
+          {
+            "baseline_units": 1152,
+            "response_units": 518,
+            "supplier_id": "SUP-006"
+          },
+          {
+            "baseline_units": 52,
+            "response_units": 1053,
+            "supplier_id": "SUP-007"
+          },
+          {
+            "baseline_units": 876,
+            "response_units": 1609,
+            "supplier_id": "SUP-008"
+          }
+        ],
+        "units_reallocated": 11996
+      },
+      "changes": [
+        {
+          "affected": 206,
+          "after": 27.174757281553397,
+          "assumption": "mean offer lead time (days)",
+          "before": 20.174757281553397,
+          "scope": "all"
+        },
+        {
+          "affected": 206,
+          "after": 119.0,
+          "assumption": "offers within the 28-day lead-time limit",
+          "before": 193.0,
+          "scope": "all"
+        }
+      ],
+      "commitment_violations": {
+        "UNUSABLE_OFFER": 53
+      },
+      "disrupted": {
+        "customer_fill_rate": 0.928890430559771,
+        "customer_unmet_units": 1640,
+        "fill_rate": 0.8668941659981892,
+        "mean_transit_days": 1.460766465947813,
+        "objective": 514572.3603360001,
+        "orders": 38,
+        "shipping_cost": 24466.187999999984,
+        "spend": 172947.33000000005,
+        "units_ordered": 4569,
+        "unmet_demand": 3056.626,
+        "violations_by_kind": {
+          "SERVICE_LEVEL": 43
+        }
+      },
+      "name": "Lead time +7 days",
+      "newly_binding": [
+        {
+          "kind": "MOQ",
+          "subject": "SUP-001/SKU-022->WH-2",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-001/SKU-028->WH-2",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-003/SKU-001->WH-3",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-003/SKU-021->WH-1",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-003/SKU-021->WH-3",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-007/SKU-018->WH-2",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-008/SKU-039->WH-3",
+          "utilization": 1.0
+        },
+        {
+          "kind": "SERVICE_LEVEL",
+          "subject": "SKU-004@WH-3",
+          "utilization": 9.628035420259032
+        },
+        {
+          "kind": "WAREHOUSE_STOCK",
+          "subject": "SKU-004@WH-1",
+          "utilization": 1.0
+        },
+        {
+          "kind": "WAREHOUSE_STOCK",
+          "subject": "SKU-004@WH-2",
+          "utilization": 1.0
+        },
+        {
+          "kind": "WAREHOUSE_STOCK",
+          "subject": "SKU-004@WH-3",
+          "utilization": 1.0
+        }
+      ],
+      "no_longer_binding": [
+        {
+          "kind": "MOQ",
+          "subject": "SUP-004/SKU-005->WH-1",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-005/SKU-021->WH-1",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-005/SKU-021->WH-3",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-005/SKU-022->WH-2",
+          "utilization": 1.0
+        },
+        {
+          "kind": "SUPPLIER_CAPACITY",
+          "subject": "SUP-002/SKU-029",
+          "utilization": 1.0
+        }
+      ],
+      "objective_delta_disrupted": {
+        "absolute": 212040.3034640003,
+        "percent": 70.08854058520937
+      },
+      "objective_delta_response": {
+        "absolute": 45568.217234000156,
+        "percent": 15.062277269109336
+      },
+      "resilience_cost": 45568.217234000156,
+      "response": {
+        "customer_fill_rate": 0.9973117113992108,
+        "customer_unmet_units": 62,
+        "fill_rate": 0.9870622456303872,
+        "mean_transit_days": 1.3810269118733969,
+        "objective": 348100.27410599997,
+        "orders": 89,
+        "shipping_cost": 25101.516,
+        "spend": 287506.78699999995,
+        "units_ordered": 9378,
+        "unmet_demand": 297.101,
+        "violations_by_kind": {
+          "SERVICE_LEVEL": 1
+        }
+      },
+      "response_benefit": 166472.08623000013,
+      "response_binding": {
+        "MOQ": 12,
+        "SERVICE_LEVEL": 1,
+        "WAREHOUSE_STOCK": 5
+      },
+      "scenario_id": "SCN-LEAD-7",
+      "scenario_type": "LEAD_TIME_SHOCK",
+      "service_level_delta_disrupted": -0.07110956944022895,
+      "service_level_delta_response": -0.0026882886007891793
+    },
+    {
+      "baseline": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 1.0,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 302532.0568719998,
+        "orders": 91,
+        "shipping_cost": 25048.266,
+        "spend": 298335.95299999986,
+        "units_ordered": 10422,
+        "unmet_demand": 0.0,
+        "violations_by_kind": {}
+      },
+      "baseline_binding": {
+        "MOQ": 9,
+        "SUPPLIER_CAPACITY": 1,
+        "WAREHOUSE_STOCK": 2
+      },
+      "changed_allocations": {
+        "changed_purchase_lines": 14,
+        "changed_shipment_routes": 0,
+        "largest_changes": [
+          {
+            "baseline_units": 0,
+            "delta": 278,
+            "response_units": 278,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-003",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 327,
+            "delta": -277,
+            "response_units": 50,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 182,
+            "delta": -182,
+            "response_units": 0,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-003",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 181,
+            "response_units": 181,
+            "sku_id": "SKU-031",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 162,
+            "response_units": 162,
+            "sku_id": "SKU-028",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 150,
+            "delta": -150,
+            "response_units": 0,
+            "sku_id": "SKU-028",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 78,
+            "delta": -78,
+            "response_units": 0,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-006",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 149,
+            "delta": 75,
+            "response_units": 224,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-006",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 73,
+            "delta": -73,
+            "response_units": 0,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 69,
+            "response_units": 69,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-007",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 229,
+            "delta": -54,
+            "response_units": 175,
+            "sku_id": "SKU-028",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 50,
+            "response_units": 50,
+            "sku_id": "SKU-028",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 108,
+            "delta": 21,
+            "response_units": 129,
+            "sku_id": "SKU-001",
+            "supplier_id": "SUP-003",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 178,
+            "delta": -19,
+            "response_units": 159,
+            "sku_id": "SKU-001",
+            "supplier_id": "SUP-008",
+            "warehouse_id": "WH-3"
+          }
+        ],
+        "shipment_units_moved": 0,
+        "supplier_shifts": [
+          {
+            "baseline_units": 1213,
+            "response_units": 1113,
+            "supplier_id": "SUP-001"
+          },
+          {
+            "baseline_units": 764,
+            "response_units": 881,
+            "supplier_id": "SUP-003"
+          },
+          {
+            "baseline_units": 2304,
+            "response_units": 2243,
+            "supplier_id": "SUP-005"
+          },
+          {
+            "baseline_units": 1152,
+            "response_units": 1149,
+            "supplier_id": "SUP-006"
+          },
+          {
+            "baseline_units": 52,
+            "response_units": 121,
+            "supplier_id": "SUP-007"
+          },
+          {
+            "baseline_units": 876,
+            "response_units": 857,
+            "supplier_id": "SUP-008"
+          }
+        ],
+        "units_reallocated": 1669
+      },
+      "changes": [
+        {
+          "affected": 3,
+          "after": 17920.0,
+          "assumption": "warehouse capacity (units)",
+          "before": 22400.0,
+          "scope": "all"
+        }
+      ],
+      "commitment_violations": {},
+      "disrupted": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 1.0,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 302532.0568719998,
+        "orders": 91,
+        "shipping_cost": 25048.266,
+        "spend": 298335.95299999986,
+        "units_ordered": 10422,
+        "unmet_demand": 0.0,
+        "violations_by_kind": {}
+      },
+      "name": "Warehouse capacity -20%",
+      "newly_binding": [
+        {
+          "kind": "MOQ",
+          "subject": "SUP-001/SKU-028->WH-2",
+          "utilization": 1.0
+        }
+      ],
+      "no_longer_binding": [],
+      "objective_delta_disrupted": {
+        "absolute": 0.0,
+        "percent": 0.0
+      },
+      "objective_delta_response": {
+        "absolute": -4.836643999966327,
+        "percent": -0.0015987211570153352
+      },
+      "resilience_cost": -4.836643999966327,
+      "response": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 1.0,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 302527.22022799985,
+        "orders": 92,
+        "shipping_cost": 25048.266,
+        "spend": 298333.84499999986,
+        "units_ordered": 10425,
+        "unmet_demand": 0.0,
+        "violations_by_kind": {}
+      },
+      "response_benefit": 4.836643999966327,
+      "response_binding": {
+        "MOQ": 10,
+        "SUPPLIER_CAPACITY": 1,
+        "WAREHOUSE_STOCK": 2
+      },
+      "scenario_id": "SCN-WAREHOUSE-20",
+      "scenario_type": "WAREHOUSE_CAPACITY_REDUCTION",
+      "service_level_delta_disrupted": 0.0,
+      "service_level_delta_response": 0.0
+    },
+    {
+      "baseline": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 1.0,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 302532.0568719998,
+        "orders": 91,
+        "shipping_cost": 25048.266,
+        "spend": 298335.95299999986,
+        "units_ordered": 10422,
+        "unmet_demand": 0.0,
+        "violations_by_kind": {}
+      },
+      "baseline_binding": {
+        "MOQ": 9,
+        "SUPPLIER_CAPACITY": 1,
+        "WAREHOUSE_STOCK": 2
+      },
+      "changed_allocations": {
+        "changed_purchase_lines": 20,
+        "changed_shipment_routes": 0,
+        "largest_changes": [
+          {
+            "baseline_units": 108,
+            "delta": 196,
+            "response_units": 304,
+            "sku_id": "SKU-001",
+            "supplier_id": "SUP-003",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 178,
+            "delta": -178,
+            "response_units": 0,
+            "sku_id": "SKU-001",
+            "supplier_id": "SUP-008",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 162,
+            "response_units": 162,
+            "sku_id": "SKU-028",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 150,
+            "delta": -150,
+            "response_units": 0,
+            "sku_id": "SKU-028",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 146,
+            "delta": -146,
+            "response_units": 0,
+            "sku_id": "SKU-014",
+            "supplier_id": "SUP-004",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 119,
+            "response_units": 119,
+            "sku_id": "SKU-014",
+            "supplier_id": "SUP-007",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 78,
+            "delta": -78,
+            "response_units": 0,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-006",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 149,
+            "delta": 75,
+            "response_units": 224,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-006",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 73,
+            "delta": -73,
+            "response_units": 0,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-3"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 69,
+            "response_units": 69,
+            "sku_id": "SKU-003",
+            "supplier_id": "SUP-007",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 229,
+            "delta": -54,
+            "response_units": 175,
+            "sku_id": "SKU-028",
+            "supplier_id": "SUP-005",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 50,
+            "response_units": 50,
+            "sku_id": "SKU-028",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-2"
+          },
+          {
+            "baseline_units": 0,
+            "delta": 50,
+            "response_units": 50,
+            "sku_id": "SKU-034",
+            "supplier_id": "SUP-002",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 41,
+            "delta": -41,
+            "response_units": 0,
+            "sku_id": "SKU-034",
+            "supplier_id": "SUP-001",
+            "warehouse_id": "WH-1"
+          },
+          {
+            "baseline_units": 39,
+            "delta": -39,
+            "response_units": 0,
+            "sku_id": "SKU-032",
+            "supplier_id": "SUP-003",
+            "warehouse_id": "WH-2"
+          }
+        ],
+        "shipment_units_moved": 0,
+        "supplier_shifts": [
+          {
+            "baseline_units": 1213,
+            "response_units": 1078,
+            "supplier_id": "SUP-001"
+          },
+          {
+            "baseline_units": 2528,
+            "response_units": 2571,
+            "supplier_id": "SUP-002"
+          },
+          {
+            "baseline_units": 764,
+            "response_units": 891,
+            "supplier_id": "SUP-003"
+          },
+          {
+            "baseline_units": 1533,
+            "response_units": 1387,
+            "supplier_id": "SUP-004"
+          },
+          {
+            "baseline_units": 2304,
+            "response_units": 2339,
+            "supplier_id": "SUP-005"
+          },
+          {
+            "baseline_units": 1152,
+            "response_units": 1218,
+            "supplier_id": "SUP-006"
+          },
+          {
+            "baseline_units": 52,
+            "response_units": 240,
+            "supplier_id": "SUP-007"
+          },
+          {
+            "baseline_units": 876,
+            "response_units": 698,
+            "supplier_id": "SUP-008"
+          }
+        ],
+        "units_reallocated": 1592
+      },
+      "changes": [
+        {
+          "affected": 206,
+          "after": 0.9485702265372169,
+          "assumption": "mean inbound shipping cost per unit",
+          "before": 0.7588559870550162,
+          "scope": "all"
+        },
+        {
+          "affected": 15,
+          "after": 2.3188400000000002,
+          "assumption": "mean outbound lane cost per unit",
+          "before": 1.8550666666666666,
+          "scope": "all"
+        }
+      ],
+      "commitment_violations": {},
+      "disrupted": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 1.0,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 303935.5772719998,
+        "orders": 91,
+        "shipping_cost": 31310.20569999999,
+        "spend": 299739.47339999984,
+        "units_ordered": 10422,
+        "unmet_demand": 0.0,
+        "violations_by_kind": {}
+      },
+      "name": "Transport cost +25%",
+      "newly_binding": [
+        {
+          "kind": "MOQ",
+          "subject": "SUP-001/SKU-028->WH-2",
+          "utilization": 1.0
+        },
+        {
+          "kind": "MOQ",
+          "subject": "SUP-002/SKU-034->WH-1",
+          "utilization": 1.0
+        }
+      ],
+      "no_longer_binding": [
+        {
+          "kind": "SUPPLIER_CAPACITY",
+          "subject": "SUP-002/SKU-029",
+          "utilization": 1.0
+        }
+      ],
+      "objective_delta_disrupted": {
+        "absolute": 1403.5203999999794,
+        "percent": 0.4639245224164141
+      },
+      "objective_delta_response": {
+        "absolute": 1353.5825520000071,
+        "percent": 0.44741789217157335
+      },
+      "resilience_cost": 1353.5825520000071,
+      "response": {
+        "customer_fill_rate": 1.0,
+        "customer_unmet_units": 0,
+        "fill_rate": 1.0,
+        "mean_transit_days": 1.3731518015869575,
+        "objective": 303885.6394239998,
+        "orders": 90,
+        "shipping_cost": 31310.20569999999,
+        "spend": 299644.27119999984,
+        "units_ordered": 10422,
+        "unmet_demand": 0.0,
+        "violations_by_kind": {}
+      },
+      "response_benefit": 49.93784799997229,
+      "response_binding": {
+        "MOQ": 11,
+        "WAREHOUSE_STOCK": 2
+      },
+      "scenario_id": "SCN-TRANSPORT-25",
+      "scenario_type": "TRANSPORT_COST_SHOCK",
+      "service_level_delta_disrupted": 0.0,
+      "service_level_delta_response": 0.0
+    }
+  ],
+  "suite_version": "1"
+}

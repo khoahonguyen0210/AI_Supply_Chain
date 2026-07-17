@@ -8,14 +8,14 @@ judged by the same rules. Runtimes are wall-clock on the machine that ran the be
 from __future__ import annotations
 
 import time
-from collections import Counter, defaultdict
+from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import replace
 from functools import partial
 from pathlib import Path
 from typing import Any
 
-from scm_common.domain import FulfillmentLane, PurchaseLine
+from scm_common.domain import PurchaseLine
 from scm_ml.forecast.artifacts import provenance, write_json
 from scm_ml.forecast.panel import panel_from_world
 from scm_ml.service.contracts import ForecastRequest
@@ -32,9 +32,10 @@ from .allocation import (
     solve_allocation,
     stock_after_procurement,
 )
+from .demand import warehouse_demand
 from .evaluate import PlanMetrics, evaluate_plan
 from .heuristics import SupplierChoice, reorder_up_to
-from .problem import CellKey, ProcurementParams, ProcurementProblem, problem_from_world
+from .problem import ProcurementParams, ProcurementProblem, problem_from_world
 from .procurement import solve_procurement
 
 EXPERIMENT_PATH = Path("ml/experiments/optimization/synthetic.json")
@@ -59,29 +60,6 @@ def forecast_regional_demand(
         )
         demand[(sku_id, region_id)] = sum(point.point for point in response.points)
     return demand
-
-
-def serving_warehouse(lanes: Sequence[FulfillmentLane]) -> dict[str, str]:
-    """Each region's primary warehouse: its cheapest lane (ties broken by warehouse id)."""
-    best: dict[str, FulfillmentLane] = {}
-    for lane in lanes:
-        current = best.get(lane.region_id)
-        if current is None or (lane.cost_per_unit, lane.warehouse_id) < (
-            current.cost_per_unit,
-            current.warehouse_id,
-        ):
-            best[lane.region_id] = lane
-    return {region: lane.warehouse_id for region, lane in best.items()}
-
-
-def warehouse_demand(
-    regional: Mapping[tuple[str, str], float], lanes: Sequence[FulfillmentLane]
-) -> dict[CellKey, float]:
-    primary = serving_warehouse(lanes)
-    totals: dict[CellKey, float] = defaultdict(float)
-    for (sku_id, region_id), value in regional.items():
-        totals[CellKey(sku_id, primary[region_id])] += value
-    return dict(totals)
 
 
 def _summarise(metrics: PlanMetrics) -> dict[str, Any]:

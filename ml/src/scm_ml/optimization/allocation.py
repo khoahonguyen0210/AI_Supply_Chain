@@ -111,12 +111,16 @@ class AllocationPlan(DomainModel):
 def stock_after_procurement(
     problem: ProcurementProblem, lines: Sequence[PurchaseLine]
 ) -> dict[CellKey, int]:
-    """On-hand plus incoming plus expected arrivals (reliability-derated, rounded down)."""
+    """On-hand plus incoming plus expected arrivals (reliability-derated, rounded down).
+
+    Lines whose offer is not usable in this problem (for example a supplier that is out) deliver
+    nothing, matching how `evaluate_plan` treats them.
+    """
     arrivals: dict[CellKey, float] = defaultdict(float)
     for line in lines:
-        arrivals[CellKey(line.sku_id, line.warehouse_id)] += (
-            problem.reliability(line.supplier_id) * line.quantity
-        )
+        key = CellKey(line.sku_id, line.warehouse_id)
+        if any(o.supplier_id == line.supplier_id for o in problem.offers.get(key, ())):
+            arrivals[key] += problem.reliability(line.supplier_id) * line.quantity
     return {
         key: cell.available + int(math.floor(arrivals[key] + 1e-9))
         for key, cell in problem.cells.items()
