@@ -1,0 +1,21 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "data": {
+      "additionalProperties": true,
+      "title": "Data",
+      "type": "object"
+    },
+    "schemaVersion": {
+      "const": "1",
+      "default": "1",
+      "title": "Schemaversion",
+      "type": "string"
+    }
+  },
+  "required": [
+    "data"
+  ],
+  "title": "EngineResponse",
+  "type": "object"
+}

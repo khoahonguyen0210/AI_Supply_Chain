@@ -1,0 +1,87 @@
+{
+  "$defs": {
+    "ActorRef": {
+      "additionalProperties": false,
+      "description": "The authenticated human a request runs for; authentication itself is the backend's job.",
+      "properties": {
+        "role": {
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "userId": {
+          "minLength": 1,
+          "title": "Userid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "userId",
+        "role"
+      ],
+      "title": "ActorRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actor": {
+      "$ref": "#/$defs/ActorRef"
+    },
+    "budget": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Budget"
+    },
+    "demandMultiplier": {
+      "default": 1.0,
+      "exclusiveMinimum": 0,
+      "maximum": 5,
+      "title": "Demandmultiplier",
+      "type": "number"
+    },
+    "horizonWeeks": {
+      "default": 4,
+      "maximum": 8,
+      "minimum": 1,
+      "title": "Horizonweeks",
+      "type": "integer"
+    },
+    "schemaVersion": {
+      "const": "1",
+      "default": "1",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "serviceLevel": {
+      "default": 0.95,
+      "maximum": 1.0,
+      "minimum": 0.5,
+      "title": "Servicelevel",
+      "type": "number"
+    },
+    "skuIds": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 5,
+      "minItems": 1,
+      "title": "Skuids",
+      "type": "array"
+    }
+  },
+  "required": [
+    "skuIds",
+    "actor"
+  ],
+  "title": "OptimizeRequest",
+  "type": "object"
+}

@@ -75,7 +75,7 @@ class ApprovalRecord(DomainModel):
 
 class SqliteStateStore:
     def __init__(self, path: Path | str = ":memory:") -> None:
-        self._db = sqlite3.connect(str(path))
+        self._db = sqlite3.connect(str(path), check_same_thread=False)
         self._db.executescript(_SCHEMA)
 
     def close(self) -> None:

@@ -1,0 +1,75 @@
+{
+  "$defs": {
+    "ActorRef": {
+      "additionalProperties": false,
+      "description": "The authenticated human a request runs for; authentication itself is the backend's job.",
+      "properties": {
+        "role": {
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "userId": {
+          "minLength": 1,
+          "title": "Userid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "userId",
+        "role"
+      ],
+      "title": "ActorRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actor": {
+      "$ref": "#/$defs/ActorRef"
+    },
+    "horizonWeeks": {
+      "default": 4,
+      "maximum": 8,
+      "minimum": 1,
+      "title": "Horizonweeks",
+      "type": "integer"
+    },
+    "maxLeadTimeDays": {
+      "default": 28,
+      "maximum": 365,
+      "minimum": 0,
+      "title": "Maxleadtimedays",
+      "type": "integer"
+    },
+    "quantity": {
+      "minimum": 1,
+      "title": "Quantity",
+      "type": "integer"
+    },
+    "schemaVersion": {
+      "const": "1",
+      "default": "1",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "skuId": {
+      "minLength": 1,
+      "title": "Skuid",
+      "type": "string"
+    },
+    "warehouseId": {
+      "minLength": 1,
+      "title": "Warehouseid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "actor",
+    "skuId",
+    "warehouseId",
+    "quantity"
+  ],
+  "title": "SupplierSearchRequest",
+  "type": "object"
+}

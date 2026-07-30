@@ -1,0 +1,68 @@
+{
+  "$defs": {
+    "ActorRef": {
+      "additionalProperties": false,
+      "description": "The authenticated human a request runs for; authentication itself is the backend's job.",
+      "properties": {
+        "role": {
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "userId": {
+          "minLength": 1,
+          "title": "Userid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "userId",
+        "role"
+      ],
+      "title": "ActorRef",
+      "type": "object"
+    },
+    "DecisionOutcome": {
+      "enum": [
+        "APPROVED",
+        "REJECTED"
+      ],
+      "title": "DecisionOutcome",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "actor": {
+      "$ref": "#/$defs/ActorRef"
+    },
+    "outcome": {
+      "$ref": "#/$defs/DecisionOutcome"
+    },
+    "rationale": {
+      "anyOf": [
+        {
+          "maxLength": 500,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rationale"
+    },
+    "schemaVersion": {
+      "const": "1",
+      "default": "1",
+      "title": "Schemaversion",
+      "type": "string"
+    }
+  },
+  "required": [
+    "actor",
+    "outcome"
+  ],
+  "title": "ApprovalDecisionRequest",
+  "type": "object"
+}

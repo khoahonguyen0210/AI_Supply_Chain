@@ -12,17 +12,23 @@ from scm_ml.forecast.panel import ForecastPanel, default_split, panel_from_world
 from scm_ml.forecast.uncertainty import QUANTILES, calibrate
 from scm_ml.service.app import create_app
 from scm_ml.service.contracts import ForecastResponse
+from scm_ml.service.engine import build_engine
 from scm_ml.service.export_contracts import CONTRACT_DIR, contract_files, example_response
 from scm_ml.service.forecasting import ForecastService
-from scm_ml.synthetic import SyntheticConfig, generate_world
+from scm_ml.synthetic import SyntheticConfig, SyntheticWorld, generate_world
 
 FAST = ModelConfig(max_rounds=40, early_stopping_rounds=10)
 
 
 @pytest.fixture(scope="module")
-def panel() -> ForecastPanel:
+def world() -> SyntheticWorld:
     cfg = SyntheticConfig(seed=31, n_skus=8, n_suppliers=7, n_weeks=70, target_sales_orders=4_000)
-    return panel_from_world(generate_world(cfg))
+    return generate_world(cfg)
+
+
+@pytest.fixture(scope="module")
+def panel(world: SyntheticWorld) -> ForecastPanel:
+    return panel_from_world(world)
 
 
 @pytest.fixture(scope="module")
@@ -32,8 +38,9 @@ def model(panel: ForecastPanel) -> ForecastModel:
 
 
 @pytest.fixture(scope="module")
-def client(panel: ForecastPanel, model: ForecastModel) -> TestClient:
-    with TestClient(create_app(ForecastService(model, panel))) as test_client:
+def client(world: SyntheticWorld, panel: ForecastPanel, model: ForecastModel) -> TestClient:
+    service = ForecastService(model, panel)
+    with TestClient(create_app(service, build_engine(world, service))) as test_client:
         return test_client
 
 

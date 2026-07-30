@@ -10,9 +10,29 @@ import json
 from datetime import date
 from pathlib import Path
 
+from pydantic import BaseModel
+
 from .contracts import ErrorResponse, ForecastPoint, ForecastRequest, ForecastResponse
+from .engine_contracts import (
+    AgentTaskRequest,
+    ApprovalDecisionRequest,
+    DocumentQuestionRequest,
+    EngineResponse,
+    OptimizeRequest,
+    ScenarioRunRequest,
+    SupplierSearchRequest,
+)
 
 CONTRACT_DIR = Path("docs/contracts")
+
+ENGINE_REQUESTS: dict[str, type[BaseModel]] = {
+    "supplier-search": SupplierSearchRequest,
+    "plan-optimize": OptimizeRequest,
+    "scenario-run": ScenarioRunRequest,
+    "document-question": DocumentQuestionRequest,
+    "agent-task": AgentTaskRequest,
+    "approval-decision": ApprovalDecisionRequest,
+}
 
 
 def example_response() -> ForecastResponse:
@@ -48,6 +68,11 @@ def contract_files() -> dict[str, str]:
         "forecast-response-v1.example.json": dump(
             example_response().model_dump(mode="json", by_alias=True)
         ),
+        "engine-response-v1.schema.json": dump(EngineResponse.model_json_schema(by_alias=True)),
+        **{
+            f"{name}-request-v1.schema.json": dump(model.model_json_schema(by_alias=True))
+            for name, model in ENGINE_REQUESTS.items()
+        },
     }
 
 
