@@ -8,8 +8,9 @@ Filtering and ranking follow the document lifecycle rules:
 * Validity is a soft signal. Expired, superseded and not-yet-effective documents stay retrievable
   (an expired contract must still be citable, with a qualification) but are labelled and ranked
   below current ones.
-* A supplier named in the question boosts that supplier's chunks and demotes other suppliers' and
-  company-wide chunks (the question is about that supplier's own terms).
+* A supplier named in the question boosts that supplier's chunks, demotes company-wide chunks and
+  excludes every other supplier's chunks: another supplier's clause is never evidence about the
+  named one.
 """
 
 from __future__ import annotations
@@ -90,7 +91,6 @@ _IRREGULAR = {"paid": "pay", "pays": "pay", "paying": "pay"}
 VECTOR_WEIGHT = 0.5
 LEXICAL_WEIGHT = 0.5
 SUPPLIER_MATCH_BONUS = 0.35
-SUPPLIER_MISMATCH_PENALTY = 0.25
 GENERIC_DOCUMENT_PENALTY = 0.15
 TOP_K = 5
 RESTRICTED_PROBE_K = 5
@@ -259,6 +259,14 @@ class Retriever:
         coverage = np.array([term_coverage(topic_terms, t) for t in self._chunk_terms])
 
         allowed = np.array([role in c.metadata["allowed_roles"] for c in self._chunks])
+        in_scope = np.array(
+            [
+                not suppliers
+                or c.metadata["supplier_id"] is None
+                or c.metadata["supplier_id"] in suppliers
+                for c in self._chunks
+            ]
+        )
         base = VECTOR_WEIGHT * _minmax(vector) + LEXICAL_WEIGHT * _minmax(lexical)
         final = base.copy()
         statuses: list[ValidityStatus] = []
@@ -276,11 +284,9 @@ class Retriever:
                     final[i] -= GENERIC_DOCUMENT_PENALTY
                 elif owner in suppliers:
                     final[i] += SUPPLIER_MATCH_BONUS
-                else:
-                    final[i] -= SUPPLIER_MISMATCH_PENALTY
 
         order = np.argsort(-final, kind="stable")
-        permitted = [int(i) for i in order if allowed[i]]
+        permitted = [int(i) for i in order if allowed[i] and in_scope[i]]
         hits = tuple(
             RetrievedChunk(
                 chunk=self._chunks[i],
@@ -293,6 +299,8 @@ class Retriever:
             for i in permitted[:k]
         )
         restricted = sum(
-            1 for i in order[:RESTRICTED_PROBE_K] if not allowed[i] and coverage[i] >= MIN_COVERAGE
+            1
+            for i in order[:RESTRICTED_PROBE_K]
+            if not allowed[i] and in_scope[i] and coverage[i] >= MIN_COVERAGE
         )
         return RetrievalResult(query, role, as_of, hits, restricted)

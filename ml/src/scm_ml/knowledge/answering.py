@@ -215,6 +215,10 @@ class GroundedAnswerer:
         self._title_terms = self._distinctive_title_terms()
 
     @property
+    def retriever(self) -> Retriever:
+        return self._retriever
+
+    @property
     def generator_name(self) -> str:
         return self._generator.name
 

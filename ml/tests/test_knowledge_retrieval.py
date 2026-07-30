@@ -131,3 +131,16 @@ def test_bm25_prefers_rare_matching_terms() -> None:
     scores = index.scores("thirty days payment")
     assert scores.argmax() == 1
     assert index.scores("unseen").sum() == 0
+
+
+def test_other_suppliers_documents_are_never_evidence_for_a_named_supplier(
+    retriever: Retriever, corpus: Corpus
+) -> None:
+    result = retriever.retrieve(
+        "What is the maximum value of a single purchase order with Supplier B (SUP-002)?",
+        role=PLANNER,
+        as_of=corpus.as_of,
+        k=20,
+    )
+    assert result.hits
+    assert {h.chunk.metadata["supplier_id"] for h in result.hits} <= {"SUP-002", None}

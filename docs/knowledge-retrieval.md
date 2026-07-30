@@ -23,7 +23,7 @@ and a `restricted_hits` count.
 | Superseded (a newer version is in force) | -0.30, labelled `SUPERSEDED` |
 | Not yet effective | -0.30, labelled `NOT_YET_EFFECTIVE` |
 | Chunk of a named supplier | +0.35 |
-| Chunk of another supplier | -0.25 |
+| Chunk of another supplier | excluded (never evidence about the named supplier) |
 | Company-wide chunk when a supplier is named | -0.15 |
 
 Validity is evaluated against the `as_of` date, not today's date, so the same store answers historical questions.
