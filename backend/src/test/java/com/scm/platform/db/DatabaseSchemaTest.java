@@ -21,13 +21,13 @@ class DatabaseSchemaTest {
 			"region", "sku", "supplier", "warehouse", "fulfillment_lane", "supplier_contract",
 			"supplier_offer", "supplier_offer_shipping", "sales_order", "demand_observation",
 			"inventory_position", "scenario", "recommendation", "recommendation_line",
-			"purchase_order", "decision", "knowledge_document", "knowledge_chunk");
+			"purchase_order", "decision", "knowledge_document", "knowledge_chunk", "job");
 
 	private static final List<String> EXPECTED_INDEXES = List.of(
 			"supplier_offer_sku_validity", "sales_order_series", "demand_observation_period",
 			"inventory_position_warehouse", "purchase_order_sku_created", "purchase_order_status",
 			"recommendation_status_created", "decision_recommendation",
-			"knowledge_chunk_embedding_hnsw", "knowledge_chunk_tsv_gin", "knowledge_document_validity");
+			"knowledge_chunk_embedding_hnsw", "knowledge_chunk_tsv_gin", "knowledge_document_validity", "job_claimable");
 
 	@Autowired
 	private JdbcClient jdbc;
@@ -45,7 +45,7 @@ class DatabaseSchemaTest {
 		List<String> versions = jdbc
 				.sql("SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank")
 				.query(String.class).list();
-		assertThat(versions).containsExactly("1", "2");
+		assertThat(versions).containsExactly("1", "2", "3");
 	}
 
 	@Test

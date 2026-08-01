@@ -22,3 +22,9 @@ scm:
   service-name: scm-backend
   version: "@project.version@"
   ml-service-url: ${ML_SERVICE_URL:http://localhost:8001}
+  jobs:
+    worker-enabled: ${SCM_JOBS_WORKER_ENABLED:true}
+    poll-interval: 1s
+    lease: 5m
+    max-attempts: 3
+    retry-backoff: 2s

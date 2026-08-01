@@ -22,6 +22,11 @@ public class MlServiceConfig {
 	}
 
 	@Bean
+	MlEngineClient mlEngineClient(RestClient mlServiceRestClient) {
+		return new PythonEngineClient(mlServiceRestClient);
+	}
+
+	@Bean
 	ForecastClient forecastClient(RestClient mlServiceRestClient) {
 		return new PythonForecastClient(mlServiceRestClient);
 	}
