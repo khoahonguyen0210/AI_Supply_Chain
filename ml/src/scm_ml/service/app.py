@@ -24,6 +24,7 @@ from .engine_contracts import (
     EngineResponse,
     OptimizeRequest,
     ScenarioRunRequest,
+    SupplierPerformanceRequest,
     SupplierSearchRequest,
 )
 from .forecasting import ForecastService
@@ -114,6 +115,10 @@ def create_app(
     @app.post("/v1/suppliers/search")
     def search_suppliers(request: Request, body: SupplierSearchRequest) -> EngineResponse:
         return EngineResponse(data=engine_of(request).search_suppliers(body))
+
+    @app.post("/v1/suppliers/performance")
+    def supplier_performance(request: Request, body: SupplierPerformanceRequest) -> EngineResponse:
+        return EngineResponse(data=engine_of(request).supplier_performance(body))
 
     @app.post("/v1/plans/optimize")
     def optimize(request: Request, body: OptimizeRequest) -> EngineResponse:

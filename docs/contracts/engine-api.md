@@ -12,6 +12,7 @@ body `{ "code", "message" }` (`error-response-v1.schema.json`).
 | --- | --- | --- |
 | `POST /v1/forecast` | `forecast-request-v1` | (unwrapped) `forecast-response-v1` |
 | `POST /v1/suppliers/search` | `supplier-search-request-v1` | ranked eligible suppliers, rejections with reasons, cheapest-overall, trade-offs |
+| `POST /v1/suppliers/performance` | `supplier-performance-request-v1` | reliability, quality, certifications, delivery history, contracts in force |
 | `POST /v1/plans/optimize` | `plan-optimize-request-v1` | plan id, objective, spend, fill rate, violations, purchase lines, binding constraints |
 | `POST /v1/scenarios/run` | `scenario-run-request-v1` | `{ plan, scenario }`: the plan is solved afresh, then stressed; baseline / disrupted / re-optimized deltas |
 | `POST /v1/documents/ask` | `document-question-request-v1` | cited answer filtered to the actor's role, or why none is given |

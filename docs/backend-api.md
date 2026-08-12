@@ -1,0 +1,46 @@
+# Backend API
+
+Spring Boot service on port 8080. It owns authentication context, persistence, async jobs and the
+approval record. Every planning computation (forecast, supplier ranking, optimization, scenarios,
+policy answers, agent runs, approval rules) is relayed to the Python engine
+(`docs/contracts/engine-api.md`); the Java side never recomputes them.
+
+Until token authentication lands (Phase 11) a caller is identified by `X-User-Id` and `X-User-Role`
+headers (`planner`, `procurement_manager`, `finance`, `admin`). A request without them is `401`.
+Errors always use `{ timestamp, status, code, message, path, violations }`; an engine failure keeps
+the engine's status and code.
+
+| Area | Endpoints |
+| --- | --- |
+| Forecasts | `POST /api/forecasts` (synchronous), or a `FORECAST` job |
+| Data | `GET /api/skus`, `GET /api/demand?skuId&regionId&weeks`, `GET /api/inventory?skuId` |
+| Suppliers | `GET /api/suppliers?regionId&certification&minReliability`, `GET /api/suppliers/{id}` (contracts, offers), `GET /api/suppliers/{id}/performance`, `POST /api/suppliers/search` (ranking; planning roles) |
+| Recommendations | `GET /api/recommendations?status`, `GET /api/recommendations/{id}` (lines, approval, decisions) |
+| Scenarios | `POST /api/scenarios`, `GET /api/scenarios`, `GET /api/scenarios/{id}`, `POST /api/scenarios/{id}/runs` (queues a `SCENARIO` job) |
+| Documents | `GET /api/documents?docType&supplierId&asOf&includeSuperseded`, `GET /api/documents/{id}?version&asOf`, `POST /api/documents/ask` |
+| Copilot | `POST /api/agent/tasks`, `GET /api/agent/tasks/{id}`, `GET /api/agent/conversations`, `GET /api/agent/conversations/{id}` |
+| Approvals | `GET /api/approvals?status`, `GET /api/approvals/{id}`, `POST /api/approvals/{id}/decision` |
+| Jobs | `POST /api/jobs`, `GET /api/jobs/{id}`, `GET /api/jobs` (see `docs/async-jobs.md`) |
+
+## Rules worth knowing
+
+* **Permissions.** Documents are filtered by the caller's role in SQL; a document the role may not
+  read is `404`, not `403`. Jobs, agent tasks and conversations are private to their owner.
+  Scenario creation/runs and supplier search need a planning role.
+* **Recommendations come from the copilot.** When an agent task ends `AWAITING_APPROVAL`, the
+  backend stores the recommendation, its lines and the approval request, so it appears in the queue.
+* **Approvals.** The engine decides who may approve and when an approval is complete (manager and
+  finance thresholds, no self-approval above the manager threshold). The backend relays the decision;
+  on success it stores the approval state and appends an immutable `decision` row (a database trigger
+  forbids update and delete). Only when the approval is complete are purchase orders created, one per
+  line, in status `APPROVED`; placing them with suppliers is outside the system. An engine refusal is
+  returned unchanged and nothing is stored.
+* **Long work is a job.** Optimization and scenarios are asynchronous; the copilot and forecast calls
+  are synchronous. The engine read timeout is `scm.ml-read-timeout` (120s).
+
+## Data for local runs
+
+`uv run python -m scm_ml.synthetic.sql_export` writes `data/seed/synthetic-seed.sql` (master data,
+inventory, delivery history, weekly demand, policy documents); load it with `psql` after the
+migrations. It is idempotent. The engine must run with `SCM_ML_STATE_PATH` set so approvals and ids
+survive an engine restart.

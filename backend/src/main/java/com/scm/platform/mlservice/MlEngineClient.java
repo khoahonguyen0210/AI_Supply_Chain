@@ -13,6 +13,8 @@ public interface MlEngineClient {
 
 	JsonNode searchSuppliers(Actor actor, JsonNode request);
 
+	JsonNode supplierPerformance(Actor actor, String supplierId);
+
 	JsonNode optimize(Actor actor, JsonNode request);
 
 	JsonNode runScenario(Actor actor, JsonNode request);

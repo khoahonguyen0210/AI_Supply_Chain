@@ -26,6 +26,13 @@ public class PythonEngineClient implements MlEngineClient {
 	}
 
 	@Override
+	public JsonNode supplierPerformance(Actor actor, String supplierId) {
+		Map<String, Object> body = base(actor);
+		body.put("supplierId", supplierId);
+		return post("/v1/suppliers/performance", body);
+	}
+
+	@Override
 	public JsonNode optimize(Actor actor, JsonNode request) {
 		return post("/v1/plans/optimize", envelope(actor, request));
 	}

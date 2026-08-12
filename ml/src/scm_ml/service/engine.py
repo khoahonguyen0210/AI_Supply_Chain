@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import re
 import threading
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -42,6 +43,7 @@ from .engine_contracts import (
     OptimizeRequest,
     PlanSpec,
     ScenarioRunRequest,
+    SupplierPerformanceRequest,
     SupplierSearchRequest,
 )
 from .forecasting import ForecastService
@@ -137,6 +139,14 @@ class EngineService:
         with self._lock:
             return _wire(self._invoke("search_suppliers", request.actor, arguments))
 
+    def supplier_performance(self, request: SupplierPerformanceRequest) -> dict[str, Any]:
+        with self._lock:
+            return _wire(
+                self._invoke(
+                    "get_supplier_performance", request.actor, {"supplier_id": request.supplier_id}
+                )
+            )
+
     def optimize(self, request: OptimizeRequest) -> dict[str, Any]:
         arguments = request.model_dump(
             exclude={"schema_version", "actor"}, mode="json", by_alias=False
@@ -226,7 +236,11 @@ def build_engine(
     embedder: Embedder = FastEmbedEmbedder() if embedder_name == "fastembed" else HashingEmbedder()
     llm = ClaudeJsonLlm() if planner_name == "claude" else None
     planning = build_planning_context(
-        world, forecasts, embedder=embedder, generator=ClaudeGenerator(llm) if llm else None
+        world,
+        forecasts,
+        embedder=embedder,
+        generator=ClaudeGenerator(llm) if llm else None,
+        plan_namespace=f"{datetime.now(UTC):%y%m%d%H%M%S}-",
     )
     planner: Planner = ClaudePlanner(llm, default_registry()) if llm else RulePlanner(planning)
     store = SqliteStateStore(state_path)

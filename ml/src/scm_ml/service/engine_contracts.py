@@ -39,6 +39,10 @@ class SupplierSearchRequest(EngineRequest):
     horizon_weeks: int = Field(default=4, ge=1, le=MAX_HORIZON_WEEKS)
 
 
+class SupplierPerformanceRequest(EngineRequest):
+    supplier_id: str = Field(min_length=1)
+
+
 class PlanSpec(WireModel):
     sku_ids: tuple[str, ...] = Field(min_length=1, max_length=5)
     horizon_weeks: int = Field(default=4, ge=1, le=MAX_HORIZON_WEEKS)

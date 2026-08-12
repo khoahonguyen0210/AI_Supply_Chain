@@ -22,6 +22,7 @@ scm:
   service-name: scm-backend
   version: "@project.version@"
   ml-service-url: ${ML_SERVICE_URL:http://localhost:8001}
+  ml-read-timeout: 120s
   jobs:
     worker-enabled: ${SCM_JOBS_WORKER_ENABLED:true}
     poll-interval: 1s

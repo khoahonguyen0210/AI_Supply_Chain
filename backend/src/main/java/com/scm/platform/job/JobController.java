@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import tools.jackson.databind.JsonNode;
 
-/** Submit long-running work and poll it: 202 with a job to poll, then GET until it is SUCCEEDED or FAILED. */
 @RestController
 @RequestMapping("/api/jobs")
 public class JobController {
@@ -36,7 +35,7 @@ public class JobController {
 			String errorCode, String errorMessage, String lastError, Instant createdAt, Instant startedAt,
 			Instant finishedAt) {
 
-		static JobView of(Job job) {
+		public static JobView of(Job job) {
 			return new JobView(job.id(), job.type(), job.status(), job.attempts(), job.maxAttempts(), job.result(),
 					job.errorCode(), job.errorMessage(), job.lastError(), job.createdAt(), job.startedAt(),
 					job.finishedAt());

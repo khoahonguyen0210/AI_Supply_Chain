@@ -203,3 +203,14 @@ def test_primary_workflow_opens_an_approval_that_humans_decide(client: TestClien
     )
     assert again.status_code == 409 and again.json()["code"] == "ALREADY_DECIDED"
     assert client.get("/v1/approvals/APR-9999").status_code == 404
+
+
+def test_supplier_performance_reports_history_and_contracts(client: TestClient) -> None:
+    supplier = sorted(client.app.state.engine._planning.catalog.suppliers)[0]  # type: ignore[attr-defined]
+    response = post(client, "/v1/suppliers/performance", supplierId=supplier)
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["supplierId"] == supplier and "contracts" in data and "onTimeRate" in data
+    assert_camel_case(data)
+    unknown = post(client, "/v1/suppliers/performance", supplierId="SUP-NOPE")
+    assert unknown.status_code == 404 and unknown.json()["code"] == "UNKNOWN_SUPPLIER"

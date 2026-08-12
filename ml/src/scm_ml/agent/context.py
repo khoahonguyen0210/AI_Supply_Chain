@@ -43,9 +43,15 @@ class PlanRecord:
 
 class PlanningContext:
     def __init__(
-        self, world: SyntheticWorld, service: ForecastService, answerer: GroundedAnswerer
+        self,
+        world: SyntheticWorld,
+        service: ForecastService,
+        answerer: GroundedAnswerer,
+        plan_namespace: str = "",
     ) -> None:
+        """`plan_namespace` keeps plan (and recommendation) ids unique across process restarts."""
         self.world, self.service, self.answerer = world, service, answerer
+        self._plan_namespace = plan_namespace
         self.as_of = world.as_of
         self.catalog = SourcingCatalog.from_world(world)
         self._plans: dict[str, PlanRecord] = {}
@@ -122,7 +128,7 @@ class PlanningContext:
         inputs: PlanningInputs,
         result: DecisionResult,
     ) -> PlanRecord:
-        plan_id = f"PLAN-{len(self._plans) + 1:03d}"
+        plan_id = f"PLAN-{self._plan_namespace}{len(self._plans) + 1:03d}"
         record = PlanRecord(
             plan_id=plan_id,
             owner=owner,
@@ -160,10 +166,11 @@ def build_planning_context(
     *,
     embedder: Embedder | None = None,
     generator: AnswerGenerator | None = None,
+    plan_namespace: str = "",
 ) -> PlanningContext:
     """Wire the knowledge base (generated from the world) and the forecast model together."""
     embedder = embedder or HashingEmbedder()
     store = KnowledgeStore(EMBEDDING_DIM)
     ingest(build_corpus(world).documents, embedder, store)
     answerer = GroundedAnswerer(Retriever(store, embedder), generator or ExtractiveGenerator())
-    return PlanningContext(world, service, answerer)
+    return PlanningContext(world, service, answerer, plan_namespace)

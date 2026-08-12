@@ -17,7 +17,8 @@ public class MlServiceConfig {
 	RestClient mlServiceRestClient(ScmProperties properties) {
 		HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
 		JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(httpClient);
-		factory.setReadTimeout(Duration.ofSeconds(30));
+		// optimization, scenarios and agent runs are CPU-bound in the engine, so reads are allowed to be slow
+		factory.setReadTimeout(properties.mlReadTimeout());
 		return RestClient.builder().baseUrl(properties.mlServiceUrl()).requestFactory(factory).build();
 	}
 

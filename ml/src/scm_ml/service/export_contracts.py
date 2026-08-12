@@ -20,6 +20,7 @@ from .engine_contracts import (
     EngineResponse,
     OptimizeRequest,
     ScenarioRunRequest,
+    SupplierPerformanceRequest,
     SupplierSearchRequest,
 )
 
@@ -27,6 +28,7 @@ CONTRACT_DIR = Path("docs/contracts")
 
 ENGINE_REQUESTS: dict[str, type[BaseModel]] = {
     "supplier-search": SupplierSearchRequest,
+    "supplier-performance": SupplierPerformanceRequest,
     "plan-optimize": OptimizeRequest,
     "scenario-run": ScenarioRunRequest,
     "document-question": DocumentQuestionRequest,
