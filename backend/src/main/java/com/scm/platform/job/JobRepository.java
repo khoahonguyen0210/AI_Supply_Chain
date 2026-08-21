@@ -67,6 +67,27 @@ public class JobRepository {
 				.query(mapper).optional();
 	}
 
+	/** Number of jobs in each status. */
+	public java.util.Map<JobStatus, Long> countsByStatus() {
+		java.util.Map<JobStatus, Long> counts = new java.util.EnumMap<>(JobStatus.class);
+		for (JobStatus status : JobStatus.values()) {
+			counts.put(status, 0L);
+		}
+		jdbc.sql("SELECT status, count(*) FROM job GROUP BY status").query((rs, i) -> {
+			counts.put(JobStatus.valueOf(rs.getString(1)), rs.getLong(2));
+			return null;
+		}).list();
+		return counts;
+	}
+
+	/** Seconds the longest-waiting runnable job has waited, or 0 when nothing is waiting. */
+	public double oldestQueuedAgeSeconds() {
+		return jdbc.sql("""
+				SELECT COALESCE(EXTRACT(EPOCH FROM now() - min(run_after)), 0)
+				FROM job WHERE status = 'QUEUED' AND run_after <= now()""")
+				.query(Double.class).single();
+	}
+
 	public List<Job> recentBy(String submittedBy, int limit) {
 		return jdbc.sql("SELECT " + COLUMNS + " FROM job WHERE submitted_by = :by ORDER BY created_at DESC LIMIT :limit")
 				.param("by", submittedBy).param("limit", limit).query(mapper).list();

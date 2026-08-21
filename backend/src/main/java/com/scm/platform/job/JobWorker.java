@@ -2,6 +2,7 @@ package com.scm.platform.job;
 
 import com.scm.platform.config.ScmProperties;
 import com.scm.platform.mlservice.MlServiceException;
+import com.scm.platform.observability.JobMetrics;
 import java.time.Duration;
 import java.util.EnumMap;
 import java.util.List;
@@ -32,10 +33,14 @@ public class JobWorker {
 
 	private final Duration retryBackoff;
 
+	private final JobMetrics metrics;
+
 	private final String workerId = "worker-" + UUID.randomUUID();
 
-	public JobWorker(JobRepository repository, List<JobHandler> handlers, ScmProperties properties) {
+	public JobWorker(JobRepository repository, List<JobHandler> handlers, ScmProperties properties,
+			JobMetrics metrics) {
 		this.repository = repository;
+		this.metrics = metrics;
 		handlers.forEach(handler -> this.handlers.put(handler.type(), handler));
 		this.lease = properties.jobs().lease();
 		this.retryBackoff = properties.jobs().retryBackoff();
@@ -48,9 +53,12 @@ public class JobWorker {
 			return false;
 		}
 		Job job = claimed.get();
+		long started = System.nanoTime();
+		String outcome = "succeeded";
 		try {
 			JobHandler handler = handlers.get(job.type());
 			if (handler == null) {
+				outcome = "failed";
 				fail(job, "NO_HANDLER", "no handler is registered for " + job.type());
 				return true;
 			}
@@ -61,15 +69,21 @@ public class JobWorker {
 		}
 		catch (MlServiceException ex) {
 			if (ex.status() >= 500 && job.attempts() < job.maxAttempts()) {
+				outcome = "retried";
 				retry(job, ex.code() + ": " + ex.getMessage());
 			}
 			else {
+				outcome = "failed";
 				fail(job, ex.code(), ex.getMessage());
 			}
 		}
 		catch (RuntimeException ex) {
 			log.error("job {} failed unexpectedly", job.id(), ex);
+			outcome = "failed";
 			fail(job, "INTERNAL_ERROR", "unexpected error while running the job");
+		}
+		finally {
+			metrics.attemptFinished(job.type(), outcome, Duration.ofNanos(System.nanoTime() - started));
 		}
 		return true;
 	}

@@ -27,6 +27,9 @@ public interface MlEngineClient {
 
 	JsonNode listApprovals(String status);
 
+	/** Runtime telemetry and offline-evaluation headlines (not wrapped in the v1 envelope). */
+	JsonNode telemetry();
+
 	JsonNode getApproval(String approvalId);
 
 	JsonNode decideApproval(Actor approver, String approvalId, String outcome, String rationale);

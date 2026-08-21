@@ -69,6 +69,16 @@ public class PythonEngineClient implements MlEngineClient {
 	}
 
 	@Override
+	public JsonNode telemetry() {
+		JsonNode body = MlErrors.call(CONTRACT,
+				() -> restClient.get().uri("/v1/telemetry").retrieve().body(JsonNode.class));
+		if (body == null || !body.has("runtime") || !body.has("quality")) {
+			throw MlErrors.contractMismatch(CONTRACT);
+		}
+		return body;
+	}
+
+	@Override
 	public JsonNode getApproval(String approvalId) {
 		return unwrap(MlErrors.call(CONTRACT,
 				() -> restClient.get().uri("/v1/approvals/{id}", approvalId).retrieve().body(JsonNode.class)));

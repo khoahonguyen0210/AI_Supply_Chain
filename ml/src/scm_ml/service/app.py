@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -28,6 +29,7 @@ from .engine_contracts import (
     SupplierSearchRequest,
 )
 from .forecasting import ForecastService
+from .quality import DEFAULT_ROOT, quality_summary
 
 STATUS_BY_CODE = {
     "UNKNOWN_SERIES": 404,
@@ -103,8 +105,23 @@ def create_app(
 
     @app.post("/v1/forecast", response_model_by_alias=True)
     async def forecast(request: Request, body: ForecastRequest) -> ForecastResponse:
-        response: ForecastResponse = request.app.state.forecasts.forecast(body)
+        telemetry = request.app.state.engine.telemetry
+        started = time.perf_counter()
+        try:
+            response: ForecastResponse = request.app.state.forecasts.forecast(body)
+        except Exception:
+            telemetry.forecast(time.perf_counter() - started, ok=False)
+            raise
+        telemetry.forecast(time.perf_counter() - started, ok=True)
         return response
+
+    @app.get("/v1/telemetry")
+    def telemetry_snapshot(request: Request) -> dict[str, Any]:
+        """Runtime counters and latencies, plus the headline offline-evaluation results."""
+        return {
+            "runtime": request.app.state.engine.telemetry.snapshot(),
+            "quality": quality_summary(Path(os.environ.get("SCM_ML_EXPERIMENT_DIR", DEFAULT_ROOT))),
+        }
 
     def engine_of(request: Request) -> EngineService:
         service: EngineService = request.app.state.engine

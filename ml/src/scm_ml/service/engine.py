@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import re
 import threading
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -34,6 +35,7 @@ from scm_ml.knowledge import (
 )
 from scm_ml.llm import ClaudeJsonLlm
 from scm_ml.synthetic import SyntheticWorld
+from scm_ml.telemetry import Telemetry
 
 from .engine_contracts import (
     ActorRef,
@@ -100,7 +102,9 @@ class EngineService:
         approvals: ApprovalService,
         store: SqliteStateStore,
         tools: dict[str, ToolSpec] | None = None,
+        telemetry: Telemetry | None = None,
     ) -> None:
+        self.telemetry = telemetry or Telemetry()
         self._planning, self._runner = planning, runner
         self._approvals, self._store = approvals, store
         self._tools = tools if tools is not None else default_registry()
@@ -118,6 +122,18 @@ class EngineService:
     def _invoke(self, name: str, actor: ActorRef, arguments: dict[str, Any]) -> dict[str, Any]:
         spec = self._tools[name]
         who = Actor(user_id=actor.user_id, role=actor.role)
+        started = time.perf_counter()
+        try:
+            result = self._call(spec, who, name, arguments)
+        except EngineError as error:
+            self.telemetry.tool_call(name, time.perf_counter() - started, False, error.code)
+            raise
+        self.telemetry.tool_call(name, time.perf_counter() - started, True)
+        return result
+
+    def _call(
+        self, spec: ToolSpec, who: Actor, name: str, arguments: dict[str, Any]
+    ) -> dict[str, Any]:
         try:
             authorize(spec, who)
             args = validate_arguments(spec, arguments)
@@ -170,10 +186,11 @@ class EngineService:
             return _wire({"plan": plan, "scenario": scenario})
 
     def ask_documents(self, request: DocumentQuestionRequest) -> dict[str, Any]:
+        started = time.perf_counter()
         with self._lock:
-            return _wire(
-                self._invoke("search_policies", request.actor, {"question": request.question})
-            )
+            data = self._invoke("search_policies", request.actor, {"question": request.question})
+        self.telemetry.answer(str(data.get("status", "UNKNOWN")), time.perf_counter() - started)
+        return _wire(data)
 
     def run_agent(self, request: AgentTaskRequest) -> dict[str, Any]:
         with self._lock:
@@ -234,7 +251,8 @@ def build_engine(
     if panel_from_world(world).dataset_id != forecasts.history.dataset_id:
         raise ValueError("the forecast model was not trained on this world's demand history")
     embedder: Embedder = FastEmbedEmbedder() if embedder_name == "fastembed" else HashingEmbedder()
-    llm = ClaudeJsonLlm() if planner_name == "claude" else None
+    telemetry = Telemetry()
+    llm = ClaudeJsonLlm(telemetry=telemetry) if planner_name == "claude" else None
     planning = build_planning_context(
         world,
         forecasts,
@@ -247,5 +265,5 @@ def build_engine(
     approvals = ApprovalService(
         store, ApprovalPolicy.from_documents(build_corpus(world).documents, planning.as_of)
     )
-    runner = AgentRunner(planning, planner, store, approvals)
-    return EngineService(planning, runner, approvals, store)
+    runner = AgentRunner(planning, planner, store, approvals, telemetry=telemetry)
+    return EngineService(planning, runner, approvals, store, telemetry=telemetry)

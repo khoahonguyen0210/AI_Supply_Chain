@@ -8,7 +8,10 @@ are not backed by tool results, records a trace, persists task state and caps th
 from __future__ import annotations
 
 import json
+import time
 from typing import Any
+
+from scm_ml.telemetry import Telemetry
 
 from .approval import ApprovalService
 from .context import PlanningContext
@@ -51,7 +54,9 @@ class AgentRunner:
         *,
         tools: dict[str, ToolSpec] | None = None,
         max_steps: int = MAX_STEPS,
+        telemetry: Telemetry | None = None,
     ) -> None:
+        self._telemetry = telemetry
         self._planning, self._planner = planning, planner
         self._store, self._approvals = store, approvals
         self._tools = tools if tools is not None else default_registry()
@@ -62,6 +67,15 @@ class AgentRunner:
         )
 
     def run(self, text: str, actor: Actor) -> AgentRun:
+        started = time.perf_counter()
+        result = self._run(text, actor)
+        if self._telemetry is not None:
+            self._telemetry.task(
+                result.status.value, time.perf_counter() - started, result.violations
+            )
+        return result
+
+    def _run(self, text: str, actor: Actor) -> AgentRun:
         task_id = f"TASK-{self._store.next_task_number():04d}"
         created = now_utc()
         record = TaskRecord(
@@ -197,6 +211,22 @@ class AgentRunner:
             "reason": action.reason,
             "replan": action.replan,
         }
+        started = time.perf_counter()
+        step = self._execute_tool(action, actor, context, violations, base)
+        if self._telemetry is not None:
+            self._telemetry.tool_call(
+                action.tool, time.perf_counter() - started, step.ok, step.error_code
+            )
+        return step
+
+    def _execute_tool(
+        self,
+        action: CallTool,
+        actor: Actor,
+        context: ToolContext,
+        violations: list[str],
+        base: dict[str, Any],
+    ) -> TraceStep:
         spec = self._tools.get(action.tool)
         if spec is None:
             violations.append("UNKNOWN_TOOL")

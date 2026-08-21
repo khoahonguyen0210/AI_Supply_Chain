@@ -7,10 +7,13 @@ is injectable so tests run without a key or network access.
 from __future__ import annotations
 
 import json
+import time
 from typing import Any, Literal
 
 import anthropic
 from anthropic.types import OutputConfigParam
+
+from scm_ml.telemetry import Telemetry
 
 from .base import LlmError
 
@@ -24,7 +27,9 @@ class ClaudeJsonLlm:
         *,
         effort: Literal["low", "medium", "high", "xhigh", "max"] = "medium",
         client: anthropic.Anthropic | None = None,
+        telemetry: Telemetry | None = None,
     ) -> None:
+        self._telemetry = telemetry
         self.name = model
         self._model = model
         self._effort = effort
@@ -37,6 +42,7 @@ class ClaudeJsonLlm:
             "effort": self._effort,
             "format": {"type": "json_schema", "schema": schema},
         }
+        started = time.perf_counter()
         try:
             response = self._client.messages.create(
                 model=self._model,
@@ -46,7 +52,15 @@ class ClaudeJsonLlm:
                 output_config=output_config,
             )
         except anthropic.APIError as error:
+            self._record(started, ok=False)
             raise LlmError(f"Claude API call failed: {error}") from error
+        usage = getattr(response, "usage", None)
+        self._record(
+            started,
+            ok=response.stop_reason not in {"refusal", "max_tokens"},
+            input_tokens=int(getattr(usage, "input_tokens", 0) or 0),
+            output_tokens=int(getattr(usage, "output_tokens", 0) or 0),
+        )
         if response.stop_reason == "refusal":
             raise LlmError("Claude declined the request")
         if response.stop_reason == "max_tokens":
@@ -61,3 +75,11 @@ class ClaudeJsonLlm:
         if not isinstance(parsed, dict):
             raise LlmError("Claude returned JSON that is not an object")
         return parsed
+
+    def _record(
+        self, started: float, *, ok: bool, input_tokens: int = 0, output_tokens: int = 0
+    ) -> None:
+        if self._telemetry is not None:
+            self._telemetry.model_call(
+                self._model, time.perf_counter() - started, ok, input_tokens, output_tokens
+            )

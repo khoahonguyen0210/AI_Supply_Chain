@@ -135,6 +135,18 @@ class PythonEngineClientTest {
 	}
 
 	@Test
+	void telemetryIsReadWithoutTheEnvelopeAndMustHaveBothSections() {
+		server.expect(requestTo("http://ml.test/v1/telemetry")).andExpect(method(HttpMethod.GET))
+				.andRespond(withSuccess("{\"runtime\":{},\"quality\":{}}", MediaType.APPLICATION_JSON));
+		server.expect(requestTo("http://ml.test/v1/telemetry"))
+				.andRespond(withSuccess("{\"runtime\":{}}", MediaType.APPLICATION_JSON));
+
+		assertThat(client.telemetry().has("quality")).isTrue();
+		assertThatThrownBy(() -> client.telemetry()).isInstanceOfSatisfying(MlServiceException.class,
+				ex -> assertThat(ex.code()).isEqualTo("ML_CONTRACT_MISMATCH"));
+	}
+
+	@Test
 	void requestsMustBeJsonObjects() {
 		assertThatThrownBy(() -> client.optimize(ACTOR, json.readTree("[1]")))
 				.isInstanceOf(IllegalArgumentException.class);

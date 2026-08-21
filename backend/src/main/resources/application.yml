@@ -13,10 +13,13 @@ server:
   port: ${BACKEND_PORT:8080}
 
 management:
+  # Operational endpoints live on their own port so they are never exposed with the public API.
+  server:
+    port: ${MANAGEMENT_PORT:8081}
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics,prometheus
 
 scm:
   service-name: scm-backend
