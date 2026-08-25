@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.scm.platform.mlservice.MlEngineClient;
 import com.scm.platform.support.PostgresContainerConfig;
+import com.scm.platform.support.TestAuth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,7 @@ class JobControllerTest {
 	}
 
 	private static MockHttpServletRequestBuilder as(MockHttpServletRequestBuilder request, String user, String role) {
-		return request.header("X-User-Id", user).header("X-User-Role", role);
+		return TestAuth.as(request, user, role);
 	}
 
 	private String submit(String key) throws Exception {

@@ -40,7 +40,9 @@ def model(panel: ForecastPanel) -> ForecastModel:
 @pytest.fixture(scope="module")
 def client(world: SyntheticWorld, panel: ForecastPanel, model: ForecastModel) -> TestClient:
     service = ForecastService(model, panel)
-    with TestClient(create_app(service, build_engine(world, service))) as test_client:
+    with TestClient(
+        create_app(service, build_engine(world, service), require_token=False)
+    ) as test_client:
         return test_client
 
 
@@ -100,9 +102,9 @@ def test_errors_are_structured(
 
 
 def test_health_and_model_info(client: TestClient, model: ForecastModel) -> None:
-    health = client.get("/health").json()
-    assert health["status"] == "UP" and health["modelVersion"] == model.version
-    assert client.get("/v1/model").json()["horizons"] == 8
+    assert client.get("/health").json() == {"status": "UP", "service": "scm-ml"}
+    info = client.get("/v1/model").json()
+    assert info["horizons"] == 8 and info["modelVersion"] == model.version
 
 
 def test_forecast_uses_only_history_before_as_of(

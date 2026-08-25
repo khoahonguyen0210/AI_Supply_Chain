@@ -13,13 +13,20 @@ import org.springframework.web.client.RestClient;
 @Configuration(proxyBeanMethods = false)
 public class MlServiceConfig {
 
+	public static final String INTERNAL_TOKEN_HEADER = "X-Internal-Token";
+
 	@Bean
 	RestClient mlServiceRestClient(ScmProperties properties) {
 		HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
 		JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(httpClient);
 		// optimization, scenarios and agent runs are CPU-bound in the engine, so reads are allowed to be slow
 		factory.setReadTimeout(properties.mlReadTimeout());
-		return RestClient.builder().baseUrl(properties.mlServiceUrl()).requestFactory(factory).build();
+		RestClient.Builder builder = RestClient.builder().baseUrl(properties.mlServiceUrl()).requestFactory(factory);
+		// The engine trusts the user named in a request, so it only answers callers holding this shared secret.
+		if (!properties.mlInternalToken().isBlank()) {
+			builder.defaultHeader(INTERNAL_TOKEN_HEADER, properties.mlInternalToken());
+		}
+		return builder.build();
 	}
 
 	@Bean

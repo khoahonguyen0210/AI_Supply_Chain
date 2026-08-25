@@ -528,3 +528,10 @@ details > summary {
   color: var(--error);
   border-color: var(--error);
 }
+
+/* ---- sign-in ------------------------------------------------------------------------------ */
+
+.login-panel {
+  max-width: 380px;
+  margin: 48px auto;
+}

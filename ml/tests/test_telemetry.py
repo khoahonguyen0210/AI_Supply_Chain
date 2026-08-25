@@ -1,5 +1,3 @@
-"""Runtime telemetry and the offline-quality summary the backend shows to admins."""
-
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -147,7 +145,9 @@ def test_a_missing_artifact_is_reported_as_unavailable_not_invented(tmp_path: Pa
 
 @pytest.fixture(scope="module")
 def client(small_world: SyntheticWorld, small_service: ForecastService) -> Any:
-    with TestClient(create_app(small_service, build_engine(small_world, small_service))) as c:
+    with TestClient(
+        create_app(small_service, build_engine(small_world, small_service), require_token=False)
+    ) as c:
         yield c
 
 

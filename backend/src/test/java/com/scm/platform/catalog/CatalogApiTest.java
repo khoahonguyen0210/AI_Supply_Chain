@@ -14,6 +14,7 @@ import com.scm.platform.mlservice.MlEngineClient;
 import com.scm.platform.mlservice.MlServiceException;
 import com.scm.platform.security.Actor;
 import com.scm.platform.support.PostgresContainerConfig;
+import com.scm.platform.support.TestAuth;
 import com.scm.platform.support.TestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ class CatalogApiTest {
 	}
 
 	private static MockHttpServletRequestBuilder as(MockHttpServletRequestBuilder request, String role) {
-		return request.header("X-User-Id", "pat").header("X-User-Role", role);
+		return TestAuth.as(request, "pat", role);
 	}
 
 	@Test

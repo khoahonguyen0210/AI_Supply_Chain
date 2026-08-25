@@ -10,6 +10,7 @@ import com.scm.platform.forecast.ForecastDtos.ForecastPoint;
 import com.scm.platform.forecast.ForecastDtos.ForecastResponse;
 import com.scm.platform.mlservice.MlServiceException;
 import com.scm.platform.support.PostgresContainerConfig;
+import com.scm.platform.support.TestAuth;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ class ForecastControllerTest {
 				"R1", LocalDate.of(2024, 12, 30), 0.8, "lightgbm-cqr",
 				List.of(new ForecastPoint(LocalDate.of(2024, 12, 30), 1, 12.5, 0.0, 31.0))));
 
-		mockMvc.perform(post("/api/forecasts").contentType(MediaType.APPLICATION_JSON).content(BODY))
+		mockMvc.perform(post("/api/forecasts").header("Authorization", TestAuth.bearer("pat", "planner")).contentType(MediaType.APPLICATION_JSON).content(BODY))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.modelVersion").value("lgbm-1"))
 				.andExpect(jsonPath("$.points[0].upper").value(31.0))
@@ -50,7 +51,7 @@ class ForecastControllerTest {
 
 	@Test
 	void rejectsInvalidRequestsBeforeCallingTheMlService() throws Exception {
-		mockMvc.perform(post("/api/forecasts").contentType(MediaType.APPLICATION_JSON)
+		mockMvc.perform(post("/api/forecasts").header("Authorization", TestAuth.bearer("pat", "planner")).contentType(MediaType.APPLICATION_JSON)
 						.content("{\"skuId\":\"\",\"regionId\":\"R1\",\"asOf\":\"2024-12-30\",\"horizonWeeks\":99}"))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
@@ -62,7 +63,7 @@ class ForecastControllerTest {
 		when(forecastClient.forecast(any()))
 				.thenThrow(new MlServiceException(404, "UNKNOWN_SERIES", "no demand history for SKU-001 in R1"));
 
-		mockMvc.perform(post("/api/forecasts").contentType(MediaType.APPLICATION_JSON).content(BODY))
+		mockMvc.perform(post("/api/forecasts").header("Authorization", TestAuth.bearer("pat", "planner")).contentType(MediaType.APPLICATION_JSON).content(BODY))
 				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.code").value("UNKNOWN_SERIES"))
 				.andExpect(jsonPath("$.path").value("/api/forecasts"));

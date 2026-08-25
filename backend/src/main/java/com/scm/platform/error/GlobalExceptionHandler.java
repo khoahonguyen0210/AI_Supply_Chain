@@ -1,11 +1,13 @@
 package com.scm.platform.error;
 
 import com.scm.platform.mlservice.MlServiceException;
+import com.scm.platform.security.RateLimitedException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +54,14 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(NoResourceFoundException.class)
 	public ResponseEntity<ApiError> handleNotFound(NoResourceFoundException ex, HttpServletRequest request) {
 		return build(HttpStatus.NOT_FOUND, "NOT_FOUND", "Resource not found", request, List.of());
+	}
+
+	@ExceptionHandler(RateLimitedException.class)
+	public ResponseEntity<ApiError> handleRateLimited(RateLimitedException ex, HttpServletRequest request) {
+		ResponseEntity<ApiError> response = build(HttpStatus.TOO_MANY_REQUESTS, "RATE_LIMITED", ex.getMessage(),
+				request, List.of());
+		return ResponseEntity.status(response.getStatusCode())
+				.header(HttpHeaders.RETRY_AFTER, Long.toString(ex.retryAfterSeconds())).body(response.getBody());
 	}
 
 	@ExceptionHandler(ApiException.class)

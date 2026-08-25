@@ -22,10 +22,16 @@ management:
         include: health,info,metrics,prometheus
 
 scm:
+  security:
+    # No default on purpose: the service will not start without SCM_JWT_SECRET (32+ bytes).
+    jwt-secret: ${SCM_JWT_SECRET:}
+    token-ttl: 8h
   service-name: scm-backend
   version: "@project.version@"
   ml-service-url: ${ML_SERVICE_URL:http://localhost:8001}
   ml-read-timeout: 120s
+  # Shared secret the planning engine requires (same value as its SCM_ML_INTERNAL_TOKEN).
+  ml-internal-token: ${SCM_ML_INTERNAL_TOKEN:}
   jobs:
     worker-enabled: ${SCM_JOBS_WORKER_ENABLED:true}
     poll-interval: 1s

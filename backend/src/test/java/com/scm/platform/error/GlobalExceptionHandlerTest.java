@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.scm.platform.support.PostgresContainerConfig;
+import com.scm.platform.support.TestAuth;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import org.junit.jupiter.api.Test;
@@ -31,19 +32,19 @@ class GlobalExceptionHandlerTest {
 
 	@Test
 	void validationFailureReturnsStructuredBadRequest() throws Exception {
-		mockMvc.perform(post("/test-support/validate")
+		mockMvc.perform(post("/api/test-support/validate").header("Authorization", TestAuth.bearer("pat", "planner"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("{\"name\":\"\"}"))
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
 				.andExpect(jsonPath("$.status").value(400))
-				.andExpect(jsonPath("$.path").value("/test-support/validate"))
+				.andExpect(jsonPath("$.path").value("/api/test-support/validate"))
 				.andExpect(jsonPath("$.violations[0].field").value("name"));
 	}
 
 	@Test
 	void unknownPathReturnsStructuredNotFound() throws Exception {
-		mockMvc.perform(get("/api/does-not-exist"))
+		mockMvc.perform(get("/api/does-not-exist").header("Authorization", TestAuth.bearer("pat", "planner")))
 				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.code").value("NOT_FOUND"))
 				.andExpect(jsonPath("$.path").value("/api/does-not-exist"));
@@ -51,14 +52,14 @@ class GlobalExceptionHandlerTest {
 
 	@Test
 	void unexpectedExceptionReturnsStructuredServerErrorWithoutLeakingDetails() throws Exception {
-		mockMvc.perform(get("/test-support/boom"))
+		mockMvc.perform(get("/api/test-support/boom").header("Authorization", TestAuth.bearer("pat", "planner")))
 				.andExpect(status().isInternalServerError())
 				.andExpect(jsonPath("$.code").value("INTERNAL_ERROR"))
 				.andExpect(jsonPath("$.message").value("Unexpected server error"));
 	}
 
 	@RestController
-	@RequestMapping("/test-support")
+	@RequestMapping("/api/test-support")
 	static class FailingController {
 
 		record Payload(@NotBlank String name) {

@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.scm.platform.mlservice.MlEngineClient;
 import com.scm.platform.mlservice.MlServiceException;
 import com.scm.platform.support.PostgresContainerConfig;
+import com.scm.platform.support.TestAuth;
 import com.scm.platform.support.TestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,7 +68,7 @@ class AgentApprovalFlowTest {
 	}
 
 	private static MockHttpServletRequestBuilder as(MockHttpServletRequestBuilder request, String user, String role) {
-		return request.header("X-User-Id", user).header("X-User-Role", role);
+		return TestAuth.as(request, user, role);
 	}
 
 	private String runTask(String user, String text, String conversationId) throws Exception {

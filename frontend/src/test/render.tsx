@@ -1,10 +1,18 @@
 import { render } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { vi } from "vitest";
+import type { Profile } from "@/lib/api/auth";
+import { setAccessToken } from "@/lib/api/client";
 import { SessionProvider } from "@/lib/session";
 
-export function renderWithSession(ui: ReactElement) {
-  return render(<SessionProvider>{ui}</SessionProvider>);
+export const TEST_TOKEN = "test-access-token";
+
+export const PLANNER: Profile = { userId: "pat", displayName: "Pat", role: "planner" };
+
+/** Renders the page as a signed-in user (a planner unless told otherwise), with a token on every request. */
+export function renderWithSession(ui: ReactElement, user: Profile = PLANNER) {
+  setAccessToken(TEST_TOKEN);
+  return render(<SessionProvider initialUser={user}>{ui}</SessionProvider>);
 }
 
 type Handler = (url: string, init: RequestInit) => unknown;

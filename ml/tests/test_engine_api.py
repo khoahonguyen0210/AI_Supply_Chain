@@ -1,5 +1,3 @@
-"""The planning-engine endpoints the Spring backend calls: contract shape, errors, approvals."""
-
 from collections.abc import Iterator
 from typing import Any
 
@@ -20,7 +18,7 @@ PLAN = {"skuIds": ["SKU-001"], "horizonWeeks": 4, "demandMultiplier": 1.2}
 
 @pytest.fixture(scope="module")
 def client(small_world: SyntheticWorld, small_service: ForecastService) -> Iterator[TestClient]:
-    app = create_app(small_service, build_engine(small_world, small_service))
+    app = create_app(small_service, build_engine(small_world, small_service), require_token=False)
     with TestClient(app) as test_client:
         yield test_client
 
@@ -46,8 +44,8 @@ def test_camelize_converts_nested_keys_only() -> None:
     }
 
 
-def test_health_reports_the_engine(client: TestClient) -> None:
-    engine = client.get("/health").json()["engine"]
+def test_model_info_reports_the_engine(client: TestClient) -> None:
+    engine = client.get("/v1/model").json()["engine"]
     assert engine["skus"] > 0 and "optimize_procurement" in engine["tools"]
 
 

@@ -152,14 +152,14 @@ describe("Dashboard", () => {
     expect(screen.getByText("Above safety stock")).toBeInTheDocument();
   });
 
-  it("sends the signed-in user's identity with every request", async () => {
+  it("sends the signed-in user's token with every request", async () => {
     const { calls } = backend();
     renderWithSession(<Dashboard />);
     await screen.findByText(/Model lgbm-test/);
     for (const call of calls) {
       const headers = call.init.headers as Record<string, string>;
-      expect(headers["X-User-Id"]).toBe("pat");
-      expect(headers["X-User-Role"]).toBe("planner");
+      expect(headers.Authorization).toBe("Bearer test-access-token");
+      expect(headers["X-User-Id"]).toBeUndefined();
     }
   });
 

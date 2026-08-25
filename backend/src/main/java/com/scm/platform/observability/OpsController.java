@@ -1,15 +1,18 @@
 package com.scm.platform.observability;
 
+import com.scm.platform.audit.AuditService;
 import com.scm.platform.job.JobStatus;
 import com.scm.platform.job.JobType;
 import com.scm.platform.mlservice.MlEngineClient;
 import com.scm.platform.security.Actor;
 import com.scm.platform.security.Roles;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import tools.jackson.databind.JsonNode;
 
@@ -26,10 +29,13 @@ public class OpsController {
 
 	private final MlEngineClient engine;
 
-	public OpsController(RequestMetricsFilter requests, JobMetrics jobs, MlEngineClient engine) {
+	private final AuditService audit;
+
+	public OpsController(RequestMetricsFilter requests, JobMetrics jobs, MlEngineClient engine, AuditService audit) {
 		this.requests = requests;
 		this.jobs = jobs;
 		this.engine = engine;
+		this.audit = audit;
 	}
 
 	/**
@@ -64,6 +70,15 @@ public class OpsController {
 		QueueStats queue = new QueueStats(jobs.counts(), jobs.oldestQueuedSeconds(), jobs.utilization(), means,
 				failed);
 		return new Summary(api, queue);
+	}
+
+	/** The audit trail, newest first, optionally for one user or one outcome (SUCCESS, DENIED, FAILED, LIMITED). */
+	@GetMapping("/audit")
+	public List<AuditService.Entry> audit(Actor actor, @RequestParam(required = false) String user,
+			@RequestParam(required = false) AuditService.Outcome outcome,
+			@RequestParam(defaultValue = "100") int limit) {
+		Roles.require(actor, ADMINS);
+		return audit.recent(user, outcome, limit);
 	}
 
 	/**

@@ -14,6 +14,7 @@ import com.scm.platform.mlservice.MlEngineClient;
 import com.scm.platform.mlservice.MlServiceException;
 import com.scm.platform.security.Actor;
 import com.scm.platform.support.PostgresContainerConfig;
+import com.scm.platform.support.TestAuth;
 import com.scm.platform.support.TestData;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,7 +69,7 @@ class ObservabilityTest {
 	}
 
 	private static MockHttpServletRequestBuilder as(MockHttpServletRequestBuilder request, String role) {
-		return request.header("X-User-Id", "u").header("X-User-Role", role);
+		return TestAuth.as(request, "u", role);
 	}
 
 	private void submitOptimization(String key) {

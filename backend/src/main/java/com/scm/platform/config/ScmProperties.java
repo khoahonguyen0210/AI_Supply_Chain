@@ -7,7 +7,8 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 /** Application settings bound from the {@code scm.*} configuration namespace. */
 @ConfigurationProperties(prefix = "scm")
 public record ScmProperties(String serviceName, String version, String mlServiceUrl,
-		@DefaultValue("120s") Duration mlReadTimeout, @DefaultValue Jobs jobs) {
+		@DefaultValue("120s") Duration mlReadTimeout, @DefaultValue("") String mlInternalToken,
+		@DefaultValue Jobs jobs) {
 
 	/**
 	 * Async job processing.

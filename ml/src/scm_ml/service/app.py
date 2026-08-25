@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hmac
 import os
 import time
 from collections.abc import AsyncIterator
@@ -43,10 +44,46 @@ def _error(status: int, code: str, message: str) -> JSONResponse:
     return JSONResponse(status_code=status, content=body)
 
 
+INTERNAL_TOKEN_HEADER = "X-Internal-Token"
+INSECURE_FLAG = "SCM_ML_INSECURE_NO_AUTH"
+
+
+class MissingInternalTokenError(RuntimeError):
+    pass
+
+
+def resolve_internal_token(configured: str | None) -> str | None:
+    """The shared secret the backend must present; None only when auth is switched off explicitly.
+
+    The planning engine trusts the actor named in a request, so it must only ever be reachable by
+    the backend. Starting without a secret is therefore an error unless SCM_ML_INSECURE_NO_AUTH=1
+    says the caller means it (local experiments).
+    """
+
+    token = configured if configured is not None else os.environ.get("SCM_ML_INTERNAL_TOKEN")
+    if token:
+        if len(token) < 16:
+            raise MissingInternalTokenError("SCM_ML_INTERNAL_TOKEN must be at least 16 characters")
+        return token
+    if os.environ.get(INSECURE_FLAG) == "1":
+        return None
+    raise MissingInternalTokenError(
+        "SCM_ML_INTERNAL_TOKEN is not set; set it (and the same value as the backend's "
+        f"SCM_ML_INTERNAL_TOKEN), or set {INSECURE_FLAG}=1 to run without service authentication"
+    )
+
+
 def create_app(
-    forecasts: ForecastService | None = None, engine: EngineService | None = None
+    forecasts: ForecastService | None = None,
+    engine: EngineService | None = None,
+    internal_token: str | None = None,
+    *,
+    require_token: bool = True,
 ) -> FastAPI:
     """Build the app; services not given are loaded from the environment.
+
+    Every route except /health needs the shared internal token (see `resolve_internal_token`).
+    Tests that are not about authentication pass `require_token=False`.
 
     SCM_ML_MODEL_DIR / SCM_ML_DATASET_DIR locate the forecast model; the planning engine is built
     on the default synthetic world with SCM_ML_PLANNER (rule|claude), SCM_ML_EMBEDDER
@@ -74,6 +111,15 @@ def create_app(
         yield
 
     app = FastAPI(title="SCM ML service", version="1", lifespan=lifespan)
+    token = resolve_internal_token(internal_token) if require_token else None
+
+    @app.middleware("http")
+    async def require_internal_token(request: Request, call_next: Any) -> Any:
+        if token is not None and request.url.path != "/health":
+            presented = request.headers.get(INTERNAL_TOKEN_HEADER, "")
+            if not hmac.compare_digest(presented.encode(), token.encode()):
+                return _error(401, "UNAUTHENTICATED", "a valid internal service token is required")
+        return await call_next(request)
 
     @app.exception_handler(ForecastError)
     async def forecast_error(_: Request, exc: ForecastError) -> JSONResponse:
@@ -90,17 +136,16 @@ def create_app(
         return _error(422, "VALIDATION_FAILED", f"{where}: {first.get('msg', 'invalid request')}")
 
     @app.get("/health")
-    async def health(request: Request) -> dict[str, Any]:
-        return {
-            "status": "UP",
-            "service": "scm-ml",
-            **request.app.state.forecasts.info(),
-            "engine": request.app.state.engine.info(),
-        }
+    async def health() -> dict[str, str]:
+        """Liveness only; details are behind the token at /v1/model."""
+        return {"status": "UP", "service": "scm-ml"}
 
     @app.get("/v1/model")
     async def model_info(request: Request) -> dict[str, Any]:
-        info: dict[str, Any] = request.app.state.forecasts.info()
+        info: dict[str, Any] = {
+            **request.app.state.forecasts.info(),
+            "engine": request.app.state.engine.info(),
+        }
         return info
 
     @app.post("/v1/forecast", response_model_by_alias=True)
