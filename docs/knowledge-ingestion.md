@@ -30,4 +30,21 @@ real model; the hashing embedder exists so the pipeline can be tested without a 
 `KnowledgeStore` mirrors the `knowledge_document` and `knowledge_chunk` tables: a SHA-256 of each document version's
 content, and chunks with embedding and metadata. Ingestion is idempotent. An unchanged `(document_id, version)` is
 skipped, changed content replaces that version's chunks, and a wrong embedding shape or dimension is rejected.
-Writing the same records to PostgreSQL is the backend's job (Phase 9).
+## PostgreSQL / pgvector
+
+`PgKnowledgeStore` (`knowledge/pgstore.py`) makes PostgreSQL the system of record behind the in-memory store:
+
+* `sync(documents, embedder)` writes documents and chunks idempotently. A document version whose content hash is
+  unchanged is skipped, so embeddings are computed once and reused across restarts; changed content replaces only
+  that version's chunks.
+* `load()` rebuilds the in-memory `KnowledgeStore` retrieval reads. Chunks are read in the order they were written
+  (`chunk_id`), because retrieval breaks score ties by store order; retrieval over the loaded store ranks exactly
+  like retrieval over the original (test).
+* `search(query_vector, role, as_of, k)` runs the nearest-neighbour query in the database with the permission
+  (`role = ANY(allowed_roles)`) and validity (effective and expiry date) filters in SQL, so a chunk the role may
+  not read, or that is no longer in force, never leaves the database. Its ranking and scores agree with cosine
+  similarity over the stored vectors (test).
+
+The engine uses it when `SCM_ML_KNOWLEDGE_DATABASE_URL` is set. `knowledge_document.supplier_id` references
+`supplier`, so the master data (`python -m scm_ml.synthetic.sql_export`) must be loaded first. The tests run
+against a real `pgvector/pgvector:pg16` container (skipped when Docker is not available).

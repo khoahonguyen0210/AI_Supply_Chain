@@ -167,10 +167,17 @@ def build_planning_context(
     embedder: Embedder | None = None,
     generator: AnswerGenerator | None = None,
     plan_namespace: str = "",
+    knowledge: KnowledgeStore | None = None,
 ) -> PlanningContext:
-    """Wire the knowledge base (generated from the world) and the forecast model together."""
+    """Wire the knowledge base and the forecast model together.
+
+    The knowledge base is generated from the world unless a ready `knowledge` store is given (for
+    example one loaded from PostgreSQL, whose embeddings were computed earlier).
+    """
     embedder = embedder or HashingEmbedder()
-    store = KnowledgeStore(EMBEDDING_DIM)
-    ingest(build_corpus(world).documents, embedder, store)
+    store = knowledge
+    if store is None:
+        store = KnowledgeStore(EMBEDDING_DIM)
+        ingest(build_corpus(world).documents, embedder, store)
     answerer = GroundedAnswerer(Retriever(store, embedder), generator or ExtractiveGenerator())
     return PlanningContext(world, service, answerer, plan_namespace)

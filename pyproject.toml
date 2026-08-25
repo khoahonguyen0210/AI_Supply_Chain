@@ -21,6 +21,8 @@ dependencies = [
     "httpx>=0.28.1",
     "fastembed>=0.8.1",
     "anthropic>=1.11.0",
+    "psycopg[binary]>=3.2",
+    "pgvector>=0.3",
 ]
 
 [dependency-groups]
@@ -30,6 +32,7 @@ dev = [
     "ruff>=0.6",
     "mypy>=1.11",
     "pandas-stubs>=2.2",
+    "testcontainers[postgresql]>=4.9",
 ]
 
 [tool.setuptools.packages.find]
@@ -60,5 +63,5 @@ explicit_package_bases = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["lightgbm.*", "scipy.*"]
+module = ["lightgbm.*", "scipy.*", "docker.*", "testcontainers.*", "pgvector.*"]
 ignore_missing_imports = true

@@ -33,6 +33,7 @@ from scm_ml.knowledge import (
     HashingEmbedder,
     build_corpus,
 )
+from scm_ml.knowledge.pgstore import PgKnowledgeStore
 from scm_ml.llm import ClaudeJsonLlm
 from scm_ml.synthetic import SyntheticWorld
 from scm_ml.telemetry import Telemetry
@@ -246,11 +247,22 @@ def build_engine(
     planner_name: str = "rule",
     embedder_name: str = "hashing",
     state_path: Path | str = ":memory:",
+    knowledge_url: str | None = None,
 ) -> EngineService:
-    """Wire knowledge base, planner, approvals and durable state around one world and model."""
+    """Wire knowledge base, planner, approvals and durable state around one world and model.
+
+    With `knowledge_url` (a PostgreSQL connection string) the knowledge base lives there:
+    the corpus is synced (unchanged documents are skipped, so embeddings are computed once) and
+    retrieval runs on what the database holds.
+    """
     if panel_from_world(world).dataset_id != forecasts.history.dataset_id:
         raise ValueError("the forecast model was not trained on this world's demand history")
     embedder: Embedder = FastEmbedEmbedder() if embedder_name == "fastembed" else HashingEmbedder()
+    knowledge = None
+    if knowledge_url:
+        postgres = PgKnowledgeStore(knowledge_url)
+        postgres.sync(build_corpus(world).documents, embedder)
+        knowledge = postgres.load()
     telemetry = Telemetry()
     llm = ClaudeJsonLlm(telemetry=telemetry) if planner_name == "claude" else None
     planning = build_planning_context(
@@ -259,6 +271,7 @@ def build_engine(
         embedder=embedder,
         generator=ClaudeGenerator(llm) if llm else None,
         plan_namespace=f"{datetime.now(UTC):%y%m%d%H%M%S}-",
+        knowledge=knowledge,
     )
     planner: Planner = ClaudePlanner(llm, default_registry()) if llm else RulePlanner(planning)
     store = SqliteStateStore(state_path)

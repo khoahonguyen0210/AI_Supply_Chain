@@ -87,7 +87,8 @@ def create_app(
 
     SCM_ML_MODEL_DIR / SCM_ML_DATASET_DIR locate the forecast model; the planning engine is built
     on the default synthetic world with SCM_ML_PLANNER (rule|claude), SCM_ML_EMBEDDER
-    (hashing|fastembed) and SCM_ML_STATE_PATH (SQLite file for tasks and approvals).
+    (hashing|fastembed), SCM_ML_STATE_PATH (SQLite file for tasks and approvals) and
+    SCM_ML_KNOWLEDGE_DATABASE_URL (PostgreSQL connection string for the knowledge base).
     """
 
     @asynccontextmanager
@@ -105,6 +106,7 @@ def create_app(
                 planner_name=os.environ.get("SCM_ML_PLANNER", "rule"),
                 embedder_name=os.environ.get("SCM_ML_EMBEDDER", "hashing"),
                 state_path=os.environ.get("SCM_ML_STATE_PATH", ":memory:"),
+                knowledge_url=os.environ.get("SCM_ML_KNOWLEDGE_DATABASE_URL") or None,
             )
         else:
             app.state.engine = engine
