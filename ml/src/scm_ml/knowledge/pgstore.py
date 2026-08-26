@@ -60,15 +60,23 @@ class PgKnowledgeStore:
             raise ValueError(f"embedder dim {embedder.dim} != store dim {self.embedding_dim}")
         ingested = skipped = written = 0
         with self._connect() as connection:
-            known = {
+            # A document counts as current only if it also has its chunks: the master-data seed
+            # inserts documents without them, and those must still be chunked and embedded.
+            current = {
                 (row[0], row[1]): row[2]
                 for row in connection.execute(
-                    "SELECT document_id, version, content_sha256 FROM knowledge_document"
+                    """
+                    SELECT d.document_id, d.version, d.content_sha256
+                    FROM knowledge_document d
+                    WHERE EXISTS (SELECT 1 FROM knowledge_chunk c
+                                  WHERE c.document_id = d.document_id
+                                    AND c.document_version = d.version)
+                    """
                 )
             }
             for document in documents:
                 key = (document.document_id, document.version)
-                if known.get(key) == content_sha256(document):
+                if current.get(key) == content_sha256(document):
                     skipped += 1
                     continue
                 chunks = chunk_document(document)

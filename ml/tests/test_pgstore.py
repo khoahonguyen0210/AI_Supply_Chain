@@ -1,5 +1,3 @@
-"""RAG <-> vector store: the knowledge base round-trips through real PostgreSQL with pgvector."""
-
 from __future__ import annotations
 
 import re
@@ -120,6 +118,44 @@ def test_the_corpus_is_written_once_and_unchanged_documents_are_skipped(
     second = pg.sync(documents, embedder)
     assert second.ingested == 0 and second.skipped_unchanged == len(documents)
     assert _count(clean_database, "knowledge_chunk") == first.chunks_written
+
+
+def test_documents_loaded_without_chunks_are_chunked_by_the_next_sync(
+    clean_database: str, documents: tuple[PolicyDocument, ...]
+) -> None:
+    import psycopg
+
+    from scm_ml.knowledge.store import content_sha256
+
+    # what the master-data seed does: the document rows exist, their chunks do not
+    with psycopg.connect(clean_database, autocommit=True) as connection:
+        for document in documents:
+            connection.execute(
+                """
+                INSERT INTO knowledge_document (document_id, version, doc_type, title,
+                    effective_date,
+                    expiry_date, supplier_id, allowed_roles, content, content_sha256)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    document.document_id,
+                    document.version,
+                    document.doc_type.value,
+                    document.title,
+                    document.effective_date,
+                    document.expiry_date,
+                    document.supplier_id,
+                    list(document.allowed_roles),
+                    document.content,
+                    content_sha256(document),
+                ),
+            )
+    assert _count(clean_database, "knowledge_chunk") == 0
+
+    report = PgKnowledgeStore(clean_database).sync(documents, HashingEmbedder())
+
+    assert report.ingested == len(documents) and report.skipped_unchanged == 0
+    assert _count(clean_database, "knowledge_chunk") == report.chunks_written > 0
 
 
 def test_a_changed_document_replaces_only_its_own_chunks(

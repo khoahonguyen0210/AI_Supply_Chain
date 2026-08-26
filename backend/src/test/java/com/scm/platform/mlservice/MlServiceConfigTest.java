@@ -13,18 +13,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestClient;
 
-/** The real client, against a real local server, to see which headers actually go out. */
 class MlServiceConfigTest {
 
 	private HttpServer server;
 
 	private final AtomicReference<String> seenToken = new AtomicReference<>();
 
+	private final AtomicReference<String> seenUpgrade = new AtomicReference<>();
+
+	private final AtomicReference<String> seenBody = new AtomicReference<>();
+
 	@BeforeEach
 	void start() throws Exception {
 		server = HttpServer.create(new InetSocketAddress("localhost", 0), 0);
 		server.createContext("/ping", exchange -> {
 			seenToken.set(exchange.getRequestHeaders().getFirst(MlServiceConfig.INTERNAL_TOKEN_HEADER));
+			seenUpgrade.set(exchange.getRequestHeaders().getFirst("Upgrade"));
+			seenBody.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
 			byte[] body = "ok".getBytes(StandardCharsets.UTF_8);
 			exchange.sendResponseHeaders(200, body.length);
 			exchange.getResponseBody().write(body);
@@ -49,6 +54,13 @@ class MlServiceConfigTest {
 	void everyCallCarriesTheSharedSecretWhenOneIsConfigured() {
 		client("a-shared-secret-long-enough").get().uri("/ping").retrieve().body(String.class);
 		assertThat(seenToken.get()).isEqualTo("a-shared-secret-long-enough");
+	}
+
+	@Test
+	void requestsAreHttp11WithABodyBecauseTheEnginesServerDropsBodiesOnAnH2cUpgrade() {
+		client("").post().uri("/ping").body(java.util.Map.of("text", "hello")).retrieve().body(String.class);
+		assertThat(seenUpgrade.get()).isNull();
+		assertThat(seenBody.get()).isEqualTo("{\"text\":\"hello\"}");
 	}
 
 	@Test

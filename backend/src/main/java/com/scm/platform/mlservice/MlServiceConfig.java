@@ -17,7 +17,9 @@ public class MlServiceConfig {
 
 	@Bean
 	RestClient mlServiceRestClient(ScmProperties properties) {
-		HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
+		// HTTP/1.1 only: the JDK client's default h2c upgrade makes the engine's server drop request bodies.
+		HttpClient httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1)
+				.connectTimeout(Duration.ofSeconds(2)).build();
 		JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(httpClient);
 		// optimization, scenarios and agent runs are CPU-bound in the engine, so reads are allowed to be slow
 		factory.setReadTimeout(properties.mlReadTimeout());

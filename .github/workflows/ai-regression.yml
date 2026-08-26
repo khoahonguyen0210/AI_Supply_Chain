@@ -1,0 +1,58 @@
+name: AI regression
+
+# Fixed RAG and agent cases, offline (rule planner, extractive generator, no API key), gated
+# against ml/configs/ai-regression-baseline.json. Any regression fails the run.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "ml/src/**"
+      - "ml/configs/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/ai-regression.yml"
+  pull_request:
+    paths:
+      - "src/**"
+      - "ml/src/**"
+      - "ml/configs/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/ai-regression.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ai-regression-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FASTEMBED_CACHE_PATH: ${{ github.workspace }}/.cache/fastembed
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv python install 3.12
+      - run: uv sync --frozen
+      - name: Cache embedding model
+        uses: actions/cache@v4
+        with:
+          path: .cache/fastembed
+          key: fastembed-bge-small-en-v1.5
+      - name: Run the AI regression suite
+        run: uv run python -m scm_ml.regression --out regression-artifacts
+      - name: Store evaluation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-regression-${{ github.sha }}
+          path: regression-artifacts/
+          retention-days: 90

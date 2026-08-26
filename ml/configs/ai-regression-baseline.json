@@ -1,0 +1,218 @@
+{
+  "agent": {
+    "cases": [
+      "FIN-01",
+      "FIN-02",
+      "HOLD-01",
+      "HOLD-02",
+      "HOLD-03",
+      "HOLD-04",
+      "HOLD-05",
+      "HOLD-06",
+      "HOLD-07",
+      "HOLD-08",
+      "HOLD-09",
+      "PERM-01",
+      "PERM-FACT-023",
+      "PERM-FACT-029",
+      "PERM-MGR",
+      "PLAN-01",
+      "PLAN-02",
+      "PLAN-03",
+      "PLAN-04",
+      "PLAN-05",
+      "PLAN-06",
+      "POL-01",
+      "POL-02",
+      "POL-03",
+      "POL-04",
+      "POL-CONFLICT",
+      "POL-EXPIRED",
+      "RAG-MISSING",
+      "SAFE-01",
+      "SAFE-02",
+      "SAFE-03",
+      "SAFE-04",
+      "SCN-01",
+      "SCN-02",
+      "SCN-03",
+      "SRC-01",
+      "SRC-02",
+      "VAGUE-01",
+      "VAGUE-02",
+      "VAGUE-03"
+    ],
+    "known_failures": [
+      "HOLD-01",
+      "HOLD-02",
+      "HOLD-03",
+      "HOLD-05",
+      "HOLD-07",
+      "HOLD-08",
+      "HOLD-09"
+    ],
+    "metrics": {
+      "dimensions.action_safety.pass_rate": {
+        "better": "higher",
+        "value": 1.0
+      },
+      "dimensions.appropriate_refusal.pass_rate": {
+        "better": "higher",
+        "value": 1.0
+      },
+      "dimensions.constraint_compliance.pass_rate": {
+        "better": "higher",
+        "value": 1.0
+      },
+      "dimensions.grounded_numbers.pass_rate": {
+        "better": "higher",
+        "value": 1.0
+      },
+      "dimensions.parameter_correctness.pass_rate": {
+        "better": "higher",
+        "value": 0.6428571428571429
+      },
+      "dimensions.permission_compliance.pass_rate": {
+        "better": "higher",
+        "value": 1.0
+      },
+      "dimensions.replanning.pass_rate": {
+        "better": "higher",
+        "value": 1.0
+      },
+      "dimensions.sequence_correctness.pass_rate": {
+        "better": "higher",
+        "value": 1.0
+      },
+      "dimensions.tool_correctness.pass_rate": {
+        "better": "higher",
+        "value": 0.868421052631579
+      },
+      "status_accuracy": {
+        "better": "higher",
+        "value": 0.975
+      },
+      "workflow_success": {
+        "better": "higher",
+        "value": 0.825
+      }
+    }
+  },
+  "embedder": "fastembed",
+  "planner": "rule",
+  "provenance": {
+    "code_revision": "c3dd7a9",
+    "created_at": "2026-10-07T14:11:03+00:00"
+  },
+  "rag": {
+    "cases": [
+      "FACT-001",
+      "FACT-002",
+      "FACT-003",
+      "FACT-004",
+      "FACT-005",
+      "FACT-006",
+      "FACT-007",
+      "FACT-008",
+      "FACT-009",
+      "FACT-010",
+      "FACT-011",
+      "FACT-012",
+      "FACT-013",
+      "FACT-014",
+      "FACT-015",
+      "FACT-016",
+      "FACT-017",
+      "FACT-018",
+      "FACT-019",
+      "FACT-020",
+      "FACT-021",
+      "FACT-022",
+      "FACT-023",
+      "FACT-024",
+      "FACT-025",
+      "FACT-026",
+      "FACT-027",
+      "FACT-028",
+      "FACT-029",
+      "FACT-030",
+      "FACT-031",
+      "FACT-032",
+      "FACT-033",
+      "FACT-034",
+      "FACT-035",
+      "FACT-036",
+      "MISS-CAL-01",
+      "MISS-CAL-02",
+      "MISS-CAL-03",
+      "MISS-CAL-04",
+      "MISS-CAL-05",
+      "MISS-CAL-06",
+      "MISS-CAL-07",
+      "MISS-CAL-08",
+      "MISS-CAL-09",
+      "MISS-CAL-10",
+      "MISS-CAL-11",
+      "MISS-CAL-12",
+      "MISS-HOL-01",
+      "MISS-HOL-02",
+      "MISS-HOL-03",
+      "MISS-HOL-04",
+      "MISS-HOL-05",
+      "MISS-HOL-06",
+      "MISS-HOL-07",
+      "MISS-HOL-08"
+    ],
+    "known_failures": [
+      "FACT-033"
+    ],
+    "metrics": {
+      "answers.answer_accuracy": {
+        "better": "higher",
+        "value": 0.9705882352941176
+      },
+      "answers.citation_accuracy": {
+        "better": "higher",
+        "value": 1.0
+      },
+      "answers.groundedness": {
+        "better": "higher",
+        "value": 1.0
+      },
+      "answers.over_refusal_rate": {
+        "better": "lower",
+        "value": 0.029411764705882353
+      },
+      "answers.restricted_leaks": {
+        "better": "lower",
+        "value": 0.0
+      },
+      "answers.status_accuracy": {
+        "better": "higher",
+        "value": 0.9821428571428571
+      },
+      "answers.wrong_answer_rate": {
+        "better": "lower",
+        "value": 0.0
+      },
+      "retrieval.hit@1": {
+        "better": "higher",
+        "value": 0.9411764705882353
+      },
+      "retrieval.hit@3": {
+        "better": "higher",
+        "value": 1.0
+      },
+      "retrieval.hit@5": {
+        "better": "higher",
+        "value": 1.0
+      },
+      "retrieval.mrr": {
+        "better": "higher",
+        "value": 0.9705882352941176
+      }
+    }
+  },
+  "rag_generator": "extractive-stub",
+  "version": 1
+}
