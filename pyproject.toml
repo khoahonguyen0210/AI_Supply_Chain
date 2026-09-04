@@ -45,6 +45,7 @@ addopts = "-ra --strict-markers"
 markers = [
     "integration: requires external services (PostgreSQL, Redis)",
     "e2e: full-stack end-to-end test",
+    "smoke: checks against a running deployment (SCM_SMOKE_URL)",
 ]
 
 [tool.ruff]

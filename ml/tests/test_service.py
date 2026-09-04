@@ -10,7 +10,7 @@ from scm_ml.forecast.inference import ForecastError, forecast_series
 from scm_ml.forecast.model import ForecastModel, ModelConfig, train_forecaster
 from scm_ml.forecast.panel import ForecastPanel, default_split, panel_from_world
 from scm_ml.forecast.uncertainty import QUANTILES, calibrate
-from scm_ml.service.app import create_app
+from scm_ml.service.app import create_app, model_directories
 from scm_ml.service.contracts import ForecastResponse
 from scm_ml.service.engine import build_engine
 from scm_ml.service.export_contracts import CONTRACT_DIR, contract_files, example_response
@@ -145,3 +145,25 @@ def test_example_response_matches_schema_version() -> None:
     example = example_response()
     assert example.schema_version == "1"
     assert Path(CONTRACT_DIR / "forecast-response-v1.example.json").exists()
+
+
+def test_model_directories_prefer_explicit_paths(
+    world: SyntheticWorld, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("SCM_ML_MODEL_DIR", str(tmp_path / "m"))
+    monkeypatch.setenv("SCM_ML_DATASET_DIR", str(tmp_path / "d"))
+    assert model_directories(world) == (tmp_path / "m", tmp_path / "d")
+
+
+def test_model_directories_fall_back_to_the_worlds_trained_model(
+    world: SyntheticWorld, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.delenv("SCM_ML_MODEL_DIR", raising=False)
+    monkeypatch.delenv("SCM_ML_DATASET_DIR", raising=False)
+    monkeypatch.setenv("SCM_ML_ARTIFACT_ROOT", str(tmp_path))
+    with pytest.raises(FileNotFoundError):
+        model_directories(world)
+    base = tmp_path / panel_from_world(world).dataset_id
+    (base / "model").mkdir(parents=True)
+    (base / "dataset").mkdir()
+    assert model_directories(world) == (base / "model", base / "dataset")

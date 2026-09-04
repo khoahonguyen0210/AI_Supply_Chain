@@ -1,0 +1,110 @@
+# Complete local stack. Start it with `bash scripts/stack.sh up` (creates .env with random local
+# secrets on first run, then `docker compose up --build --wait`). See docs/containers.md.
+#
+# Start order: postgres -> backend (runs the migrations) -> seed (one-shot) -> engine -> frontend.
+# Published ports bind to 127.0.0.1 only; the engine is never published because it trusts the actor
+# named by the backend.
+name: scm
+
+x-db-conninfo: &db-conninfo "host=postgres port=5432 dbname=${POSTGRES_DB:-scm} user=${POSTGRES_USER:-scm} password=${POSTGRES_PASSWORD:?run scripts/stack.sh up or copy .env.example to .env}"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-scm}
+      POSTGRES_USER: ${POSTGRES_USER:-scm}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run scripts/stack.sh up or copy .env.example to .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:${SCM_DB_HOST_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build:
+      context: backend
+      dockerfile: ../infrastructure/docker/backend.Dockerfile
+    image: scm-backend:${SCM_VERSION:-local}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-scm}
+      POSTGRES_USER: ${POSTGRES_USER:-scm}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      ML_SERVICE_URL: http://engine:8001
+      SCM_JWT_SECRET: ${SCM_JWT_SECRET:?run scripts/stack.sh up or copy .env.example to .env}
+      SCM_ML_INTERNAL_TOKEN: ${SCM_ML_INTERNAL_TOKEN:?run scripts/stack.sh up or copy .env.example to .env}
+      SCM_JOBS_WORKER_ENABLED: "true"
+      # requests arrive through the Next.js proxy, which sets X-Forwarded-For
+      SCM_SECURITY_TRUSTFORWARDEDFOR: "true"
+      # demo accounts, one per role, sharing the generated demo password
+      SCM_SECURITY_BOOTSTRAPUSERS_0_USERID: planner
+      SCM_SECURITY_BOOTSTRAPUSERS_0_DISPLAYNAME: Pat Planner
+      SCM_SECURITY_BOOTSTRAPUSERS_0_ROLE: planner
+      SCM_SECURITY_BOOTSTRAPUSERS_0_PASSWORD: ${SCM_DEMO_PASSWORD:?run scripts/stack.sh up or copy .env.example to .env}
+      SCM_SECURITY_BOOTSTRAPUSERS_1_USERID: manager
+      SCM_SECURITY_BOOTSTRAPUSERS_1_DISPLAYNAME: Mia Manager
+      SCM_SECURITY_BOOTSTRAPUSERS_1_ROLE: procurement_manager
+      SCM_SECURITY_BOOTSTRAPUSERS_1_PASSWORD: ${SCM_DEMO_PASSWORD}
+      SCM_SECURITY_BOOTSTRAPUSERS_2_USERID: finance
+      SCM_SECURITY_BOOTSTRAPUSERS_2_DISPLAYNAME: Fin Finance
+      SCM_SECURITY_BOOTSTRAPUSERS_2_ROLE: finance
+      SCM_SECURITY_BOOTSTRAPUSERS_2_PASSWORD: ${SCM_DEMO_PASSWORD}
+      SCM_SECURITY_BOOTSTRAPUSERS_3_USERID: admin
+      SCM_SECURITY_BOOTSTRAPUSERS_3_DISPLAYNAME: Ada Admin
+      SCM_SECURITY_BOOTSTRAPUSERS_3_ROLE: admin
+      SCM_SECURITY_BOOTSTRAPUSERS_3_PASSWORD: ${SCM_DEMO_PASSWORD}
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8080}:8080"
+      - "127.0.0.1:${MANAGEMENT_PORT:-8081}:8081"
+
+  seed:
+    image: scm-ml:${SCM_VERSION:-local}
+    depends_on:
+      backend:
+        condition: service_healthy
+    pull_policy: never  # built by the engine service
+    command: ["python", "-m", "scm_ml.synthetic.sql_export", "--database-url", *db-conninfo]
+    restart: "no"
+
+  engine:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/ml.Dockerfile
+    image: scm-ml:${SCM_VERSION:-local}
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    environment:
+      SCM_ML_INTERNAL_TOKEN: ${SCM_ML_INTERNAL_TOKEN}
+      SCM_ML_KNOWLEDGE_DATABASE_URL: *db-conninfo
+      SCM_ML_EMBEDDER: fastembed
+      SCM_ML_PLANNER: ${SCM_ML_PLANNER:-rule}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    volumes:
+      - engine-state:/var/lib/scm
+
+  frontend:
+    build:
+      context: frontend
+      dockerfile: ../infrastructure/docker/frontend.Dockerfile
+      args:
+        BACKEND_URL: http://backend:8080
+    image: scm-frontend:${SCM_VERSION:-local}
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-3000}:3000"
+
+volumes:
+  pgdata:
+  engine-state:

@@ -9,6 +9,7 @@ Four layers, from fast and isolated to slow and whole-stack. Every command runs 
 | Frontend | `node node_modules/vitest/vitest.mjs run` in `frontend/` | - |
 | End to end | `bash scripts/e2e.sh` | Docker, Java 21, the trained synthetic forecast model |
 | AI regression | `bash scripts/ai-regression.sh` | nothing (trains the forecast model if missing) |
+| Deployment smoke | `bash scripts/stack.sh smoke` (Compose) | a running stack ([containers.md](containers.md)) |
 
 ## Unit tests (12.1)
 

@@ -258,8 +258,20 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Write the synthetic world as a PostgreSQL seed.")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--seed", type=int, default=SyntheticConfig().seed)
+    parser.add_argument(
+        "--database-url",
+        default=None,
+        help="apply the seed to this (migrated) PostgreSQL database instead of writing a file",
+    )
     args = parser.parse_args(argv)
     world = generate_world(SyntheticConfig(seed=args.seed))
+    if args.database_url:
+        import psycopg
+
+        with psycopg.connect(args.database_url, autocommit=True) as connection:
+            connection.execute(render(world).encode())
+        print("seed applied")
+        return 0
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(render(world), encoding="utf-8", newline="\n")
     print(f"wrote {args.out}")

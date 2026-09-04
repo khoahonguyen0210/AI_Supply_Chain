@@ -14,8 +14,10 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from scm_ml.forecast.artifacts import DEFAULT_ARTIFACT_ROOT
 from scm_ml.forecast.inference import ForecastError
-from scm_ml.synthetic import SyntheticConfig, generate_world
+from scm_ml.optimization.benchmark import forecast_artifact_dirs
+from scm_ml.synthetic import SyntheticConfig, SyntheticWorld, generate_world
 
 from .contracts import ErrorResponse, ForecastRequest, ForecastResponse
 from .engine import EngineError, EngineService, build_engine
@@ -42,6 +44,16 @@ STATUS_BY_CODE = {
 def _error(status: int, code: str, message: str) -> JSONResponse:
     body = ErrorResponse(code=code, message=message).model_dump(by_alias=True)
     return JSONResponse(status_code=status, content=body)
+
+
+def model_directories(world: SyntheticWorld) -> tuple[Path, Path]:
+    """The forecast model and dataset to serve: explicit directories, else the world's own model."""
+    model_dir = os.environ.get("SCM_ML_MODEL_DIR")
+    dataset_dir = os.environ.get("SCM_ML_DATASET_DIR")
+    if model_dir and dataset_dir:
+        return Path(model_dir), Path(dataset_dir)
+    root = Path(os.environ.get("SCM_ML_ARTIFACT_ROOT", str(DEFAULT_ARTIFACT_ROOT)))
+    return forecast_artifact_dirs(world, root)
 
 
 INTERNAL_TOKEN_HEADER = "X-Internal-Token"
@@ -85,7 +97,8 @@ def create_app(
     Every route except /health needs the shared internal token (see `resolve_internal_token`).
     Tests that are not about authentication pass `require_token=False`.
 
-    SCM_ML_MODEL_DIR / SCM_ML_DATASET_DIR locate the forecast model; the planning engine is built
+    SCM_ML_MODEL_DIR / SCM_ML_DATASET_DIR locate the forecast model (default: the model trained
+    on the default world under SCM_ML_ARTIFACT_ROOT); the planning engine is built
     on the default synthetic world with SCM_ML_PLANNER (rule|claude), SCM_ML_EMBEDDER
     (hashing|fastembed), SCM_ML_STATE_PATH (SQLite file for tasks and approvals) and
     SCM_ML_KNOWLEDGE_DATABASE_URL (PostgreSQL connection string for the knowledge base).
@@ -93,15 +106,16 @@ def create_app(
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        world = generate_world(SyntheticConfig()) if forecasts is None or engine is None else None
         if forecasts is None:
-            app.state.forecasts = ForecastService.from_directories(
-                Path(os.environ["SCM_ML_MODEL_DIR"]), Path(os.environ["SCM_ML_DATASET_DIR"])
-            )
+            assert world is not None
+            app.state.forecasts = ForecastService.from_directories(*model_directories(world))
         else:
             app.state.forecasts = forecasts
         if engine is None:
+            assert world is not None
             app.state.engine = build_engine(
-                generate_world(SyntheticConfig()),
+                world,
                 app.state.forecasts,
                 planner_name=os.environ.get("SCM_ML_PLANNER", "rule"),
                 embedder_name=os.environ.get("SCM_ML_EMBEDDER", "hashing"),
