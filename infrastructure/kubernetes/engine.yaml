@@ -1,0 +1,78 @@
+# The stateful planning engine: agent tasks, approvals and decisions live in its SQLite file, so it
+# runs as exactly one pod with its own volume. It serves the API backend.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: engine-config
+data:
+  SCM_ML_EMBEDDER: fastembed
+  SCM_ML_PLANNER: rule
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: engine-state
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests: { storage: 256Mi }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: engine
+spec:
+  replicas: 1
+  strategy: { type: Recreate }
+  selector:
+    matchLabels: { app: engine }
+  template:
+    metadata:
+      labels: { app: engine }
+    spec:
+      # Service env links (BACKEND_PORT=tcp://...) would clash with the app settings
+      enableServiceLinks: false
+      securityContext: { fsGroup: 10001 }
+      initContainers:
+        # the knowledge tables are created by the backend's migrations
+        - name: wait-for-schema
+          image: busybox:1.37
+          command: ["sh", "-c", "until wget -q -O /dev/null http://backend:8081/actuator/health; do sleep 2; done"]
+      containers:
+        - name: engine
+          image: scm-ml
+          envFrom:
+            - configMapRef: { name: engine-config }
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: scm-secrets, key: POSTGRES_PASSWORD } }
+            - name: SCM_ML_INTERNAL_TOKEN
+              valueFrom: { secretKeyRef: { name: scm-secrets, key: SCM_ML_INTERNAL_TOKEN } }
+            - name: SCM_ML_KNOWLEDGE_DATABASE_URL
+              value: "host=postgres port=5432 dbname=scm user=scm password=$(POSTGRES_PASSWORD)"
+          ports:
+            - { name: http, containerPort: 8001 }
+          startupProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet: { path: /health, port: http }
+            periodSeconds: 5
+          resources:
+            requests: { cpu: 500m, memory: 768Mi }
+            limits: { memory: 1536Mi }
+          volumeMounts:
+            - { name: state, mountPath: /var/lib/scm }
+      volumes:
+        - name: state
+          persistentVolumeClaim: { claimName: engine-state }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: engine
+spec:
+  selector: { app: engine }
+  ports:
+    - { port: 8001, targetPort: http }

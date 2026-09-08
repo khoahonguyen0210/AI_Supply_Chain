@@ -1,0 +1,36 @@
+# Next.js frontend; /api/* is proxied to the `backend` Service (baked in at image build time).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: frontend }
+  template:
+    metadata:
+      labels: { app: frontend }
+    spec:
+      # Service env links (BACKEND_PORT=tcp://...) would clash with the app settings
+      enableServiceLinks: false
+      containers:
+        - name: frontend
+          image: scm-frontend
+          ports:
+            - { name: http, containerPort: 3000 }
+          readinessProbe:
+            httpGet: { path: /, port: http }
+            periodSeconds: 5
+          resources:
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { memory: 512Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  type: NodePort
+  selector: { app: frontend }
+  ports:
+    - { port: 3000, targetPort: http, nodePort: 30300 }

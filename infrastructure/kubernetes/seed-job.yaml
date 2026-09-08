@@ -1,0 +1,33 @@
+# One-shot, idempotent seed of the synthetic company (master data, history, documents) once the
+# backend has migrated the schema.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: seed
+spec:
+  backoffLimit: 4
+  ttlSecondsAfterFinished: 3600
+  template:
+    spec:
+      # Service env links (BACKEND_PORT=tcp://...) would clash with the app settings
+      enableServiceLinks: false
+      restartPolicy: OnFailure
+      initContainers:
+        - name: wait-for-schema
+          image: busybox:1.37
+          command: ["sh", "-c", "until wget -q -O /dev/null http://backend:8081/actuator/health; do sleep 2; done"]
+      containers:
+        - name: seed
+          image: scm-ml
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: scm-secrets, key: POSTGRES_PASSWORD } }
+          command:
+            - python
+            - -m
+            - scm_ml.synthetic.sql_export
+            - --database-url
+            - "host=postgres port=5432 dbname=scm user=scm password=$(POSTGRES_PASSWORD)"
+          resources:
+            requests: { cpu: 250m, memory: 512Mi }
+            limits: { memory: 1Gi }

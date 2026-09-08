@@ -14,8 +14,9 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+# anchored: an unanchored lib/ also ignored frontend/src/lib
+/lib/
+/lib64/
 parts/
 sdist/
 var/

@@ -1,0 +1,14 @@
+# Local cluster: `scripts/kind.sh up`. One node is enough; scaling is about pods, not machines.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: scm
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      # frontend (NodePort 30300) and backend API (NodePort 30380), localhost only
+      - containerPort: 30300
+        hostPort: 8300
+        listenAddress: "127.0.0.1"
+      - containerPort: 30380
+        hostPort: 8380
+        listenAddress: "127.0.0.1"

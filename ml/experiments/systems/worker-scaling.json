@@ -1,0 +1,319 @@
+{
+  "benchmark": "worker-scaling",
+  "cluster": {
+    "context": "kind-scm",
+    "resources": {
+      "engine_sidecar": "{\"limits\":{\"cpu\":\"1\",\"memory\":\"1536Mi\"},\"requests\":{\"cpu\":\"1\",\"memory\":\"768Mi\"}}",
+      "node_cpus": "16",
+      "worker": "{\"limits\":{\"memory\":\"768Mi\"},\"requests\":{\"cpu\":\"250m\",\"memory\":\"384Mi\"}}"
+    },
+    "scaling_unit": "worker pod = queue worker + engine sidecar (1 CPU)"
+  },
+  "discarded_runs": [],
+  "method": "2 unrecorded warm-up jobs per worker after each scale; runs taken across a host suspend are discarded and repeated",
+  "provenance": {
+    "code_revision": "a0c3686",
+    "created_at": "2026-10-07T18:10:21+00:00"
+  },
+  "runs": [
+    {
+      "disrupted": false,
+      "errors": [],
+      "failed": 0,
+      "host_suspended": false,
+      "jobs": 48,
+      "makespan_s": 89.914757,
+      "max_clock_gap_s": 0.437,
+      "repeat": 0,
+      "replicas": 1,
+      "retried_jobs": 0,
+      "run_id": "f2953978",
+      "run_s": {
+        "max": 5.337168,
+        "mean": 1.8470605833333333,
+        "p50": 1.6334914999999999,
+        "p95": 3.704128799999999
+      },
+      "succeeded": 48,
+      "throughput_jobs_per_min": 32.030337356080494,
+      "total_attempts": 48,
+      "unfinished": 0,
+      "wait_s": {
+        "max": 82.628517,
+        "mean": 41.5946251875,
+        "p50": 37.732627,
+        "p95": 79.64949519999999
+      }
+    },
+    {
+      "disrupted": false,
+      "errors": [],
+      "failed": 0,
+      "host_suspended": false,
+      "jobs": 48,
+      "makespan_s": 91.192105,
+      "max_clock_gap_s": 0.035,
+      "repeat": 1,
+      "replicas": 1,
+      "retried_jobs": 0,
+      "run_id": "08a5b96f",
+      "run_s": {
+        "max": 4.540762,
+        "mean": 1.8678400833333333,
+        "p50": 1.624482,
+        "p95": 3.1837017499999996
+      },
+      "succeeded": 48,
+      "throughput_jobs_per_min": 31.58168133085644,
+      "total_attempts": 48,
+      "unfinished": 0,
+      "wait_s": {
+        "max": 85.781028,
+        "mean": 46.212321270833336,
+        "p50": 47.662021499999994,
+        "p95": 83.304072
+      }
+    },
+    {
+      "disrupted": false,
+      "errors": [],
+      "failed": 0,
+      "host_suspended": false,
+      "jobs": 48,
+      "makespan_s": 60.169467,
+      "max_clock_gap_s": 0.016,
+      "repeat": 2,
+      "replicas": 1,
+      "retried_jobs": 0,
+      "run_id": "057ec15f",
+      "run_s": {
+        "max": 2.711635,
+        "mean": 1.229286875,
+        "p50": 1.076034,
+        "p95": 2.1869597999999995
+      },
+      "succeeded": 48,
+      "throughput_jobs_per_min": 47.86480824235987,
+      "total_attempts": 48,
+      "unfinished": 0,
+      "wait_s": {
+        "max": 54.932114,
+        "mean": 28.0652420625,
+        "p50": 27.778185,
+        "p95": 52.181894549999996
+      }
+    },
+    {
+      "disrupted": false,
+      "errors": [],
+      "failed": 0,
+      "host_suspended": false,
+      "jobs": 48,
+      "makespan_s": 45.852048,
+      "max_clock_gap_s": 0.017,
+      "repeat": 0,
+      "replicas": 2,
+      "retried_jobs": 0,
+      "run_id": "71932f5a",
+      "run_s": {
+        "max": 4.316124,
+        "mean": 1.8544249166666666,
+        "p50": 1.551507,
+        "p95": 3.48877015
+      },
+      "succeeded": 48,
+      "throughput_jobs_per_min": 62.81071676449435,
+      "total_attempts": 48,
+      "unfinished": 0,
+      "wait_s": {
+        "max": 42.434685,
+        "mean": 21.599682812500003,
+        "p50": 21.7279195,
+        "p95": 41.1265211
+      }
+    },
+    {
+      "disrupted": false,
+      "errors": [],
+      "failed": 0,
+      "host_suspended": false,
+      "jobs": 48,
+      "makespan_s": 35.248619,
+      "max_clock_gap_s": 0.016,
+      "repeat": 1,
+      "replicas": 2,
+      "retried_jobs": 0,
+      "run_id": "da62933b",
+      "run_s": {
+        "max": 2.536189,
+        "mean": 1.4139781041666666,
+        "p50": 1.296187,
+        "p95": 2.4767001499999997
+      },
+      "succeeded": 48,
+      "throughput_jobs_per_min": 81.70532865415238,
+      "total_attempts": 48,
+      "unfinished": 0,
+      "wait_s": {
+        "max": 30.121914,
+        "mean": 14.2922445,
+        "p50": 12.852383499999998,
+        "p95": 28.90627215
+      }
+    },
+    {
+      "disrupted": false,
+      "errors": [],
+      "failed": 0,
+      "host_suspended": false,
+      "jobs": 48,
+      "makespan_s": 36.427357,
+      "max_clock_gap_s": 0.015,
+      "repeat": 2,
+      "replicas": 2,
+      "retried_jobs": 0,
+      "run_id": "671f1887",
+      "run_s": {
+        "max": 2.62766,
+        "mean": 1.446259875,
+        "p50": 1.2274955,
+        "p95": 2.44738035
+      },
+      "succeeded": 48,
+      "throughput_jobs_per_min": 79.06145922143075,
+      "total_attempts": 48,
+      "unfinished": 0,
+      "wait_s": {
+        "max": 33.70166,
+        "mean": 17.504443249999998,
+        "p50": 18.170625,
+        "p95": 32.58888345
+      }
+    },
+    {
+      "disrupted": false,
+      "errors": [],
+      "failed": 0,
+      "host_suspended": false,
+      "jobs": 48,
+      "makespan_s": 29.895337,
+      "max_clock_gap_s": 0.022,
+      "repeat": 0,
+      "replicas": 4,
+      "retried_jobs": 0,
+      "run_id": "a7824ecb",
+      "run_s": {
+        "max": 4.000601,
+        "mean": 2.3466968958333334,
+        "p50": 2.1350885,
+        "p95": 3.96189055
+      },
+      "succeeded": 48,
+      "throughput_jobs_per_min": 96.33609415408162,
+      "total_attempts": 48,
+      "unfinished": 0,
+      "wait_s": {
+        "max": 26.119343,
+        "mean": 13.056014124999999,
+        "p50": 12.897267,
+        "p95": 25.13512985
+      }
+    },
+    {
+      "disrupted": false,
+      "errors": [],
+      "failed": 0,
+      "host_suspended": false,
+      "jobs": 48,
+      "makespan_s": 28.92905,
+      "max_clock_gap_s": 0.015,
+      "repeat": 1,
+      "replicas": 4,
+      "retried_jobs": 0,
+      "run_id": "a22d5c16",
+      "run_s": {
+        "max": 4.297094,
+        "mean": 2.244317375,
+        "p50": 1.8849870000000002,
+        "p95": 3.93269555
+      },
+      "succeeded": 48,
+      "throughput_jobs_per_min": 99.55390861435131,
+      "total_attempts": 48,
+      "unfinished": 0,
+      "wait_s": {
+        "max": 22.849552,
+        "mean": 11.7327686875,
+        "p50": 12.2036425,
+        "p95": 22.005411
+      }
+    },
+    {
+      "disrupted": false,
+      "errors": [],
+      "failed": 0,
+      "host_suspended": false,
+      "jobs": 48,
+      "makespan_s": 24.065911,
+      "max_clock_gap_s": 0.016,
+      "repeat": 2,
+      "replicas": 4,
+      "retried_jobs": 0,
+      "run_id": "519859f8",
+      "run_s": {
+        "max": 3.9821,
+        "mean": 1.872433625,
+        "p50": 1.592786,
+        "p95": 3.09146725
+      },
+      "succeeded": 48,
+      "throughput_jobs_per_min": 119.67134757541487,
+      "total_attempts": 48,
+      "unfinished": 0,
+      "wait_s": {
+        "max": 20.40995,
+        "mean": 10.907731604166665,
+        "p50": 11.2644,
+        "p95": 19.924307499999998
+      }
+    },
+    {
+      "disrupted": true,
+      "disruption": {
+        "after_s": 8.0,
+        "done": "pod/worker-75fcbd6d88-g6hkt"
+      },
+      "errors": [],
+      "failed": 0,
+      "host_suspended": false,
+      "jobs": 48,
+      "makespan_s": 39.328079,
+      "max_clock_gap_s": 0.058,
+      "repeat": 0,
+      "replicas": 4,
+      "retried_jobs": 5,
+      "run_id": "65244b7f",
+      "run_s": {
+        "max": 27.786787,
+        "mean": 4.8438879791666665,
+        "p50": 2.3905415000000003,
+        "p95": 24.380685599999996
+      },
+      "succeeded": 48,
+      "throughput_jobs_per_min": 73.23012141020159,
+      "total_attempts": 53,
+      "unfinished": 0,
+      "wait_s": {
+        "max": 29.346917,
+        "mean": 11.75282025,
+        "p50": 11.017861,
+        "p95": 27.944593599999997
+      }
+    }
+  ],
+  "workload": {
+    "jobs": 48,
+    "plan": "4 SKUs, 8-week horizon, demand multiplier 1.0-1.4 (workers.workload)",
+    "type": "OPTIMIZATION"
+  }
+}

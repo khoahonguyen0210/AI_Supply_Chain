@@ -1,0 +1,81 @@
+# Job workers. One pod = one queue worker (backend image, worker on) + its own planning engine as a
+# native sidecar, reached on localhost. The pod is the scaling unit, so every worker always has a
+# whole engine to itself: no load balancing across engines, no shared state (the sidecar's state is
+# scratch; forecast, optimisation and scenario jobs are stateless).
+# Scale with `scripts/kind.sh scale N`.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: worker }
+  template:
+    metadata:
+      labels: { app: worker }
+    spec:
+      # Service env links (BACKEND_PORT=tcp://...) would clash with the app settings
+      enableServiceLinks: false
+      initContainers:
+        # the knowledge tables are created by the backend's migrations
+        - name: wait-for-schema
+          image: busybox:1.37
+          command: ["sh", "-c", "until wget -q -O /dev/null http://backend:8081/actuator/health; do sleep 2; done"]
+        # native sidecar: starts before the worker and must pass its startup probe first
+        - name: engine
+          image: scm-ml
+          restartPolicy: Always
+          envFrom:
+            - configMapRef: { name: engine-config }
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: scm-secrets, key: POSTGRES_PASSWORD } }
+            - name: SCM_ML_INTERNAL_TOKEN
+              valueFrom: { secretKeyRef: { name: scm-secrets, key: SCM_ML_INTERNAL_TOKEN } }
+            - name: SCM_ML_KNOWLEDGE_DATABASE_URL
+              value: "host=postgres port=5432 dbname=scm user=scm password=$(POSTGRES_PASSWORD)"
+            - { name: SCM_ML_HOST, value: "127.0.0.1" }
+            - { name: SCM_ML_STATE_PATH, value: ":memory:" }
+            # one CPU per engine: native thread pools (LightGBM/OpenMP, BLAS) sized to match,
+            # otherwise every engine starts one thread per node core and replicas fight
+            - { name: OMP_NUM_THREADS, value: "1" }
+            - { name: OPENBLAS_NUM_THREADS, value: "1" }
+            - { name: MKL_NUM_THREADS, value: "1" }
+          startupProbe:
+            exec:
+              command: ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=2)"]
+            periodSeconds: 5
+            failureThreshold: 60
+          resources:
+            requests: { cpu: "1", memory: 768Mi }
+            limits: { cpu: "1", memory: 1536Mi }
+      containers:
+        - name: worker
+          image: scm-backend
+          envFrom:
+            - configMapRef: { name: backend-config }
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: scm-secrets, key: POSTGRES_PASSWORD } }
+            - name: SCM_JWT_SECRET
+              valueFrom: { secretKeyRef: { name: scm-secrets, key: SCM_JWT_SECRET } }
+            - name: SCM_ML_INTERNAL_TOKEN
+              valueFrom: { secretKeyRef: { name: scm-secrets, key: SCM_ML_INTERNAL_TOKEN } }
+            - { name: ML_SERVICE_URL, value: "http://127.0.0.1:8001" }
+            - { name: SCM_JOBS_WORKER_ENABLED, value: "true" }
+            # a crashed worker's job is taken over after the lease; jobs here last seconds,
+            # so 2 minutes (default 5) keeps recovery visible without double runs
+            - { name: SCM_JOBS_LEASE, value: "120s" }
+          ports:
+            - { name: management, containerPort: 8081 }
+          startupProbe:
+            httpGet: { path: /actuator/health, port: management }
+            periodSeconds: 5
+            failureThreshold: 36
+          livenessProbe:
+            httpGet: { path: /actuator/health/liveness, port: management }
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 250m, memory: 384Mi }
+            limits: { memory: 768Mi }
