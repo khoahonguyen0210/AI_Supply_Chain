@@ -7,9 +7,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
 COPY . .
 ARG BACKEND_URL=http://backend:8080
 ENV BACKEND_URL=$BACKEND_URL NEXT_TELEMETRY_DISABLED=1
-RUN node node_modules/next/dist/bin/next build
+# public/ may be empty, and git does not track empty directories (clean checkouts, CI)
+RUN mkdir -p public && node node_modules/next/dist/bin/next build
 
 FROM node:24-alpine
+# The server only needs node; the bundled npm, npx and corepack carry their own CVEs (docs/ci.md).
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+    /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 HOSTNAME=0.0.0.0 PORT=3000
 WORKDIR /app
 COPY --from=build --chown=node:node /src/.next/standalone ./

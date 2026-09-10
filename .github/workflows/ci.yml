@@ -1,0 +1,181 @@
+name: CI
+
+# Lint, type checks and tests for all three codebases, the end-to-end planner workflow, the
+# container images with a smoke test of the whole stack, dependency and image vulnerability scans,
+# and versioned images pushed to GitHub Container Registry (main and v* tags only).
+# Nothing here needs a paid service or an API key; the AI regression gate is its own workflow.
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FASTEMBED_CACHE_PATH: ${{ github.workspace }}/.cache/fastembed
+
+jobs:
+  python:
+    name: Python (ruff, mypy, pytest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv python install 3.12
+      - run: uv sync --frozen
+      - uses: actions/cache@v4
+        with:
+          path: .cache/fastembed
+          key: fastembed-bge-small-en-v1.5
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy src ml/src ml/tests tests
+      # Docker is available on the runner, so the pgvector integration tests run too
+      - run: uv run pytest
+
+  java:
+    name: Java (Maven verify)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      # unit and Testcontainers integration tests, then the jar
+      - run: ./mvnw -B -ntp verify
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scm-backend-jar-${{ github.sha }}
+          path: backend/target/scm-backend-*.jar
+          retention-days: 14
+
+  frontend:
+    name: Frontend (eslint, tsc, vitest, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  e2e:
+    name: End to end (PostgreSQL + backend + engine)
+    needs: [python, java]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - run: uv python install 3.12
+      - run: uv sync --frozen
+      - uses: actions/cache@v4
+        with:
+          path: .cache/fastembed
+          key: fastembed-bge-small-en-v1.5
+      - name: Train the synthetic forecast model (deterministic)
+        run: uv run python -m scm_ml.forecast --source synthetic
+      - run: bash scripts/e2e.sh
+
+  dependencies:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Python runtime dependencies (pip-audit)
+        run: |
+          uv export --frozen --no-dev --no-emit-project --format requirements-txt > requirements.txt
+          uvx pip-audit --strict --disable-pip --require-hashes -r requirements.txt
+      - name: Frontend runtime dependencies (npm audit)
+        working-directory: frontend
+        run: npm audit --omit=dev --audit-level=high
+
+  images:
+    name: Images, stack smoke test and scan
+    needs: [python, java, frontend]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      packages: write
+    env:
+      SCM_VERSION: ci
+      # pinned by digest: image tags can be re-pointed (aquasecurity/trivy-action tags were, CVE-2026-33634)
+      TRIVY: aquasec/trivy:0.74.0@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv python install 3.12
+      - name: Build the images and start the stack
+        run: bash scripts/stack.sh up
+      - name: Smoke test through the frontend
+        run: |
+          uv sync --frozen
+          bash scripts/stack.sh smoke
+      - name: Stack logs
+        if: failure()
+        run: docker compose logs --no-color --tail 300
+      - name: Vulnerability scan (fixable critical and high findings fail the build)
+        run: |
+          for image in scm-backend scm-ml scm-frontend; do
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+              -v "$HOME/.cache/trivy:/root/.cache/trivy" "$TRIVY" image \
+              --timeout 20m --scanners vuln --ignore-unfixed --severity CRITICAL,HIGH --exit-code 1 \
+              "$image:$SCM_VERSION"
+          done
+      - run: bash scripts/stack.sh down
+      - name: Push versioned images to GHCR
+        if: github.event_name == 'push'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          tags=("sha-${GITHUB_SHA::7}")
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            tags+=("${GITHUB_REF_NAME#v}" latest)
+          else
+            tags+=(main)
+          fi
+          for image in scm-backend scm-ml scm-frontend; do
+            for tag in "${tags[@]}"; do
+              docker tag "$image:$SCM_VERSION" "ghcr.io/$owner/$image:$tag"
+              docker push "ghcr.io/$owner/$image:$tag"
+            done
+          done

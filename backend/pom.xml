@@ -15,6 +15,10 @@
 	<description>API and orchestration layer for the AI Supply Chain Decision Intelligence Platform</description>
 	<properties>
 		<java.version>21</java.version>
+		<!-- Patch overrides of Boot 4.1.1's managed versions for fixed CVEs (Trivy image scan, docs/ci.md).
+		     Remove when the Spring Boot parent manages these versions or newer. -->
+		<tomcat.version>11.0.25</tomcat.version>
+		<jackson-bom.version>3.1.7</jackson-bom.version>
 	</properties>
 	<dependencies>
 		<dependency>
