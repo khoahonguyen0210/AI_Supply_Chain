@@ -1,0 +1,17 @@
+# Copy to terraform.tfvars (git-ignored) and adjust. Every variable has a default; see variables.tf.
+region      = "us-east-1"
+environment = "demo"
+image_tag   = "0.1.0"
+
+# HTTPS: an ACM certificate in the same region. Empty serves HTTP only.
+certificate_arn = ""
+allowed_cidrs   = ["203.0.113.0/24"]
+
+worker_min = 1
+worker_max = 4
+
+# "claude" also needs the key: aws secretsmanager put-secret-value --secret-id scm-demo/anthropic --secret-string <key>
+planner = "rule"
+
+alarm_email       = ""
+github_repository = "" # owner/name, creates the OIDC role CI uses to push to ECR

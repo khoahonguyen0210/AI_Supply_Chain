@@ -110,6 +110,30 @@ jobs:
         run: uv run python -m scm_ml.forecast --source synthetic
       - run: bash scripts/e2e.sh
 
+  terraform:
+    name: Terraform (fmt, validate, tflint)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: infrastructure/terraform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.4
+      - run: terraform fmt -check -recursive
+      # no backend and no credentials: this checks the configuration, it never plans or applies
+      - run: terraform init -backend=false -input=false
+      - run: terraform validate
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.64.0
+      - run: tflint --init
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - run: tflint --format compact
+
   dependencies:
     name: Dependency audit
     runs-on: ubuntu-latest

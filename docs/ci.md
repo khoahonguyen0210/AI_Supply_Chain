@@ -12,6 +12,7 @@ Runs on pull requests, pushes to `main` and `v*` tags.
 | `java` | `./mvnw verify`: unit and Testcontainers integration tests, then the jar (uploaded for 14 days) | - |
 | `frontend` | `npm ci`, eslint, `tsc --noEmit`, vitest, `next build` | - |
 | `e2e` | trains the synthetic forecast model, then `scripts/e2e.sh` (PostgreSQL + backend jar + engine, driven through the public API) | python, java |
+| `terraform` | `terraform fmt -check`, `init -backend=false`, `validate`, `tflint` on `infrastructure/terraform` (no credentials, never plans or applies; [cloud.md](cloud.md)) | - |
 | `dependencies` | `pip-audit` on the locked runtime dependencies (hash-checked), `npm audit --omit=dev --audit-level=high` | - |
 | `images` | `scripts/stack.sh up` (builds the three images, starts the Compose stack, waits for health), `scripts/stack.sh smoke`, Trivy scan of each image, then on a push: tag and push to GHCR | python, java, frontend |
 
