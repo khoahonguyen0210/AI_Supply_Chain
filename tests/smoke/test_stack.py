@@ -99,3 +99,12 @@ def test_optimisation_runs_as_a_job() -> None:
         time.sleep(1)
     assert job["status"] == "SUCCEEDED", job
     assert job["result"]["lines"] and job["result"]["violations"] == []
+
+
+def test_the_demo_story_runs_end_to_end() -> None:
+    from scm_ml.demo.__main__ import main as demo
+
+    assert (
+        demo(["--url", os.environ["SCM_SMOKE_URL"], "--password", os.environ["SCM_SMOKE_PASSWORD"]])
+        == 0
+    )

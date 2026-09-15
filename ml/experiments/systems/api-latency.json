@@ -1,0 +1,60 @@
+{
+  "benchmark": "api-latency",
+  "deployment": "docker compose (local)",
+  "endpoints": {
+    "GET /api/inventory": {
+      "max_ms": 14.781499998207437,
+      "mean_ms": 11.566292000061367,
+      "p50_ms": 11.425549999330542,
+      "p95_ms": 14.363684999807447,
+      "rate_limited_retries": 0,
+      "samples": 50
+    },
+    "GET /api/skus": {
+      "max_ms": 2062.3871000025247,
+      "mean_ms": 54.9498300004052,
+      "p50_ms": 13.465799998812145,
+      "p95_ms": 19.30131000099208,
+      "rate_limited_retries": 0,
+      "samples": 50
+    },
+    "POST /api/agent/tasks": {
+      "max_ms": 1185.2197000007436,
+      "mean_ms": 1019.6836900006019,
+      "p50_ms": 981.2793000019155,
+      "p95_ms": 1162.5893350004844,
+      "rate_limited_retries": 9,
+      "samples": 10
+    },
+    "POST /api/documents/ask": {
+      "max_ms": 3033.198799999809,
+      "mean_ms": 287.80902333346603,
+      "p50_ms": 100.2171999989514,
+      "p95_ms": 1299.745399999842,
+      "rate_limited_retries": 23,
+      "samples": 30
+    },
+    "POST /api/forecasts": {
+      "max_ms": 2105.2340999995067,
+      "mean_ms": 131.161003333303,
+      "p50_ms": 58.8427499988029,
+      "p95_ms": 109.2913900001804,
+      "rate_limited_retries": 16,
+      "samples": 30
+    },
+    "POST /api/suppliers/search": {
+      "max_ms": 94.04859999995097,
+      "mean_ms": 39.371816667213956,
+      "p50_ms": 35.92010000102164,
+      "p95_ms": 48.776040000666384,
+      "rate_limited_retries": 30,
+      "samples": 30
+    }
+  },
+  "method": "sequential, one client, after one warm-up call per endpoint; 429 responses waited out and retried outside the timed window",
+  "provenance": {
+    "code_revision": "9ccf604",
+    "created_at": "2026-10-07T21:14:44+00:00"
+  },
+  "url": "http://localhost:3000"
+}
