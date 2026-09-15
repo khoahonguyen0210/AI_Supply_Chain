@@ -3,6 +3,7 @@ package com.scm.platform.approval;
 import com.scm.platform.approval.ApprovalRepository.ApprovalRow;
 import com.scm.platform.error.ApiException;
 import com.scm.platform.mlservice.MlEngineClient;
+import com.scm.platform.outcome.OutcomeService;
 import com.scm.platform.security.Actor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -24,11 +25,14 @@ public class ApprovalService {
 
 	private final TransactionTemplate transaction;
 
+	private final OutcomeService outcomes;
+
 	public ApprovalService(MlEngineClient engine, ApprovalRepository repository,
-			PlatformTransactionManager transactionManager) {
+			PlatformTransactionManager transactionManager, OutcomeService outcomes) {
 		this.engine = engine;
 		this.repository = repository;
 		this.transaction = new TransactionTemplate(transactionManager);
+		this.outcomes = outcomes;
 	}
 
 	/** Stores an engine approval record and its recommendation; safe to repeat. */
@@ -44,7 +48,12 @@ public class ApprovalService {
 	 */
 	public ApprovalRow decide(Actor approver, String approvalId, String outcome, String rationale) {
 		JsonNode record = engine.decideApproval(approver, approvalId, outcome, rationale);
-		return transaction.execute(status -> store(approver, approvalId, outcome, rationale, record));
+		ApprovalRow stored = transaction.execute(status -> store(approver, approvalId, outcome, rationale, record));
+		if (stored != null && "APPROVED".equals(stored.status())) {
+			// What the decision relied on, for the feedback loop. Best effort: the approval itself is done.
+			outcomes.captureForecastQuietly(approver, stored.recommendationId());
+		}
+		return stored;
 	}
 
 	private ApprovalRow store(Actor approver, String approvalId, String outcome, String rationale,

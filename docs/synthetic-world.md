@@ -21,7 +21,9 @@ Generate: `uv run python -m scm_ml.synthetic --out data/synthetic --seed 42`
 
 ## Determinism and identity
 
-A single seed drives three independent random streams (master data, demand, operations). `manifest.json`
+A single seed drives three independent random streams (master data, demand, operations); a fourth,
+used only by the feedback loop, draws what happens after `as_of` (`docs/feedback-loop.md`). The
+world itself never contains anything after `as_of`. `manifest.json`
 records config, per-file row counts and SHA-256 checksums, and a `dataset_id` derived from them.
 `read_world` refuses a directory whose files no longer match the manifest.
 

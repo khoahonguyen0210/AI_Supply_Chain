@@ -40,8 +40,14 @@ def generate_purchase_orders(
     suppliers: list[Supplier],
     offers: list[SupplierOffer],
     specs: list[WarehouseSpec],
+    pending: dict[str, tuple[date, int]] | None = None,
 ) -> list[PurchaseOrder]:
-    """Simulate past replenishment; deliveries still pending at ``as_of`` stay open."""
+    """Simulate past replenishment; deliveries still pending at ``as_of`` stay open.
+
+    The delivery of an open order is drawn like any other but kept out of the world. Pass
+    ``pending`` to receive it (order id -> delivery date and quantity): it is the future the
+    feedback loop compares plans with, never an input to planning.
+    """
     reliability = {s.supplier_id: s.reliability for s in suppliers}
     offers_by_sku: dict[str, list[SupplierOffer]] = defaultdict(list)
     for offer in offers:
@@ -70,6 +76,8 @@ def generate_purchase_orders(
         expected_delivery = created.date() + timedelta(days=offer.lead_time_days)
         delivered_at = expected_delivery + timedelta(days=delay)
         is_open = delivered_at > as_of
+        if is_open and pending is not None:
+            pending[f"PO-{n + 1:05d}"] = (delivered_at, delivered_quantity)
         orders.append(
             PurchaseOrder(
                 po_id=f"PO-{n + 1:05d}",

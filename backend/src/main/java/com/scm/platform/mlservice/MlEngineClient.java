@@ -34,4 +34,10 @@ public interface MlEngineClient {
 
 	JsonNode decideApproval(Actor approver, String approvalId, String outcome, String rationale);
 
+	/** The served model's forecast for the SKUs from {@code asOf}: what an approved decision relied on. */
+	JsonNode forecastSnapshot(Actor actor, JsonNode request);
+
+	/** Scores recorded outcomes (demand, deliveries, stock) against forecasts and promises. */
+	JsonNode evaluateOutcomes(Actor actor, JsonNode request);
+
 }

@@ -18,7 +18,9 @@ from .engine_contracts import (
     ApprovalDecisionRequest,
     DocumentQuestionRequest,
     EngineResponse,
+    ForecastSnapshotRequest,
     OptimizeRequest,
+    OutcomeEvaluationRequest,
     ScenarioRunRequest,
     SupplierPerformanceRequest,
     SupplierSearchRequest,
@@ -34,6 +36,8 @@ ENGINE_REQUESTS: dict[str, type[BaseModel]] = {
     "document-question": DocumentQuestionRequest,
     "agent-task": AgentTaskRequest,
     "approval-decision": ApprovalDecisionRequest,
+    "forecast-snapshot": ForecastSnapshotRequest,
+    "outcome-evaluation": OutcomeEvaluationRequest,
 }
 
 

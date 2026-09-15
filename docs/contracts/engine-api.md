@@ -21,6 +21,8 @@ body `{ "code", "message" }` (`error-response-v1.schema.json`).
 | `GET /v1/approvals?status=` | | `{ approvals: [...] }` |
 | `GET /v1/approvals/{approvalId}` | | the approval, its recommendation, required and approved roles |
 | `POST /v1/approvals/{approvalId}/decision` | `approval-decision-request-v1` | the updated approval |
+| `POST /v1/outcomes/forecast-snapshot` | `forecast-snapshot-request-v1` | model version, dataset id, `asOf`, interval level and forecast points for every region with demand for the SKUs |
+| `POST /v1/outcomes/evaluate` | `outcome-evaluation-request-v1` | `forecast` (accuracy and interval coverage of snapshot points that have actuals, `awaitingActuals`), `deliveries` (on-time, in-full, unit fill rate, delay; per supplier against promised reliability), `inventory` (stockouts, unmet units, ending stock) |
 
 The shape of `data` is the documented output of the matching agent tool (`docs/agent.md`) with keys
 converted to camelCase; data keys such as supplier ids are left alone.

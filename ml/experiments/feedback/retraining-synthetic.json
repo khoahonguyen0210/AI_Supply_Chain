@@ -1,0 +1,93 @@
+{
+  "actuals": {
+    "new_weeks": 8,
+    "sha256": "29f2d63c424bfb60ea67ce4bb8b434a4a1806139437a085d2cc2215cd8afecd0",
+    "source": "SIMULATED",
+    "weeks": [
+      "2024-12-30",
+      "2025-02-17"
+    ]
+  },
+  "candidate": {
+    "artifact_dir": "candidates/synthetic-extended-ced8774557b1",
+    "config": {
+      "bagging_fraction": 0.8,
+      "early_stopping_rounds": 50,
+      "feature_fraction": 0.8,
+      "horizons": 8,
+      "lambda_l2": 1.0,
+      "learning_rate": 0.05,
+      "max_rounds": 1000,
+      "min_data_in_leaf": 40,
+      "num_leaves": 15,
+      "objective": "tweedie",
+      "seed": 42,
+      "tweedie_variance_power": 1.5,
+      "weight_power": 1.0
+    },
+    "dataset_id": "synthetic-extended-ced8774557b1",
+    "model_version": "lgbm-deb945aea1",
+    "panel_sha256": "8467ddfa3b3a37415cf13696e1b8ae11122e96504dcb751f964fafadad08c2b3",
+    "split": {
+      "test_start": "2024-10-28",
+      "val_start": "2024-07-29"
+    }
+  },
+  "current": {
+    "dataset_id": "synthetic-ef2dbee886f5",
+    "history_end": "2024-12-23",
+    "model_version": "lgbm-1f6789b06e"
+  },
+  "gate": {
+    "max_coverage_error": 0.1,
+    "min_mae_improvement": 0.0,
+    "passed": false,
+    "reasons": [
+      "candidate MAE 31.2787 is not below 31.1761 (current 31.1761, required improvement 0.0%)"
+    ]
+  },
+  "holdout": {
+    "horizons": 8,
+    "n_weeks": 4,
+    "note": "neither model was trained or calibrated on these weeks; walk-forward inputs are identical for both",
+    "series": 200,
+    "weeks": [
+      "2025-01-27",
+      "2025-02-17"
+    ]
+  },
+  "provenance": {
+    "code_revision": "a0c3686",
+    "created_at": "2026-10-07T15:24:58+00:00"
+  },
+  "scores": {
+    "candidate": {
+      "bias": -3.1627371836274927,
+      "coverage": 0.788125,
+      "mae": 31.278738250930974,
+      "mape": 0.6028856102386582,
+      "mean_width": 79.1718438571968,
+      "model_version": "lgbm-deb945aea1",
+      "rmse": 48.47041682388724,
+      "wape": 0.9140818484290331
+    },
+    "current": {
+      "bias": -3.1727557824194013,
+      "coverage": 0.8665625,
+      "mae": 31.1760558456939,
+      "mape": 0.6052917531951143,
+      "mean_width": 81.51698420833924,
+      "model_version": "lgbm-1f6789b06e",
+      "rmse": 48.33406145528456,
+      "wape": 0.9110810840750728
+    },
+    "moving_average_13": {
+      "bias": -2.0432692307692304,
+      "mae": 32.82560096153846,
+      "mape": 0.6616728850195919,
+      "rmse": 50.96609852602509,
+      "wape": 0.9592869687390235
+    }
+  },
+  "status": "REJECTED_BY_GATE"
+}

@@ -1,0 +1,550 @@
+{
+  "actuals": {
+    "demand_units": 53661,
+    "files_sha256": {
+      "deliveries.csv": "3f78e4b6aad68164217829f432ee0675a833d530e51ed4e1cd8f0b82e1762d9f",
+      "demand_actuals.csv": "29f2d63c424bfb60ea67ce4bb8b434a4a1806139437a085d2cc2215cd8afecd0",
+      "inventory.csv": "86e9af075d4abf987b90086c3217216544fd35550fb570470b2dffdebd9e7519"
+    },
+    "weeks": [
+      "2024-12-30",
+      "2025-02-17"
+    ]
+  },
+  "actuals_source": "SIMULATED",
+  "as_of": "2024-12-30",
+  "dataset_id": "synthetic-ef2dbee886f5",
+  "decision": {
+    "actual_demand_units": 26286.0,
+    "approval": "SIMULATED: every plan line treated as approved and placed at as_of",
+    "forecast_demand_units": 22963.9,
+    "horizon_weeks": 4,
+    "method": "milp",
+    "planned_fill_rate": 1.0,
+    "purchase_orders": 91,
+    "service_level_target": 0.95,
+    "solver_status": "OPTIMAL",
+    "spend": 298335.95,
+    "units_ordered": 10422
+  },
+  "deliveries": {
+    "open_at_as_of": {
+      "by_supplier": {
+        "SUP-001": {
+          "delivered": 9,
+          "in_full_rate": 1.0,
+          "max_delay_days": 0,
+          "mean_delay_days": 0.0,
+          "on_time_gap": 0.039,
+          "on_time_rate": 1.0,
+          "orders": 9,
+          "pending": 0,
+          "promised_on_time_rate": 0.961,
+          "unit_fill_rate": 1.0
+        },
+        "SUP-002": {
+          "delivered": 6,
+          "in_full_rate": 1.0,
+          "max_delay_days": 0,
+          "mean_delay_days": 0.0,
+          "on_time_gap": 0.133,
+          "on_time_rate": 1.0,
+          "orders": 6,
+          "pending": 0,
+          "promised_on_time_rate": 0.867,
+          "unit_fill_rate": 1.0
+        },
+        "SUP-003": {
+          "delivered": 2,
+          "in_full_rate": 1.0,
+          "max_delay_days": 0,
+          "mean_delay_days": 0.0,
+          "on_time_gap": 0.114,
+          "on_time_rate": 1.0,
+          "orders": 2,
+          "pending": 0,
+          "promised_on_time_rate": 0.886,
+          "unit_fill_rate": 1.0
+        },
+        "SUP-004": {
+          "delivered": 10,
+          "in_full_rate": 0.9,
+          "max_delay_days": 10,
+          "mean_delay_days": 1.0,
+          "on_time_gap": 0.099,
+          "on_time_rate": 0.9,
+          "orders": 10,
+          "pending": 0,
+          "promised_on_time_rate": 0.801,
+          "unit_fill_rate": 0.9893
+        },
+        "SUP-005": {
+          "delivered": 8,
+          "in_full_rate": 1.0,
+          "max_delay_days": 2,
+          "mean_delay_days": 0.25,
+          "on_time_gap": -0.016,
+          "on_time_rate": 0.875,
+          "orders": 8,
+          "pending": 0,
+          "promised_on_time_rate": 0.891,
+          "unit_fill_rate": 1.0
+        },
+        "SUP-006": {
+          "delivered": 3,
+          "in_full_rate": 1.0,
+          "max_delay_days": 0,
+          "mean_delay_days": 0.0,
+          "on_time_gap": 0.135,
+          "on_time_rate": 1.0,
+          "orders": 3,
+          "pending": 0,
+          "promised_on_time_rate": 0.865,
+          "unit_fill_rate": 1.0
+        },
+        "SUP-007": {
+          "delivered": 2,
+          "in_full_rate": 1.0,
+          "max_delay_days": 0,
+          "mean_delay_days": 0.0,
+          "on_time_gap": 0.017,
+          "on_time_rate": 1.0,
+          "orders": 2,
+          "pending": 0,
+          "promised_on_time_rate": 0.983,
+          "unit_fill_rate": 1.0
+        },
+        "SUP-008": {
+          "delivered": 2,
+          "in_full_rate": 1.0,
+          "max_delay_days": 0,
+          "mean_delay_days": 0.0,
+          "on_time_gap": 0.023,
+          "on_time_rate": 1.0,
+          "orders": 2,
+          "pending": 0,
+          "promised_on_time_rate": 0.977,
+          "unit_fill_rate": 1.0
+        },
+        "SUP-009": {
+          "delivered": 8,
+          "in_full_rate": 0.875,
+          "max_delay_days": 6,
+          "mean_delay_days": 2.0,
+          "on_time_gap": -0.225,
+          "on_time_rate": 0.625,
+          "orders": 8,
+          "pending": 0,
+          "promised_on_time_rate": 0.85,
+          "unit_fill_rate": 0.9679
+        },
+        "SUP-010": {
+          "delivered": 3,
+          "in_full_rate": 0.6667,
+          "max_delay_days": 8,
+          "mean_delay_days": 2.6667,
+          "on_time_gap": -0.2203,
+          "on_time_rate": 0.6667,
+          "orders": 3,
+          "pending": 0,
+          "promised_on_time_rate": 0.887,
+          "unit_fill_rate": 0.9789
+        }
+      },
+      "overall": {
+        "delivered": 53,
+        "in_full_rate": 0.9434,
+        "max_delay_days": 10,
+        "mean_delay_days": 0.6792,
+        "on_time_rate": 0.8868,
+        "orders": 53,
+        "pending": 0,
+        "unit_fill_rate": 0.9931
+      }
+    },
+    "plan_orders": {
+      "by_supplier": {
+        "SUP-001": {
+          "delivered": 9,
+          "in_full_rate": 1.0,
+          "max_delay_days": 2,
+          "mean_delay_days": 0.2222,
+          "on_time_gap": -0.0721,
+          "on_time_rate": 0.8889,
+          "orders": 9,
+          "pending": 0,
+          "promised_on_time_rate": 0.961,
+          "unit_fill_rate": 1.0
+        },
+        "SUP-002": {
+          "delivered": 19,
+          "in_full_rate": 0.8947,
+          "max_delay_days": 8,
+          "mean_delay_days": 0.8947,
+          "on_time_gap": -0.0775,
+          "on_time_rate": 0.7895,
+          "orders": 19,
+          "pending": 0,
+          "promised_on_time_rate": 0.867,
+          "unit_fill_rate": 0.9699
+        },
+        "SUP-003": {
+          "delivered": 10,
+          "in_full_rate": 0.9,
+          "max_delay_days": 2,
+          "mean_delay_days": 0.2,
+          "on_time_gap": 0.014,
+          "on_time_rate": 0.9,
+          "orders": 10,
+          "pending": 0,
+          "promised_on_time_rate": 0.886,
+          "unit_fill_rate": 0.9804
+        },
+        "SUP-004": {
+          "delivered": 19,
+          "in_full_rate": 0.8421,
+          "max_delay_days": 7,
+          "mean_delay_days": 0.7895,
+          "on_time_gap": -0.0115,
+          "on_time_rate": 0.7895,
+          "orders": 19,
+          "pending": 0,
+          "promised_on_time_rate": 0.801,
+          "unit_fill_rate": 0.953
+        },
+        "SUP-005": {
+          "delivered": 13,
+          "in_full_rate": 1.0,
+          "max_delay_days": 0,
+          "mean_delay_days": 0.0,
+          "on_time_gap": 0.109,
+          "on_time_rate": 1.0,
+          "orders": 13,
+          "pending": 0,
+          "promised_on_time_rate": 0.891,
+          "unit_fill_rate": 1.0
+        },
+        "SUP-006": {
+          "delivered": 8,
+          "in_full_rate": 1.0,
+          "max_delay_days": 10,
+          "mean_delay_days": 1.75,
+          "on_time_gap": -0.115,
+          "on_time_rate": 0.75,
+          "orders": 8,
+          "pending": 0,
+          "promised_on_time_rate": 0.865,
+          "unit_fill_rate": 1.0
+        },
+        "SUP-007": {
+          "delivered": 2,
+          "in_full_rate": 0.5,
+          "max_delay_days": 3,
+          "mean_delay_days": 1.5,
+          "on_time_gap": -0.483,
+          "on_time_rate": 0.5,
+          "orders": 2,
+          "pending": 0,
+          "promised_on_time_rate": 0.983,
+          "unit_fill_rate": 0.9615
+        },
+        "SUP-008": {
+          "delivered": 11,
+          "in_full_rate": 1.0,
+          "max_delay_days": 0,
+          "mean_delay_days": 0.0,
+          "on_time_gap": 0.023,
+          "on_time_rate": 1.0,
+          "orders": 11,
+          "pending": 0,
+          "promised_on_time_rate": 0.977,
+          "unit_fill_rate": 1.0
+        }
+      },
+      "overall": {
+        "delivered": 91,
+        "in_full_rate": 0.9231,
+        "max_delay_days": 10,
+        "mean_delay_days": 0.5824,
+        "on_time_rate": 0.8571,
+        "orders": 91,
+        "pending": 0,
+        "unit_fill_rate": 0.9842
+      }
+    }
+  },
+  "experiment": "feedback-loop",
+  "experiment_version": "1",
+  "forecast": {
+    "horizons": 8,
+    "model": {
+      "by_horizon": {
+        "1": {
+          "actual_total": 6753.0,
+          "bias": -6.3015,
+          "coverage": 0.855,
+          "forecast_total": 5492.71,
+          "mae": 30.8289,
+          "mape": 0.5231,
+          "mean_width": 75.03,
+          "n": 200,
+          "rmse": 48.8192,
+          "wape": 0.913
+        },
+        "2": {
+          "actual_total": 6116.0,
+          "bias": -1.9257,
+          "coverage": 0.845,
+          "forecast_total": 5730.87,
+          "mae": 27.5451,
+          "mape": 0.5941,
+          "mean_width": 76.7013,
+          "n": 200,
+          "rmse": 37.7962,
+          "wape": 0.9008
+        },
+        "3": {
+          "actual_total": 6781.0,
+          "bias": -4.9956,
+          "coverage": 0.845,
+          "forecast_total": 5781.89,
+          "mae": 31.0259,
+          "mape": 0.5649,
+          "mean_width": 77.5999,
+          "n": 200,
+          "rmse": 46.487,
+          "wape": 0.9151
+        },
+        "4": {
+          "actual_total": 6636.0,
+          "bias": -3.3879,
+          "coverage": 0.86,
+          "forecast_total": 5958.41,
+          "mae": 30.9338,
+          "mape": 0.5427,
+          "mean_width": 77.7971,
+          "n": 200,
+          "rmse": 50.9606,
+          "wape": 0.9323
+        },
+        "5": {
+          "actual_total": 6397.0,
+          "bias": -1.8806,
+          "coverage": 0.85,
+          "forecast_total": 6020.88,
+          "mae": 30.8986,
+          "mape": 0.5862,
+          "mean_width": 75.1942,
+          "n": 200,
+          "rmse": 51.1987,
+          "wape": 0.966
+        },
+        "6": {
+          "actual_total": 5926.0,
+          "bias": 0.631,
+          "coverage": 0.855,
+          "forecast_total": 6052.2,
+          "mae": 27.9045,
+          "mape": 0.6511,
+          "mean_width": 75.8606,
+          "n": 200,
+          "rmse": 37.9381,
+          "wape": 0.9418
+        },
+        "7": {
+          "actual_total": 6277.0,
+          "bias": -0.0679,
+          "coverage": 0.915,
+          "forecast_total": 6263.42,
+          "mae": 30.6363,
+          "mape": 0.6182,
+          "mean_width": 87.4468,
+          "n": 200,
+          "rmse": 45.2677,
+          "wape": 0.9761
+        },
+        "8": {
+          "actual_total": 8775.0,
+          "bias": -12.0409,
+          "coverage": 0.85,
+          "forecast_total": 6366.83,
+          "mae": 35.5497,
+          "mape": 0.5715,
+          "mean_width": 87.8874,
+          "n": 200,
+          "rmse": 57.3889,
+          "wape": 0.8102
+        }
+      },
+      "overall": {
+        "actual_total": 53661.0,
+        "bias": -3.7461,
+        "coverage": 0.8594,
+        "forecast_total": 47667.21,
+        "mae": 30.6653,
+        "mape": 0.5831,
+        "mean_width": 79.1897,
+        "n": 1600,
+        "rmse": 47.3988,
+        "wape": 0.9143
+      }
+    },
+    "moving_average_13": {
+      "by_horizon": {
+        "1": {
+          "actual_total": 6753.0,
+          "bias": -1.4531,
+          "coverage": 0.005,
+          "forecast_total": 6462.38,
+          "mae": 31.5808,
+          "mape": 0.5587,
+          "mean_width": 0.0,
+          "n": 200,
+          "rmse": 48.2961,
+          "wape": 0.9353
+        },
+        "2": {
+          "actual_total": 6116.0,
+          "bias": 1.7319,
+          "coverage": 0.01,
+          "forecast_total": 6462.38,
+          "mae": 29.0981,
+          "mape": 0.7105,
+          "mean_width": 0.0,
+          "n": 200,
+          "rmse": 39.2604,
+          "wape": 0.9515
+        },
+        "3": {
+          "actual_total": 6781.0,
+          "bias": -1.5931,
+          "coverage": 0.005,
+          "forecast_total": 6462.38,
+          "mae": 32.3746,
+          "mape": 0.6361,
+          "mean_width": 0.0,
+          "n": 200,
+          "rmse": 46.5459,
+          "wape": 0.9549
+        },
+        "4": {
+          "actual_total": 6636.0,
+          "bias": -0.8681,
+          "coverage": 0.01,
+          "forecast_total": 6462.38,
+          "mae": 30.925,
+          "mape": 0.5577,
+          "mean_width": 0.0,
+          "n": 200,
+          "rmse": 50.795,
+          "wape": 0.932
+        },
+        "5": {
+          "actual_total": 6397.0,
+          "bias": 0.3269,
+          "coverage": 0.005,
+          "forecast_total": 6462.38,
+          "mae": 31.4485,
+          "mape": 0.6776,
+          "mean_width": 0.0,
+          "n": 200,
+          "rmse": 49.6398,
+          "wape": 0.9832
+        },
+        "6": {
+          "actual_total": 5926.0,
+          "bias": 2.6819,
+          "coverage": 0.01,
+          "forecast_total": 6462.38,
+          "mae": 28.1165,
+          "mape": 0.6938,
+          "mean_width": 0.0,
+          "n": 200,
+          "rmse": 39.7365,
+          "wape": 0.9489
+        },
+        "7": {
+          "actual_total": 6277.0,
+          "bias": 0.9269,
+          "coverage": 0.005,
+          "forecast_total": 6462.38,
+          "mae": 34.08,
+          "mape": 0.6559,
+          "mean_width": 0.0,
+          "n": 200,
+          "rmse": 51.6559,
+          "wape": 1.0859
+        },
+        "8": {
+          "actual_total": 8775.0,
+          "bias": -11.5631,
+          "coverage": 0.005,
+          "forecast_total": 6462.38,
+          "mae": 38.8192,
+          "mape": 0.6476,
+          "mean_width": 0.0,
+          "n": 200,
+          "rmse": 60.603,
+          "wape": 0.8848
+        }
+      },
+      "overall": {
+        "actual_total": 53661.0,
+        "bias": -1.2262,
+        "coverage": 0.0069,
+        "forecast_total": 51699.08,
+        "mae": 32.0553,
+        "mape": 0.6444,
+        "mean_width": 0.0,
+        "n": 1600,
+        "rmse": 48.74,
+        "wape": 0.9558
+      }
+    },
+    "origin": "2024-12-30",
+    "series": 200
+  },
+  "forecast_model_version": "lgbm-1f6789b06e",
+  "inventory": {
+    "actual": {
+      "cell_weeks": 480,
+      "cells": 120,
+      "cells_with_stockout": 59,
+      "demand_units": 26286.0,
+      "ending_on_hand_units": 11431.0,
+      "ending_week": "2025-01-20",
+      "fill_rate": 0.8032,
+      "stockout_cell_weeks": 92,
+      "unmet_units": 5174.0
+    },
+    "planned": {
+      "cell_weeks": 480,
+      "cells": 120,
+      "cells_with_stockout": 45,
+      "demand_units": 22963.88,
+      "ending_on_hand_units": 12709.87,
+      "ending_week": "2025-01-20",
+      "fill_rate": 0.9079,
+      "stockout_cell_weeks": 77,
+      "unmet_units": 2115.75
+    },
+    "planned_vs_actual": {
+      "actual_stockout_cell_weeks": 92,
+      "ending_on_hand_bias": -10.6573,
+      "ending_on_hand_mae": 63.5788,
+      "matched_cell_weeks": 480,
+      "planned_stockout_cell_weeks": 77,
+      "unexpected_stockout_cell_weeks": 62
+    },
+    "weeks": [
+      "2024-12-30",
+      "2025-01-20"
+    ]
+  },
+  "note": "Actuals are SIMULATED by continuing the synthetic world's generative process past as_of with the same seed; the approval of the plan is simulated (all lines approved).",
+  "provenance": {
+    "code_revision": "a0c3686",
+    "created_at": "2026-10-07T15:16:45+00:00"
+  },
+  "seed": 42
+}

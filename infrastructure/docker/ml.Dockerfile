@@ -14,7 +14,9 @@ COPY pyproject.toml uv.lock README.md LICENSE ./
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev --no-install-project
 COPY src src
 COPY ml/src ml/src
-RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev --no-editable
+# uv rebuilds a cached local project only when pyproject.toml changes, so force it: otherwise the
+# image can silently ship the previous build's code
+RUN --mount=type=cache,target=/root/.cache/uv     uv sync --frozen --no-dev --no-editable --reinstall-package ai-scm-platform
 COPY ml/experiments ml/experiments
 ENV PATH=/opt/venv/bin:$PATH FASTEMBED_CACHE_PATH=/opt/fastembed
 RUN python -m scm_ml.forecast --source synthetic \

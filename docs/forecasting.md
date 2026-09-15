@@ -53,3 +53,9 @@ Test MAE improvement over the selected baseline: **+11.1% synthetic, +2.1% real*
   conformal offset cannot shrink them; real-data calibration lifts coverage from 0.729 to 0.783 on test.
 - Synthetic test MAE is flat across horizons: with this noise level, a 1-week and an 8-week forecast are
   equally hard.
+
+## Which model is served
+
+`SCM_ML_MODEL_DIR` + `SCM_ML_DATASET_DIR` if set; otherwise a model promoted through the feedback
+loop (`ml/artifacts/forecast/serving.json`, written only by an approved promotion, see
+`docs/feedback-loop.md`); otherwise the model trained on the world's own history.

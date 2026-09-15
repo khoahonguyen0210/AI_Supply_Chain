@@ -1,0 +1,276 @@
+{
+  "$defs": {
+    "ActorRef": {
+      "additionalProperties": false,
+      "description": "The authenticated human a request runs for; authentication itself is the backend's job.",
+      "properties": {
+        "role": {
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "userId": {
+          "minLength": 1,
+          "title": "Userid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "userId",
+        "role"
+      ],
+      "title": "ActorRef",
+      "type": "object"
+    },
+    "DeliveryRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "deliveredOn": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deliveredon"
+        },
+        "deliveredQuantity": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deliveredquantity"
+        },
+        "expectedDelivery": {
+          "format": "date",
+          "title": "Expecteddelivery",
+          "type": "string"
+        },
+        "orderedQuantity": {
+          "minimum": 1,
+          "title": "Orderedquantity",
+          "type": "integer"
+        },
+        "poId": {
+          "minLength": 1,
+          "title": "Poid",
+          "type": "string"
+        },
+        "promisedReliability": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Promisedreliability"
+        },
+        "supplierId": {
+          "minLength": 1,
+          "title": "Supplierid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "poId",
+        "supplierId",
+        "orderedQuantity",
+        "expectedDelivery"
+      ],
+      "title": "DeliveryRecord",
+      "type": "object"
+    },
+    "DemandRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "quantity": {
+          "minimum": 0,
+          "title": "Quantity",
+          "type": "number"
+        },
+        "regionId": {
+          "minLength": 1,
+          "title": "Regionid",
+          "type": "string"
+        },
+        "skuId": {
+          "minLength": 1,
+          "title": "Skuid",
+          "type": "string"
+        },
+        "weekStart": {
+          "format": "date",
+          "title": "Weekstart",
+          "type": "string"
+        }
+      },
+      "required": [
+        "skuId",
+        "regionId",
+        "weekStart",
+        "quantity"
+      ],
+      "title": "DemandRecord",
+      "type": "object"
+    },
+    "ForecastPointRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "horizon": {
+          "minimum": 1,
+          "title": "Horizon",
+          "type": "integer"
+        },
+        "lower": {
+          "minimum": 0,
+          "title": "Lower",
+          "type": "number"
+        },
+        "point": {
+          "minimum": 0,
+          "title": "Point",
+          "type": "number"
+        },
+        "regionId": {
+          "minLength": 1,
+          "title": "Regionid",
+          "type": "string"
+        },
+        "skuId": {
+          "minLength": 1,
+          "title": "Skuid",
+          "type": "string"
+        },
+        "upper": {
+          "minimum": 0,
+          "title": "Upper",
+          "type": "number"
+        },
+        "weekStart": {
+          "format": "date",
+          "title": "Weekstart",
+          "type": "string"
+        }
+      },
+      "required": [
+        "skuId",
+        "regionId",
+        "weekStart",
+        "horizon",
+        "point",
+        "lower",
+        "upper"
+      ],
+      "title": "ForecastPointRecord",
+      "type": "object"
+    },
+    "InventoryRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "onHand": {
+          "minimum": 0,
+          "title": "Onhand",
+          "type": "number"
+        },
+        "skuId": {
+          "minLength": 1,
+          "title": "Skuid",
+          "type": "string"
+        },
+        "unmetUnits": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Unmetunits",
+          "type": "number"
+        },
+        "warehouseId": {
+          "minLength": 1,
+          "title": "Warehouseid",
+          "type": "string"
+        },
+        "weekStart": {
+          "format": "date",
+          "title": "Weekstart",
+          "type": "string"
+        }
+      },
+      "required": [
+        "skuId",
+        "warehouseId",
+        "weekStart",
+        "onHand"
+      ],
+      "title": "InventoryRecord",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Recorded outcomes next to what was forecast and promised; the engine scores them.",
+  "properties": {
+    "actor": {
+      "$ref": "#/$defs/ActorRef"
+    },
+    "deliveries": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/DeliveryRecord"
+      },
+      "maxItems": 50000,
+      "title": "Deliveries",
+      "type": "array"
+    },
+    "demand": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/DemandRecord"
+      },
+      "maxItems": 50000,
+      "title": "Demand",
+      "type": "array"
+    },
+    "forecasts": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ForecastPointRecord"
+      },
+      "maxItems": 50000,
+      "title": "Forecasts",
+      "type": "array"
+    },
+    "inventory": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/InventoryRecord"
+      },
+      "maxItems": 50000,
+      "title": "Inventory",
+      "type": "array"
+    },
+    "schemaVersion": {
+      "const": "1",
+      "default": "1",
+      "title": "Schemaversion",
+      "type": "string"
+    }
+  },
+  "required": [
+    "actor"
+  ],
+  "title": "OutcomeEvaluationRequest",
+  "type": "object"
+}

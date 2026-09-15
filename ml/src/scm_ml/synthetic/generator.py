@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
+from dataclasses import dataclass
+from datetime import date, timedelta
 
 import numpy as np
 
 from .config import SyntheticConfig
-from .demand import generate_sales_orders
+from .demand import DemandProcess, generate_sales_orders
 from .master_data import (
     build_contracts,
     build_lanes,
@@ -21,11 +22,42 @@ from .operations import generate_inventory_and_warehouses, generate_purchase_ord
 from .world import SyntheticWorld
 
 STAGES = ("master", "demand", "operations")
+OUTCOME_STREAM = len(STAGES)
+"""Index of the random stream reserved for what happens after ``as_of`` (the feedback loop)."""
+
+
+@dataclass(frozen=True)
+class HiddenFuture:
+    """What the generator knows about the time after ``as_of`` but never puts in the world.
+
+    Only the feedback loop reads it, to produce simulated actuals; planning never sees it.
+    """
+
+    demand: DemandProcess
+    pending_deliveries: dict[str, tuple[date, int]]
+    """Open purchase order id -> the delivery date and quantity already drawn for it."""
 
 
 def generate_world(cfg: SyntheticConfig | None = None) -> SyntheticWorld:
     """Same config (including seed) always yields an identical world."""
-    cfg = cfg or SyntheticConfig()
+    return _generate(cfg or SyntheticConfig())[0]
+
+
+def generate_world_with_future(
+    cfg: SyntheticConfig | None = None,
+) -> tuple[SyntheticWorld, HiddenFuture]:
+    """The world plus its hidden future; the world is identical to ``generate_world``'s."""
+    return _generate(cfg or SyntheticConfig())
+
+
+def outcome_rng(cfg: SyntheticConfig) -> np.random.Generator:
+    """The random stream for simulated outcomes, independent of the three world streams."""
+    return np.random.default_rng(
+        np.random.SeedSequence(cfg.seed).spawn(OUTCOME_STREAM + 1)[OUTCOME_STREAM]
+    )
+
+
+def _generate(cfg: SyntheticConfig) -> tuple[SyntheticWorld, HiddenFuture]:
     master_rng, demand_rng, ops_rng = (
         np.random.default_rng(seq) for seq in np.random.SeedSequence(cfg.seed).spawn(len(STAGES))
     )
@@ -38,7 +70,7 @@ def generate_world(cfg: SyntheticConfig | None = None) -> SyntheticWorld:
     suppliers, price_factor = build_suppliers(cfg, master_rng, regions)
     contracts = build_contracts(suppliers, as_of)
 
-    sales_orders, weekly_units = generate_sales_orders(cfg, demand_rng, skus, regions)
+    sales_orders, weekly_units, process = generate_sales_orders(cfg, demand_rng, skus, regions)
 
     offers = build_offers(
         cfg,
@@ -52,11 +84,14 @@ def generate_world(cfg: SyntheticConfig | None = None) -> SyntheticWorld:
         regions,
         weekly_units,
     )
-    purchase_orders = generate_purchase_orders(cfg, ops_rng, as_of, skus, suppliers, offers, specs)
+    pending: dict[str, tuple[date, int]] = {}
+    purchase_orders = generate_purchase_orders(
+        cfg, ops_rng, as_of, skus, suppliers, offers, specs, pending
+    )
     inventory, warehouses = generate_inventory_and_warehouses(
         ops_rng, as_of, skus, specs, lanes, sales_orders, purchase_orders
     )
-    return SyntheticWorld(
+    world = SyntheticWorld(
         config=cfg,
         as_of=as_of,
         regions=regions,
@@ -70,3 +105,4 @@ def generate_world(cfg: SyntheticConfig | None = None) -> SyntheticWorld:
         purchase_orders=purchase_orders,
         inventory=inventory,
     )
+    return world, HiddenFuture(demand=process, pending_deliveries=pending)

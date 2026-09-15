@@ -21,6 +21,7 @@ the engine's status and code.
 | Copilot | `POST /api/agent/tasks`, `GET /api/agent/tasks/{id}`, `GET /api/agent/conversations`, `GET /api/agent/conversations/{id}` |
 | Approvals | `GET /api/approvals?status`, `GET /api/approvals/{id}`, `POST /api/approvals/{id}/decision` |
 | Jobs | `POST /api/jobs`, `GET /api/jobs/{id}`, `GET /api/jobs` (see `docs/async-jobs.md`) |
+| Outcomes | `POST /api/outcomes/demand`, `POST /api/outcomes/deliveries`, `POST /api/outcomes/inventory`, `POST /api/outcomes/forecast-snapshots/{recommendationId}` (planning roles), `GET /api/outcomes/evaluation?recommendationId` (see `docs/feedback-loop.md`) |
 
 ## Rules worth knowing
 
@@ -34,7 +35,12 @@ the engine's status and code.
   on success it stores the approval state and appends an immutable `decision` row (a database trigger
   forbids update and delete). Only when the approval is complete are purchase orders created, one per
   line, in status `APPROVED`; placing them with suppliers is outside the system. An engine refusal is
-  returned unchanged and nothing is stored.
+  returned unchanged and nothing is stored. After a complete approval the backend also stores the
+  forecast the recommendation relied on (`forecast_snapshot`), best effort: if the engine cannot be
+  reached the approval still stands and the snapshot can be taken later.
+* **Outcomes are append-only.** Recorded demand, deliveries and stock are never updated; a correction
+  is a newer record and the latest one counts. A delivery also moves its purchase order to
+  `DELIVERED`. The evaluation is computed by the engine from what the backend gathered.
 * **Long work is a job.** Optimization and scenarios are asynchronous; the copilot and forecast calls
   are synchronous. The engine read timeout is `scm.ml-read-timeout` (120s).
 

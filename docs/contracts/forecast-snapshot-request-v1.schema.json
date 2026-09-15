@@ -1,0 +1,67 @@
+{
+  "$defs": {
+    "ActorRef": {
+      "additionalProperties": false,
+      "description": "The authenticated human a request runs for; authentication itself is the backend's job.",
+      "properties": {
+        "role": {
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "userId": {
+          "minLength": 1,
+          "title": "Userid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "userId",
+        "role"
+      ],
+      "title": "ActorRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The forecast a decision relies on, for every region with demand for each SKU.",
+  "properties": {
+    "actor": {
+      "$ref": "#/$defs/ActorRef"
+    },
+    "asOf": {
+      "format": "date",
+      "title": "Asof",
+      "type": "string"
+    },
+    "horizonWeeks": {
+      "default": 4,
+      "maximum": 8,
+      "minimum": 1,
+      "title": "Horizonweeks",
+      "type": "integer"
+    },
+    "schemaVersion": {
+      "const": "1",
+      "default": "1",
+      "title": "Schemaversion",
+      "type": "string"
+    },
+    "skuIds": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Skuids",
+      "type": "array"
+    }
+  },
+  "required": [
+    "actor",
+    "skuIds",
+    "asOf"
+  ],
+  "title": "ForecastSnapshotRequest",
+  "type": "object"
+}

@@ -14,6 +14,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from scm_ml.feedback.retraining import serving_directories
 from scm_ml.forecast.artifacts import DEFAULT_ARTIFACT_ROOT
 from scm_ml.forecast.inference import ForecastError
 from scm_ml.optimization.benchmark import forecast_artifact_dirs
@@ -26,7 +27,9 @@ from .engine_contracts import (
     ApprovalDecisionRequest,
     DocumentQuestionRequest,
     EngineResponse,
+    ForecastSnapshotRequest,
     OptimizeRequest,
+    OutcomeEvaluationRequest,
     ScenarioRunRequest,
     SupplierPerformanceRequest,
     SupplierSearchRequest,
@@ -47,13 +50,14 @@ def _error(status: int, code: str, message: str) -> JSONResponse:
 
 
 def model_directories(world: SyntheticWorld) -> tuple[Path, Path]:
-    """The forecast model and dataset to serve: explicit directories, else the world's own model."""
+    """The forecast model and dataset to serve: explicit directories, else the model promoted
+    through the feedback loop (``serving.json``), else the world's own model."""
     model_dir = os.environ.get("SCM_ML_MODEL_DIR")
     dataset_dir = os.environ.get("SCM_ML_DATASET_DIR")
     if model_dir and dataset_dir:
         return Path(model_dir), Path(dataset_dir)
     root = Path(os.environ.get("SCM_ML_ARTIFACT_ROOT", str(DEFAULT_ARTIFACT_ROOT)))
-    return forecast_artifact_dirs(world, root)
+    return serving_directories(root) or forecast_artifact_dirs(world, root)
 
 
 INTERNAL_TOKEN_HEADER = "X-Internal-Token"
@@ -231,5 +235,13 @@ def create_app(
         request: Request, approval_id: str, body: ApprovalDecisionRequest
     ) -> EngineResponse:
         return EngineResponse(data=engine_of(request).decide_approval(approval_id, body))
+
+    @app.post("/v1/outcomes/forecast-snapshot")
+    def forecast_snapshot(request: Request, body: ForecastSnapshotRequest) -> EngineResponse:
+        return EngineResponse(data=engine_of(request).forecast_snapshot(body))
+
+    @app.post("/v1/outcomes/evaluate")
+    def evaluate_outcomes(request: Request, body: OutcomeEvaluationRequest) -> EngineResponse:
+        return EngineResponse(data=engine_of(request).evaluate_outcomes(body))
 
     return app

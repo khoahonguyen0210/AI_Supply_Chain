@@ -20,7 +20,6 @@ import org.springframework.web.client.RestClient;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
-/** The engine client sends v1 requests carrying the actor and returns only the response's {@code data}. */
 class PythonEngineClientTest {
 
 	private static final Actor ACTOR = new Actor("pat", "planner");
@@ -73,6 +72,26 @@ class PythonEngineClientTest {
 		assertThat(client.runAgentTask(ACTOR, "forecast SKU-001").path("taskId").asString()).isEqualTo("TASK-1");
 		assertThat(client.decideApproval(new Actor("mia", "procurement_manager"), "APR-1", "APPROVED", "ok")
 				.path("status").asString()).isEqualTo("APPROVED");
+		server.verify();
+	}
+
+	@Test
+	void outcomeCallsPostToTheirEndpoints() {
+		server.expect(requestTo("http://ml.test/v1/outcomes/forecast-snapshot"))
+				.andExpect(method(HttpMethod.POST))
+				.andExpect(jsonPath("$.asOf").value("2024-12-30"))
+				.andExpect(jsonPath("$.actor.userId").value("pat"))
+				.andRespond(withSuccess(envelope("{\"modelVersion\":\"lgbm-1\",\"points\":[]}"),
+						MediaType.APPLICATION_JSON));
+		server.expect(requestTo("http://ml.test/v1/outcomes/evaluate"))
+				.andExpect(jsonPath("$.schemaVersion").value("1"))
+				.andExpect(jsonPath("$.demand").isArray())
+				.andRespond(withSuccess(envelope("{\"forecast\":{\"points\":0}}"), MediaType.APPLICATION_JSON));
+
+		assertThat(client.forecastSnapshot(ACTOR, json.readTree("{\"skuIds\":[\"SKU-001\"],\"asOf\":\"2024-12-30\"}"))
+				.path("modelVersion").asString()).isEqualTo("lgbm-1");
+		assertThat(client.evaluateOutcomes(ACTOR, json.readTree("{\"demand\":[]}")).path("forecast").path("points")
+				.asInt()).isZero();
 		server.verify();
 	}
 

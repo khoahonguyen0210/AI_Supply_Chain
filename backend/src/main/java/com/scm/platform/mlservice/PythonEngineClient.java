@@ -94,6 +94,16 @@ public class PythonEngineClient implements MlEngineClient {
 		return post("/v1/approvals/" + approvalId + "/decision", body);
 	}
 
+	@Override
+	public JsonNode forecastSnapshot(Actor actor, JsonNode request) {
+		return post("/v1/outcomes/forecast-snapshot", envelope(actor, request));
+	}
+
+	@Override
+	public JsonNode evaluateOutcomes(Actor actor, JsonNode request) {
+		return post("/v1/outcomes/evaluate", envelope(actor, request));
+	}
+
 	private JsonNode post(String path, Object body) {
 		return unwrap(MlErrors.call(CONTRACT,
 				() -> restClient.post().uri(path).body(body).retrieve().body(JsonNode.class)));

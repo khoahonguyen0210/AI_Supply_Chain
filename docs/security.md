@@ -37,6 +37,7 @@ Roles: `planner`, `procurement_manager`, `finance`, `admin`.
 | --- | --- |
 | `/api/ops/**` is admin only | security filter chain and the controller |
 | scenarios and supplier search need a planning role | controller |
+| recording outcomes (demand, deliveries, stock, forecast snapshots) needs a planning role; reading the evaluation does not | controller |
 | documents are filtered by role in SQL; an unreadable document is `404` | repository |
 | policy answers only use documents the role may read | engine retrieval |
 | jobs, agent tasks and conversations belong to their owner (others get `404`) | service |

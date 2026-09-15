@@ -25,7 +25,9 @@ from scm_ml.agent.planner import ClaudePlanner, Planner, RulePlanner
 from scm_ml.agent.runner import AgentRunner
 from scm_ml.agent.state import ApprovalStatus, SqliteStateStore
 from scm_ml.agent.tools import default_registry
-from scm_ml.forecast.panel import panel_from_world
+from scm_ml.feedback.recorded import evaluate_recorded
+from scm_ml.forecast.panel import extends, panel_from_world
+from scm_ml.forecast.uncertainty import INTERVAL_LEVEL
 from scm_ml.knowledge import (
     ClaudeGenerator,
     Embedder,
@@ -38,12 +40,15 @@ from scm_ml.llm import ClaudeJsonLlm
 from scm_ml.synthetic import SyntheticWorld
 from scm_ml.telemetry import Telemetry
 
+from .contracts import ForecastRequest
 from .engine_contracts import (
     ActorRef,
     AgentTaskRequest,
     ApprovalDecisionRequest,
     DocumentQuestionRequest,
+    ForecastSnapshotRequest,
     OptimizeRequest,
+    OutcomeEvaluationRequest,
     PlanSpec,
     ScenarioRunRequest,
     SupplierPerformanceRequest,
@@ -224,6 +229,48 @@ class EngineService:
                 raise EngineError(_status_for(error.code), error.code, error.message) from error
         return _wire(record.model_dump(mode="json"))
 
+    def forecast_snapshot(self, request: ForecastSnapshotRequest) -> dict[str, Any]:
+        """The served model's forecast for every region with demand for the SKUs.
+
+        Recorded by the backend when a recommendation is approved, so it can later be compared
+        with actual demand even after the served model changes. Forecast errors (for example an
+        `as_of` beyond the history) surface as the forecast endpoint's errors.
+        """
+        service = self._planning.service
+        points: list[dict[str, Any]] = []
+        with self._lock:
+            for sku_id in request.sku_ids:
+                try:
+                    self._planning.require_sku(sku_id)
+                except ToolError as error:
+                    raise EngineError(_status_for(error.code), error.code, error.message) from error
+                for region_id in self._planning.regions_with_demand(sku_id):
+                    response = service.forecast(
+                        ForecastRequest(
+                            sku_id=sku_id,
+                            region_id=region_id,
+                            as_of=request.as_of,
+                            horizon_weeks=request.horizon_weeks,
+                        )
+                    )
+                    points.extend(
+                        {"sku_id": sku_id, "region_id": region_id, **p.model_dump(mode="json")}
+                        for p in response.points
+                    )
+        return _wire(
+            {
+                "model_version": service.model.version,
+                "dataset_id": service.model.dataset_id,
+                "as_of": request.as_of.isoformat(),
+                "interval_level": INTERVAL_LEVEL,
+                "points": points,
+            }
+        )
+
+    def evaluate_outcomes(self, request: OutcomeEvaluationRequest) -> dict[str, Any]:
+        """Score recorded outcomes against forecasts and promises (no shared state is touched)."""
+        return _wire(evaluate_recorded(request))
+
     def decide_approval(self, approval_id: str, request: ApprovalDecisionRequest) -> dict[str, Any]:
         approver = Actor(user_id=request.actor.user_id, role=request.actor.role)
         with self._lock:
@@ -255,7 +302,8 @@ def build_engine(
     the corpus is synced (unchanged documents are skipped, so embeddings are computed once) and
     retrieval runs on what the database holds.
     """
-    if panel_from_world(world).dataset_id != forecasts.history.dataset_id:
+    # A promoted model may have been trained on the world's history plus captured actuals.
+    if not extends(forecasts.history, panel_from_world(world)):
         raise ValueError("the forecast model was not trained on this world's demand history")
     embedder: Embedder = FastEmbedEmbedder() if embedder_name == "fastembed" else HashingEmbedder()
     knowledge = None

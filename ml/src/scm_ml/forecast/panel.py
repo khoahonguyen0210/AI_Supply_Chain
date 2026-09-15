@@ -1,5 +1,3 @@
-"""Weekly SKU x region demand panel and its temporal train/validation/test split."""
-
 from __future__ import annotations
 
 import hashlib
@@ -21,7 +19,7 @@ PANEL_COLUMNS = ["sku_id", "region_id", "period_start", "quantity"]
 
 
 class TemporalSplit(DomainModel):
-    """Targets before ``val_start`` train, [val_start, test_start) validate, the rest test."""
+    """Targets before `val_start` train, [val_start, test_start) validate, the rest test."""
 
     val_start: date
     test_start: date
@@ -55,7 +53,6 @@ def _validate(frame: pd.DataFrame) -> None:
 
 
 def panel_from_frame(frame: pd.DataFrame, source: str) -> ForecastPanel:
-    """Pivot long-format demand into a dense, zero-filled matrix."""
     frame = frame[PANEL_COLUMNS].copy()
     frame["period_start"] = pd.to_datetime(frame["period_start"]).dt.date
     _validate(frame)
@@ -73,7 +70,6 @@ def panel_from_frame(frame: pd.DataFrame, source: str) -> ForecastPanel:
 
 
 def panel_from_world(world: SyntheticWorld) -> ForecastPanel:
-    """Aggregate synthetic customer order lines to weekly demand (zero-filled)."""
     start = world.config.start_date
     rows = [
         (
@@ -106,9 +102,17 @@ def panel_from_world(world: SyntheticWorld) -> ForecastPanel:
 
 
 def panel_from_real(directory: Path) -> ForecastPanel:
-    """Load the normalised Online Retail II demand written by ``scm_ml.realdata``."""
     frame = pd.read_csv(directory / "demand_weekly.csv", dtype={"sku_id": str})
     return panel_from_frame(frame, source="online-retail-ii")
+
+
+def extends(panel: ForecastPanel, base: ForecastPanel) -> bool:
+    n = len(base.weeks)
+    return (
+        panel.series == base.series
+        and panel.weeks[:n] == base.weeks
+        and bool(np.array_equal(panel.values[:, :n], base.values))
+    )
 
 
 def default_split(panel: ForecastPanel, val_weeks: int = 13, test_weeks: int = 13) -> TemporalSplit:
@@ -120,7 +124,6 @@ def default_split(panel: ForecastPanel, val_weeks: int = 13, test_weeks: int = 1
 
 
 def split_indices(panel: ForecastPanel, split: TemporalSplit) -> tuple[int, int]:
-    """Column indices of the first validation week and the first test week."""
     val, test = panel.week_index(split.val_start), panel.week_index(split.test_start)
     if not 0 < val < test < len(panel.weeks):
         raise ValueError("split boundaries must lie strictly inside the panel in order")
@@ -128,7 +131,6 @@ def split_indices(panel: ForecastPanel, split: TemporalSplit) -> tuple[int, int]
 
 
 def save_dataset(panel: ForecastPanel, split: TemporalSplit, directory: Path) -> dict[str, object]:
-    """Persist the panel and exact split so the experiment can be replayed."""
     directory.mkdir(parents=True, exist_ok=True)
     long = pd.DataFrame(
         [

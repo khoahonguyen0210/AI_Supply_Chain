@@ -3,6 +3,7 @@ package com.scm.platform.approval;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -16,6 +17,7 @@ import com.scm.platform.support.TestAuth;
 import com.scm.platform.support.TestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -29,7 +31,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
-/** The copilot task -> recommendation -> approval -> decision -> purchase order path, with a stubbed engine. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Import(PostgresContainerConfig.class)
@@ -145,6 +146,12 @@ class AgentApprovalFlowTest {
 		runTask("pat", "Demand for SKU-001 will rise 20%", null);
 		when(engine.decideApproval(any(), eq("APR-0001"), eq("APPROVED"), eq("within budget")))
 				.thenReturn(approval("APPROVED", "APPROVED", "[\"procurement_manager\"]", "[\"mia\"]"));
+		when(engine.forecastSnapshot(any(), any())).thenReturn(json.readTree("""
+				{"modelVersion":"lgbm-test","datasetId":"synthetic-test","asOf":"2024-12-30","intervalLevel":0.8,
+				 "points":[{"skuId":"SKU-001","regionId":"R1","weekStart":"2024-12-30","horizon":1,
+				            "point":12.0,"lower":4.0,"upper":20.0},
+				           {"skuId":"SKU-001","regionId":"R2","weekStart":"2024-12-30","horizon":1,
+				            "point":22.0,"lower":10.0,"upper":30.0}]}"""));
 
 		mockMvc.perform(as(post("/api/approvals/APR-0001/decision"), "mia", "procurement_manager")
 						.contentType(MediaType.APPLICATION_JSON)
@@ -162,6 +169,30 @@ class AgentApprovalFlowTest {
 		assertThat(orders.get(0)).containsEntry("po_id", "APR-0001-PO01").containsEntry("status", "APPROVED")
 				.containsEntry("quantity", 100).containsEntry("lead_days", 7)
 				.containsEntry("recommendation_id", "REC-PLAN-001");
+
+		// the forecast the decision relied on is recorded for the feedback loop
+		ArgumentCaptor<JsonNode> request = ArgumentCaptor.forClass(JsonNode.class);
+		verify(engine).forecastSnapshot(any(), request.capture());
+		assertThat(request.getValue().path("asOf").asString()).isEqualTo("2024-12-30");
+		assertThat(request.getValue().path("horizonWeeks").asInt()).isEqualTo(4);
+		assertThat(request.getValue().path("skuIds").get(0).asString()).isEqualTo("SKU-001");
+		assertThat(jdbc.sql("SELECT count(*) FROM forecast_snapshot WHERE recommendation_id = 'REC-PLAN-001'"
+				+ " AND model_version = 'lgbm-test'").query(Integer.class).single()).isEqualTo(2);
+	}
+
+	@Test
+	void anApprovalStandsEvenWhenTheForecastSnapshotCannotBeTaken() throws Exception {
+		runTask("pat", "Demand for SKU-001 will rise 20%", null);
+		when(engine.decideApproval(any(), eq("APR-0001"), eq("APPROVED"), any()))
+				.thenReturn(approval("APPROVED", "APPROVED", "[\"procurement_manager\"]", "[\"mia\"]"));
+		when(engine.forecastSnapshot(any(), any())).thenThrow(new IllegalStateException("engine down"));
+
+		mockMvc.perform(as(post("/api/approvals/APR-0001/decision"), "mia", "procurement_manager")
+						.contentType(MediaType.APPLICATION_JSON).content("{\"outcome\":\"APPROVED\"}"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.approval.status").value("APPROVED"));
+		assertThat(jdbc.sql("SELECT count(*) FROM purchase_order").query(Integer.class).single()).isEqualTo(1);
+		assertThat(jdbc.sql("SELECT count(*) FROM forecast_snapshot").query(Integer.class).single()).isZero();
 	}
 
 	@Test
