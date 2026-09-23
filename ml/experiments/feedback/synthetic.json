@@ -394,11 +394,9 @@
         "1": {
           "actual_total": 6753.0,
           "bias": -1.4531,
-          "coverage": 0.005,
           "forecast_total": 6462.38,
           "mae": 31.5808,
           "mape": 0.5587,
-          "mean_width": 0.0,
           "n": 200,
           "rmse": 48.2961,
           "wape": 0.9353
@@ -406,11 +404,9 @@
         "2": {
           "actual_total": 6116.0,
           "bias": 1.7319,
-          "coverage": 0.01,
           "forecast_total": 6462.38,
           "mae": 29.0981,
           "mape": 0.7105,
-          "mean_width": 0.0,
           "n": 200,
           "rmse": 39.2604,
           "wape": 0.9515
@@ -418,11 +414,9 @@
         "3": {
           "actual_total": 6781.0,
           "bias": -1.5931,
-          "coverage": 0.005,
           "forecast_total": 6462.38,
           "mae": 32.3746,
           "mape": 0.6361,
-          "mean_width": 0.0,
           "n": 200,
           "rmse": 46.5459,
           "wape": 0.9549
@@ -430,11 +424,9 @@
         "4": {
           "actual_total": 6636.0,
           "bias": -0.8681,
-          "coverage": 0.01,
           "forecast_total": 6462.38,
           "mae": 30.925,
           "mape": 0.5577,
-          "mean_width": 0.0,
           "n": 200,
           "rmse": 50.795,
           "wape": 0.932
@@ -442,11 +434,9 @@
         "5": {
           "actual_total": 6397.0,
           "bias": 0.3269,
-          "coverage": 0.005,
           "forecast_total": 6462.38,
           "mae": 31.4485,
           "mape": 0.6776,
-          "mean_width": 0.0,
           "n": 200,
           "rmse": 49.6398,
           "wape": 0.9832
@@ -454,11 +444,9 @@
         "6": {
           "actual_total": 5926.0,
           "bias": 2.6819,
-          "coverage": 0.01,
           "forecast_total": 6462.38,
           "mae": 28.1165,
           "mape": 0.6938,
-          "mean_width": 0.0,
           "n": 200,
           "rmse": 39.7365,
           "wape": 0.9489
@@ -466,11 +454,9 @@
         "7": {
           "actual_total": 6277.0,
           "bias": 0.9269,
-          "coverage": 0.005,
           "forecast_total": 6462.38,
           "mae": 34.08,
           "mape": 0.6559,
-          "mean_width": 0.0,
           "n": 200,
           "rmse": 51.6559,
           "wape": 1.0859
@@ -478,11 +464,9 @@
         "8": {
           "actual_total": 8775.0,
           "bias": -11.5631,
-          "coverage": 0.005,
           "forecast_total": 6462.38,
           "mae": 38.8192,
           "mape": 0.6476,
-          "mean_width": 0.0,
           "n": 200,
           "rmse": 60.603,
           "wape": 0.8848
@@ -491,11 +475,9 @@
       "overall": {
         "actual_total": 53661.0,
         "bias": -1.2262,
-        "coverage": 0.0069,
         "forecast_total": 51699.08,
         "mae": 32.0553,
         "mape": 0.6444,
-        "mean_width": 0.0,
         "n": 1600,
         "rmse": 48.74,
         "wape": 0.9558
@@ -543,8 +525,8 @@
   },
   "note": "Actuals are SIMULATED by continuing the synthetic world's generative process past as_of with the same seed; the approval of the plan is simulated (all lines approved).",
   "provenance": {
-    "code_revision": "a0c3686",
-    "created_at": "2026-10-07T15:16:45+00:00"
+    "code_revision": "c32a885",
+    "created_at": "2026-10-07T21:47:35+00:00"
   },
   "seed": 42
 }

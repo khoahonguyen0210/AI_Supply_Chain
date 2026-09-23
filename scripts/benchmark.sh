@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Final benchmark: regenerates every offline experiment artifact under ml/experiments/, then writes
-# docs/benchmarks.md from those artifacts only (docs/benchmarks.md, Phase 18).
+# docs/benchmarks.md and the README figure from those artifacts only (docs/benchmarks.md, Phase 18).
 #
 #   bash scripts/benchmark.sh            offline suite (synthetic world; about 15 minutes)
 #   bash scripts/benchmark.sh --real     also the real-data forecast (downloads Online Retail II once)
@@ -16,6 +16,7 @@ real=false
 case "${1:-}" in
   --report)
     uv run python -m scm_ml.benchmark.report
+    uv run python -m scm_ml.benchmark.figure
     exit 0
     ;;
   --real) real=true ;;
@@ -48,3 +49,4 @@ uv run python -m scm_ml.feedback evaluate
 uv run python -m scm_ml.feedback retrain
 step "report"
 uv run python -m scm_ml.benchmark.report
+uv run python -m scm_ml.benchmark.figure

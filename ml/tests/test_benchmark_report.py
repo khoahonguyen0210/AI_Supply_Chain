@@ -51,3 +51,13 @@ def test_report_is_deterministic_and_written(tmp_path: Path) -> None:
     out = tmp_path / "benchmarks.md"
     assert main(["--experiments", str(root), "--out", str(out)]) == 0
     assert out.read_text(encoding="utf-8") == render(root)
+
+
+def test_figure_is_drawn_from_the_artifacts(tmp_path: Path) -> None:
+    from scm_ml.benchmark.figure import render as draw
+
+    svg = draw(EXPERIMENTS)
+    forecast = json.loads((EXPERIMENTS / "forecast/synthetic.json").read_text(encoding="utf-8"))
+    assert f"{forecast['model']['test']['overall']['mae']:.1f}" in svg
+    assert svg.count('class="title"') == 7  # the header and six panels
+    assert draw(tmp_path).count('class="title"') == 1  # no artifacts, no panels

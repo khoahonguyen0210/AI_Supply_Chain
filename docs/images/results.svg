@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="484" viewBox="0 0 960 484" role="img" aria-label="Measured results">
+<style>
+.surface { fill: #fcfcfb; }
+.title { fill: #0b0b0b; font: 600 14px system-ui, -apple-system, 'Segoe UI', sans-serif; }
+.note { fill: #52514e; font: 12px system-ui, -apple-system, 'Segoe UI', sans-serif; }
+.label { fill: #52514e; font: 12px system-ui, -apple-system, 'Segoe UI', sans-serif; }
+.value { fill: #0b0b0b; font: 600 12px system-ui, -apple-system, 'Segoe UI', sans-serif; }
+.axis { stroke: #e1e0d9; stroke-width: 1; }
+.ours { fill: #2a78d6; }
+.reference { fill: #898781; }
+@media (prefers-color-scheme: dark) {
+  .surface { fill: #1a1a19; }
+  .title, .value { fill: #ffffff; }
+  .note, .label { fill: #c3c2b7; }
+  .axis { stroke: #2c2c2a; }
+  .ours { fill: #3987e5; }
+}
+</style>
+<rect class="surface" width="960" height="484" rx="8"/>
+<text class="title" x="16" y="28">Measured results</text>
+<rect class="ours" x="16" y="40" width="12" height="12" rx="2"/>
+<text class="note" x="34" y="50">this platform</text>
+<rect class="reference" x="130" y="40" width="12" height="12" rx="2"/>
+<text class="note" x="148" y="50">reference policy or baseline</text>
+<text class="note" x="944" y="50" text-anchor="end">synthetic company unless noted; from ml/experiments</text>
+<text class="title" x="16" y="88">Demand forecast, synthetic</text>
+<text class="note" x="16" y="106">test MAE, lower is better (11.1% lower)</text>
+<line class="axis" x1="134" y1="120" x2="134" y2="186"/>
+<path class="reference" d="M134,126 h118.0 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-118.0 z"/>
+<text class="label" x="126" y="140" text-anchor="end">13-week average</text>
+<text class="value" x="262.0" y="140">33.9</text>
+<path class="ours" d="M134,160 h104.5 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-104.5 z"/>
+<text class="label" x="126" y="174" text-anchor="end">LightGBM</text>
+<text class="value" x="248.5" y="174">30.2</text>
+<text class="title" x="336" y="88">Demand forecast, real retail data</text>
+<text class="note" x="336" y="106">test MAE, lower is better (2.1% lower)</text>
+<line class="axis" x1="454" y1="120" x2="454" y2="186"/>
+<path class="reference" d="M454,126 h118.0 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-118.0 z"/>
+<text class="label" x="446" y="140" text-anchor="end">13-week average</text>
+<text class="value" x="582.0" y="140">58.2</text>
+<path class="ours" d="M454,160 h115.4 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-115.4 z"/>
+<text class="label" x="446" y="174" text-anchor="end">LightGBM</text>
+<text class="value" x="579.4" y="174">56.9</text>
+<text class="title" x="656" y="88">Procurement plan cost</text>
+<text class="note" x="656" y="106">total cost incl. stockout penalty, lower is better</text>
+<line class="axis" x1="774" y1="120" x2="774" y2="220"/>
+<path class="reference" d="M774,126 h115.0 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-115.0 z"/>
+<text class="label" x="766" y="140" text-anchor="end">cheapest supplier</text>
+<text class="value" x="899.0" y="140">349k</text>
+<path class="reference" d="M774,160 h118.0 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-118.0 z"/>
+<text class="label" x="766" y="174" text-anchor="end">weighted ranking</text>
+<text class="value" x="902.0" y="174">357k</text>
+<path class="ours" d="M774,194 h99.3 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-99.3 z"/>
+<text class="label" x="766" y="208" text-anchor="end">MILP optimizer</text>
+<text class="value" x="883.3" y="208">303k</text>
+<text class="title" x="16" y="298">Supplier outage response</text>
+<text class="note" x="16" y="316">fill rate, higher is better</text>
+<line class="axis" x1="134" y1="330" x2="134" y2="396"/>
+<path class="reference" d="M134,336 h110.8 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-110.8 z"/>
+<text class="label" x="126" y="350" text-anchor="end">hold the plan</text>
+<text class="value" x="254.8" y="350">94.1%</text>
+<path class="ours" d="M134,370 h118.0 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-118.0 z"/>
+<text class="label" x="126" y="384" text-anchor="end">re-optimize</text>
+<text class="value" x="262.0" y="384">100.0%</text>
+<text class="title" x="336" y="298">Policy and contract retrieval</text>
+<text class="note" x="336" y="316">hit@1 on 34 questions, higher is better</text>
+<line class="axis" x1="454" y1="330" x2="454" y2="396"/>
+<path class="reference" d="M454,336 h102.8 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-102.8 z"/>
+<text class="label" x="446" y="350" text-anchor="end">hashing baseline</text>
+<text class="value" x="566.8" y="350">0.82</text>
+<path class="ours" d="M454,370 h118.0 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-118.0 z"/>
+<text class="label" x="446" y="384" text-anchor="end">bge-small hybrid</text>
+<text class="value" x="582.0" y="384">0.94</text>
+<text class="title" x="656" y="298">Job throughput on kind</text>
+<text class="note" x="656" y="316">optimization jobs per minute, median of runs</text>
+<line class="axis" x1="774" y1="330" x2="774" y2="430"/>
+<path class="ours" d="M774,336 h35.3 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-35.3 z"/>
+<text class="label" x="766" y="350" text-anchor="end">1 worker</text>
+<text class="value" x="819.3" y="350">32.0</text>
+<path class="ours" d="M774,370 h92.9 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-92.9 z"/>
+<text class="label" x="766" y="384" text-anchor="end">2 workers</text>
+<text class="value" x="876.9" y="384">79.1</text>
+<path class="ours" d="M774,404 h118.0 a4,4 0 0 1 4,4 v12 a4,4 0 0 1 -4,4 h-118.0 z"/>
+<text class="label" x="766" y="418" text-anchor="end">4 workers</text>
+<text class="value" x="902.0" y="418">99.6</text>
+</svg>

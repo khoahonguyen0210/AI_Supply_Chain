@@ -134,7 +134,7 @@ Decision at 2024-12-30: forecast 8 weeks for 200 series, plan with the MILP. App
 
 Supplier deliveries for the plan's 91 orders: on-time rate 0.857, in-full rate 0.923, unit fill rate 0.984.
 Actuals are simulated by continuing the synthetic world's own process past `as_of`; they are not real outcomes ([feedback-loop.md](feedback-loop.md)).
-Source: `ml/experiments/feedback/synthetic.json` (code `a0c3686`, 2026-10-07T15:16:45+00:00).
+Source: `ml/experiments/feedback/synthetic.json` (code `c32a885`, 2026-10-07T21:47:35+00:00).
 
 ### Retraining gate
 
