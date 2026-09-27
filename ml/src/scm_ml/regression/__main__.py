@@ -1,9 +1,3 @@
-"""CLI: ``python -m scm_ml.regression`` runs the AI regression suite; exit code 1 on a regression.
-
-Offline and deterministic (rule planner, extractive RAG generator), so it needs no API key. It
-trains the synthetic forecast model first if it is not under ``--artifacts``.
-"""
-
 from __future__ import annotations
 
 import argparse

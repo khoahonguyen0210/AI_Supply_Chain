@@ -1,10 +1,3 @@
-"""Optimization benchmark: constraint optimization versus simple heuristics, on forecast demand.
-
-Every number in the output is measured by `evaluate_plan` / `evaluate_allocation`, which recompute
-cost, service and constraint violations from the plan itself, so heuristics and the optimizer are
-judged by the same rules. Runtimes are wall-clock on the machine that ran the benchmark.
-"""
-
 from __future__ import annotations
 
 import time
@@ -47,7 +40,6 @@ TIGHT_BUDGET_FRACTION = 0.85
 def forecast_regional_demand(
     service: ForecastService, world: SyntheticWorld, horizon_weeks: int
 ) -> dict[tuple[str, str], float]:
-    """Point forecast summed over the planning horizon, per (SKU, region) with a demand series."""
     demand: dict[tuple[str, str], float] = {}
     for sku_id, region_id in service.history.series:
         response = service.forecast(
@@ -183,7 +175,6 @@ def run_benchmark(
 
 
 def forecast_artifact_dirs(world: SyntheticWorld, root: Path) -> tuple[Path, Path]:
-    """Locate the trained model and dataset for this world's demand panel."""
     base = root / panel_from_world(world).dataset_id
     model_dir, dataset_dir = base / "model", base / "dataset"
     if not model_dir.is_dir() or not dataset_dir.is_dir():

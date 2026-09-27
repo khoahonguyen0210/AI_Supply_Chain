@@ -8,23 +8,26 @@ import { humanize } from "@/lib/format";
 import { useAuth } from "@/lib/session";
 
 const NAV_ITEMS: { href: string; label: string; roles?: string[] }[] = [
-  { href: "/", label: "Dashboard" },
-  { href: "/workspace", label: "Decision workspace" },
-  { href: "/copilot", label: "Copilot" },
+  { href: "/", label: "Overview" },
+  { href: "/workspace", label: "Plan builder" },
+  { href: "/copilot", label: "Assistant" },
   { href: "/approvals", label: "Approvals" },
   { href: "/documents", label: "Documents" },
-  { href: "/operations", label: "Operations", roles: ["admin"] },
-  { href: "/status", label: "System status" },
+  { href: "/operations", label: "Monitoring", roles: ["admin"] },
+  { href: "/status", label: "Status" },
+];
+
+/** Sections of the sign-in page, linked from the bar before anyone is signed in. */
+const LANDING_LINKS: { href: string; label: string }[] = [
+  { href: "#how", label: "How it works" },
+  { href: "#features", label: "Features" },
 ];
 
 function isActive(pathname: string, href: string): boolean {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/**
- * The frame around every page. Nothing but the sign-in form is shown until someone is signed in, so pages
- * never run without a user and never request data without a token.
- */
+/** Page frame; shows only the sign-in page until someone signs in. */
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { user, ready, signOut } = useAuth();
@@ -32,7 +35,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <>
       <header className="shell-header">
-        <span className="shell-title">AI Supply Chain Decision Intelligence</span>
+        <Link href="/" className="shell-title">
+          AI Supply Chain Planner
+        </Link>
         {user ? (
           <>
             <nav className="shell-nav" aria-label="Primary">
@@ -47,16 +52,35 @@ export function AppShell({ children }: { children: ReactNode }) {
               ))}
             </nav>
             <div className="session-picker">
-              <span>
-                {user.displayName} <span className="muted">({humanize(user.role)})</span>
+              <span className="user-chip">
+                <span className="avatar" aria-hidden="true">
+                  {user.displayName.slice(0, 1)}
+                </span>
+                <span>
+                  {user.displayName} <span className="muted">({humanize(user.role)})</span>
+                </span>
               </span>
               <button type="button" onClick={signOut}>
                 Sign out
               </button>
             </div>
           </>
+        ) : ready ? (
+          <>
+            <nav className="shell-nav" aria-label="Sections">
+              {LANDING_LINKS.map((item) => (
+                <a key={item.href} href={item.href}>
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+            <a className="button-solid" href="#sign-in">
+              Sign in
+            </a>
+          </>
         ) : null}
       </header>
+      <div className="backdrop" aria-hidden="true" />
       <main className="shell-main">
         {!ready ? <p role="status">Loading…</p> : user ? children : <LoginForm />}
       </main>

@@ -2,7 +2,6 @@
   "$defs": {
     "ActorRef": {
       "additionalProperties": false,
-      "description": "The authenticated human a request runs for; authentication itself is the backend's job.",
       "properties": {
         "role": {
           "minLength": 1,

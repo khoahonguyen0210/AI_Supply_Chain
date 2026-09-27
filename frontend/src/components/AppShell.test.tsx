@@ -44,7 +44,7 @@ describe("AppShell sign-in", () => {
     shell();
     expect(await screen.findByRole("heading", { name: "Sign in" })).toBeInTheDocument();
     expect(screen.queryByText("secret planning page")).not.toBeInTheDocument();
-    expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
+    expect(screen.queryByRole("navigation", { name: "Primary" })).not.toBeInTheDocument();
   });
 
   it("signs in, shows the page and the user's menu, and keeps the token for this tab only", async () => {
@@ -56,8 +56,8 @@ describe("AppShell sign-in", () => {
 
     expect(await screen.findByText("secret planning page")).toBeInTheDocument();
     expect(screen.getByText("Pat")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Copilot" })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Operations" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Assistant" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Monitoring" })).not.toBeInTheDocument();
     expect(JSON.parse(calls[0].init.body as string)).toEqual({
       userId: "pat",
       password: "a-long-password",
@@ -74,7 +74,7 @@ describe("AppShell sign-in", () => {
     await userEvent.type(await screen.findByLabelText("User id"), "root");
     await userEvent.type(screen.getByLabelText("Password"), "a-long-password");
     await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
-    expect(await screen.findByRole("link", { name: "Operations" })).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: "Monitoring" })).toBeInTheDocument();
   });
 
   it("gives the same message for a wrong password however it was wrong, and clears the password", async () => {

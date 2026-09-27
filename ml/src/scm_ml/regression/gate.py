@@ -1,10 +1,3 @@
-"""AI regression gate: the fixed RAG and agent cases, compared with a committed baseline.
-
-A run fails when a case that passed in the baseline now fails, when a tracked metric gets worse, or
-when the evaluation set itself changed (then the baseline must be regenerated on purpose). Cases
-that start passing are reported so the baseline can be tightened, but never fail the gate.
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -102,7 +95,6 @@ def case_ids(result: dict[str, Any]) -> list[str]:
 
 
 def snapshot(suite: str, result: dict[str, Any]) -> dict[str, Any]:
-    """The baseline entry for one suite: case ids, known failures and tracked metric values."""
     return {
         "cases": case_ids(result),
         "known_failures": failed_cases(suite, result),
@@ -152,7 +144,6 @@ def make_embedder(name: str) -> Embedder:
 
 
 def ensure_forecast_service(world: SyntheticWorld, artifact_root: Path) -> ForecastService:
-    """Load the trained forecast model for this world, training it first if it is missing."""
     try:
         model_dir, dataset_dir = forecast_artifact_dirs(world, artifact_root)
     except FileNotFoundError:
@@ -163,7 +154,6 @@ def ensure_forecast_service(world: SyntheticWorld, artifact_root: Path) -> Forec
 
 
 def run_suites(embedder_name: str, artifact_root: Path, out_dir: Path) -> dict[str, Any]:
-    """Run the RAG and agent evaluations offline (extractive generator, rule planner)."""
     world = generate_world(SyntheticConfig())
     embedder = make_embedder(embedder_name)
 
@@ -235,7 +225,6 @@ def run_gate(
     update_baseline: bool = False,
     embedder_name: str | None = None,
 ) -> tuple[bool, list[SuiteOutcome]]:
-    """Run both suites, write artifacts and a report to ``out_dir``; return (passed, outcomes)."""
     baseline = read_json(baseline_path) if baseline_path.exists() else None
     if baseline is None and not update_baseline:
         raise FileNotFoundError(f"no baseline at {baseline_path}; create it with --update-baseline")

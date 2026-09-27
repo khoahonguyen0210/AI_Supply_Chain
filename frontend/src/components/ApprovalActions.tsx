@@ -6,10 +6,7 @@ import { errorMessage } from "@/lib/api/client";
 import { decideApproval } from "@/lib/api/decisions";
 import type { ApprovalDetail } from "@/lib/api/types";
 
-/**
- * Approve or reject a pending approval. Who may decide is the planning engine's rule; if it refuses (wrong
- * role, own request, already decided) its reason is shown and nothing changes.
- */
+/** The engine decides who may approve; its refusal reason is shown. */
 export function ApprovalActions({
   approvalId,
   onDecided,
@@ -36,12 +33,12 @@ export function ApprovalActions({
   return (
     <div className="stack">
       <label className="field">
-        <span>Rationale (optional)</span>
+        <span>Reason (optional)</span>
         <input
           value={rationale}
           maxLength={500}
           onChange={(e) => setRationale(e.target.value)}
-          placeholder="Why you are approving or rejecting"
+          placeholder="Why you approve or reject this order"
         />
       </label>
       <div className="row">

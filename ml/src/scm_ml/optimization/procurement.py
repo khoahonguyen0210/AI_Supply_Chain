@@ -1,27 +1,3 @@
-"""Constraint-aware procurement optimization as a mixed-integer linear program (SciPy / HiGHS).
-
-Decision variables, per usable (offer, warehouse) route r:
-    x_r  integer units ordered            y_r  1 if a purchase order is placed
-
-Per planning cell c (SKU at warehouse), A_c = on-hand + incoming, P_c = sum(reliability * x_r):
-    u_c  unmet demand        s_c  shortfall below demand + safety stock
-    e_c  excess over demand  g_c  service-level shortfall (elastic, heavily penalised)
-
-Minimise  purchase + shipping + fixed order cost + holding + stockout + safety-shortfall penalties
-          + SERVICE_VIOLATION_PENALTY * sum(g)
-subject to
-    u_c >= D_c - A_c - P_c        s_c >= D_c + SS_c - A_c - P_c        e_c >= A_c + P_c - D_c
-    u_c - g_c <= (1 - service target) * D_c
-    MOQ_r * y_r <= x_r <= max_units_r * y_r      (MOQ, supplier capacity, contract order limit)
-    sum over warehouses of x_r <= weekly capacity * horizon      (per supplier offer)
-    sum(price + shipping) * x + fixed * y <= budget
-    sum(volume * x) at warehouse <= warehouse capacity - volume already stored
-
-Lead time, validity, certification and contract status are handled by excluding unusable offers.
-Physical and budget constraints are hard; only the service level is elastic so that an infeasible
-target is reported as an explicit violation instead of an opaque solver failure.
-"""
-
 from __future__ import annotations
 
 import time

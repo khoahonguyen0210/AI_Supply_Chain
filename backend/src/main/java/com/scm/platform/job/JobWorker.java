@@ -14,10 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.JsonNode;
 
-/**
- * Claims and runs queued jobs. {@link #runOnce()} is the unit of work; {@link JobWorkerScheduler} calls it
- * on a timer, and tests call it directly so they never wait on a poll.
- */
 @Component
 public class JobWorker {
 
@@ -46,7 +42,6 @@ public class JobWorker {
 		this.retryBackoff = properties.jobs().retryBackoff();
 	}
 
-	/** Runs the next runnable job, if any. Returns whether a job was claimed. */
 	public boolean runOnce() {
 		Optional<Job> claimed = repository.claim(workerId, lease);
 		if (claimed.isEmpty()) {
@@ -88,7 +83,6 @@ public class JobWorker {
 		return true;
 	}
 
-	/** Runs jobs until none is runnable; returns how many ran. */
 	public int drain() {
 		int ran = 0;
 		while (runOnce()) {

@@ -1,5 +1,3 @@
-"""Deterministic generation of the synthetic SCM company."""
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -28,30 +26,23 @@ OUTCOME_STREAM = len(STAGES)
 
 @dataclass(frozen=True)
 class HiddenFuture:
-    """What the generator knows about the time after ``as_of`` but never puts in the world.
-
-    Only the feedback loop reads it, to produce simulated actuals; planning never sees it.
-    """
-
     demand: DemandProcess
     pending_deliveries: dict[str, tuple[date, int]]
     """Open purchase order id -> the delivery date and quantity already drawn for it."""
 
 
 def generate_world(cfg: SyntheticConfig | None = None) -> SyntheticWorld:
-    """Same config (including seed) always yields an identical world."""
     return _generate(cfg or SyntheticConfig())[0]
 
 
 def generate_world_with_future(
     cfg: SyntheticConfig | None = None,
 ) -> tuple[SyntheticWorld, HiddenFuture]:
-    """The world plus its hidden future; the world is identical to ``generate_world``'s."""
     return _generate(cfg or SyntheticConfig())
 
 
 def outcome_rng(cfg: SyntheticConfig) -> np.random.Generator:
-    """The random stream for simulated outcomes, independent of the three world streams."""
+    """Random stream for simulated outcomes, independent of the world streams."""
     return np.random.default_rng(
         np.random.SeedSequence(cfg.seed).spawn(OUTCOME_STREAM + 1)[OUTCOME_STREAM]
     )

@@ -44,15 +44,10 @@ public class JobService {
 		this.maxAttempts = properties.jobs().maxAttempts();
 	}
 
-	/** The outcome of a submission: {@code created} is false when an identical earlier request is returned. */
 	public record Submission(Job job, boolean created) {
 	}
 
-	/**
-	 * Queues a job. Submitting the same request again with the same idempotency key returns the original
-	 * job instead of queuing a duplicate; the same key with a different request is a conflict. Keys are
-	 * scoped to the submitting user. Without a key every submission is a new job.
-	 */
+	/** The same idempotency key (per user) returns the original job. */
 	public Submission submit(Actor actor, JobType type, String idempotencyKey, JsonNode payload) {
 		validate(type, payload);
 		String hash = sha256(type.name() + ":" + canonical(payload));
@@ -70,7 +65,7 @@ public class JobService {
 		return new Submission(existing, false);
 	}
 
-	/** Jobs are private to the submitter (and admins); anyone else gets the same 404 as for a missing job. */
+	/** Jobs are private to the submitter and admins; others get the same 404 as for a missing job. */
 	public Job get(Actor actor, UUID id) {
 		return repository.find(id).filter(job -> canView(actor, job))
 				.orElseThrow(() -> ApiException.notFound("UNKNOWN_JOB", "no job " + id));
@@ -106,7 +101,7 @@ public class JobService {
 		}
 	}
 
-	/** The payload with object keys sorted, so equal requests hash equally whatever their key order. */
+	/** Keys sorted, so equal requests hash equally whatever their key order. */
 	private String canonical(JsonNode node) {
 		return sorted(node).toString();
 	}

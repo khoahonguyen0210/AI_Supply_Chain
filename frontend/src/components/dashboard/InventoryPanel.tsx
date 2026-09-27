@@ -23,10 +23,10 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
         <thead>
           <tr>
             <th>Warehouse</th>
-            <th className="num">On hand</th>
-            <th className="num">Incoming</th>
-            <th className="num">Safety stock</th>
-            <th>Position</th>
+            <th className="num">In stock</th>
+            <th className="num">On the way</th>
+            <th className="num">Safety buffer</th>
+            <th>Stock level</th>
             <th>As of</th>
           </tr>
         </thead>
@@ -39,9 +39,9 @@ export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
               <td className="num">{formatInt(r.safetyStock)}</td>
               <td>
                 {r.onHand + r.incoming < r.safetyStock ? (
-                  <Badge tone="bad">Below safety stock</Badge>
+                  <Badge tone="bad">Below safety buffer</Badge>
                 ) : (
-                  <Badge tone="good">Above safety stock</Badge>
+                  <Badge tone="good">Above safety buffer</Badge>
                 )}
               </td>
               <td>{formatDate(r.asOf)}</td>

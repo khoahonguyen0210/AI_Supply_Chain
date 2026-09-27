@@ -6,18 +6,7 @@ import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
-/**
- * Authentication and abuse-protection settings under {@code scm.security}. The JWT signing secret has no
- * default: the service refuses to start without one that is long enough, so a missing secret can never
- * become a weak one.
- *
- * @param jwtSecret HMAC-SHA256 signing key (at least 32 bytes), from the {@code SCM_JWT_SECRET} environment variable
- * @param tokenTtl how long an access token stays valid
- * @param bootstrapUsers accounts created or refreshed at startup (their passwords come from the environment)
- * @param rateLimit request limits per minute
- * @param trustForwardedFor use the first {@code X-Forwarded-For} address as the client address; only enable behind a
- *        proxy that sets it, otherwise callers could pick their own address
- */
+/** Security settings (scm.security); the JWT secret has no default and must be 32+ bytes. */
 @ConfigurationProperties(prefix = "scm.security")
 public record SecurityProperties(String jwtSecret, @DefaultValue("8h") Duration tokenTtl,
 		@DefaultValue List<BootstrapUser> bootstrapUsers, @DefaultValue RateLimits rateLimit,
@@ -42,14 +31,7 @@ public record SecurityProperties(String jwtSecret, @DefaultValue("8h") Duration 
 		return new SecurityProperties(jwtSecret, tokenTtl, bootstrapUsers, new RateLimits(10, 5, 300, 30), false);
 	}
 
-	/**
-	 * Requests allowed per minute (a burst up to the limit is fine).
-	 *
-	 * @param loginPerIp login attempts per client address
-	 * @param loginPerUser login attempts per user id, however many addresses they come from
-	 * @param apiPerUser all API calls per signed-in user
-	 * @param expensivePerUser calls that start heavy work (jobs, agent tasks, scenario runs, questions, ranking)
-	 */
+	/** Requests allowed per minute (login per IP and per user, API, heavy work). */
 	public record RateLimits(@DefaultValue("10") int loginPerIp, @DefaultValue("5") int loginPerUser,
 			@DefaultValue("300") int apiPerUser, @DefaultValue("30") int expensivePerUser) {
 

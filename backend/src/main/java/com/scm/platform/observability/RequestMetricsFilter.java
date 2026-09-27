@@ -15,10 +15,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/**
- * Times every API request and counts its outcome. One untagged timer carries the p50/p95/p99 (percentiles
- * cannot be merged across tags), and a counter per status class gives throughput and error rate.
- */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestMetricsFilter extends OncePerRequestFilter {

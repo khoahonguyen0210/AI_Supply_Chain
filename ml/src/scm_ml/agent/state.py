@@ -1,10 +1,3 @@
-"""Durable agent state: task records, approval requests and the append-only decision log.
-
-Only what the current work needs is kept: the task, its trace, the approval and the decision. There
-is deliberately no per-user preference or long-term memory. SQLite stands in for the PostgreSQL
-tables the backend owns (`recommendation`, `decision`); decisions are append-only here as there.
-"""
-
 from __future__ import annotations
 
 import sqlite3

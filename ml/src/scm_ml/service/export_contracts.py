@@ -1,9 +1,3 @@
-"""Write the committed contract files: ``python -m scm_ml.service.export_contracts``.
-
-The JSON Schemas and the example response in ``docs/contracts`` are the cross-language contract:
-the Python tests assert they are current and the Java tests parse the example.
-"""
-
 from __future__ import annotations
 
 import json
@@ -62,8 +56,6 @@ def example_response() -> ForecastResponse:
 
 
 def contract_files() -> dict[str, str]:
-    """File name -> exact content."""
-
     def dump(payload: object) -> str:
         return json.dumps(payload, indent=2, sort_keys=True) + "\n"
 

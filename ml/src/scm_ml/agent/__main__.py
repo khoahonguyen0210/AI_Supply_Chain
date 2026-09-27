@@ -1,9 +1,3 @@
-"""CLI: ``python -m scm_ml.agent`` runs the fixed agent evaluation and saves the artifact.
-
-``--planner rule`` (default) is offline and deterministic. ``--planner claude`` plans and writes
-RAG answers with Claude and needs ``ANTHROPIC_API_KEY``; it spends API credits, one run per case.
-"""
-
 from __future__ import annotations
 
 import argparse

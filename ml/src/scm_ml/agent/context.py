@@ -169,11 +169,7 @@ def build_planning_context(
     plan_namespace: str = "",
     knowledge: KnowledgeStore | None = None,
 ) -> PlanningContext:
-    """Wire the knowledge base and the forecast model together.
-
-    The knowledge base is generated from the world unless a ready `knowledge` store is given (for
-    example one loaded from PostgreSQL, whose embeddings were computed earlier).
-    """
+    """Wires the knowledge base and the forecast model together."""
     embedder = embedder or HashingEmbedder()
     store = knowledge
     if store is None:

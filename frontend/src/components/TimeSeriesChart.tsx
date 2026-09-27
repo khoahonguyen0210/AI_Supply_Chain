@@ -16,10 +16,6 @@ const WIDTH = 720;
 const HEIGHT = 260;
 const PAD = { top: 12, right: 12, bottom: 28, left: 48 };
 
-/**
- * Demand history as a line, the forecast as a dashed line with its prediction interval as a band. Dates are
- * placed by their real time, so a gap between history and forecast shows as a gap.
- */
 export function TimeSeriesChart({
   history,
   forecast,
@@ -30,7 +26,6 @@ export function TimeSeriesChart({
   history: HistoryPoint[];
   forecast: ForecastBandPoint[];
   intervalLevel?: number;
-  /** False when the forecast has no meaningful interval (for example summed regions). */
   showBand?: boolean;
   unitLabel?: string;
 }) {
@@ -75,7 +70,7 @@ export function TimeSeriesChart({
   const summary =
     `Weekly demand ${history.length > 0 ? `from ${formatDate(first)}` : ""}` +
     (forecast.length > 0
-      ? `, forecast to ${formatDate(last)}${showBand && intervalLevel ? ` with ${Math.round(intervalLevel * 100)}% interval` : ""}`
+      ? `, forecast to ${formatDate(last)}${showBand && intervalLevel ? `, likely range ${Math.round(intervalLevel * 100)}%` : ""}`
       : "");
 
   return (
@@ -108,7 +103,7 @@ export function TimeSeriesChart({
             <span className="legend-item legend-forecast">Forecast</span>
             {showBand ? (
               <span className="legend-item legend-band">
-                {intervalLevel ? `${Math.round(intervalLevel * 100)}% interval` : "Interval"}
+                {intervalLevel ? `Likely range (${Math.round(intervalLevel * 100)}%)` : "Likely range"}
               </span>
             ) : null}
           </>

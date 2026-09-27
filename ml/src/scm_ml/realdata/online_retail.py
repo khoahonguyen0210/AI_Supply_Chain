@@ -1,9 +1,3 @@
-"""UCI Online Retail II: ingestion and normalisation into weekly SKU x region demand.
-
-Source: https://archive.ics.uci.edu/dataset/502/online+retail+ii (CC BY 4.0), real transactions of a
-UK online gift retailer, 2009-12-01 .. 2011-12-09.
-"""
-
 from __future__ import annotations
 
 import hashlib
@@ -34,8 +28,7 @@ class OnlineRetailConfig(DomainModel):
     n_skus: int = 40
     n_regions: int = 5  # top (n_regions - 1) countries plus OTHER
     min_active_weeks: int = 20
-    # SKUs and regions are chosen from data strictly before this date, so that nothing observed
-    # in the validation/test windows influences which series are modelled.
+    # Series are picked from data before this date, so validation/test weeks can't sway them.
     selection_cutoff: date = date(2011, 6, 6)
 
 
@@ -48,7 +41,6 @@ def sha256_file(path: Path) -> str:
 
 
 def fetch_raw(raw_dir: Path) -> Path:
-    """Download (if needed) and checksum-verify the source archive; returns the xlsx path."""
     raw_dir.mkdir(parents=True, exist_ok=True)
     archive = raw_dir / ZIP_NAME
     if not archive.exists():
@@ -64,8 +56,7 @@ def fetch_raw(raw_dir: Path) -> Path:
 
 
 def load_raw_transactions(raw_dir: Path) -> pd.DataFrame:
-    """All unique transactions. The workbook's two sheets overlap on 2010-12-01..09; the second
-    sheet is authoritative there (verified identical), so the first sheet is cut at its start."""
+    """Unique transactions; the sheets overlap on 2010-12-01..09, where the second wins."""
     cache = raw_dir / CACHE_NAME
     if cache.exists():
         return pd.read_csv(
@@ -103,7 +94,6 @@ def _clean(raw: pd.DataFrame) -> pd.DataFrame:
 def normalize_transactions(
     raw: pd.DataFrame, cfg: OnlineRetailConfig
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Return (weekly demand grid, SKU metadata). Pure and deterministic."""
     full_span = raw["InvoiceDate"]
     first_day, last_day = full_span.min().normalize(), full_span.max().normalize()
     frame = _clean(raw)
@@ -188,7 +178,6 @@ def to_observations(demand: pd.DataFrame) -> list[DemandObservation]:
 def build_dataset(
     raw_dir: Path, out_dir: Path, cfg: OnlineRetailConfig | None = None
 ) -> dict[str, Any]:
-    """Ingest, normalise, write the transformed dataset and a manifest with source identity."""
     cfg = cfg or OnlineRetailConfig()
     raw = load_raw_transactions(raw_dir)
     demand, meta = normalize_transactions(raw, cfg)

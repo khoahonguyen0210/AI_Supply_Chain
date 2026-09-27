@@ -3,12 +3,6 @@ package com.scm.platform.mlservice;
 import com.scm.platform.security.Actor;
 import tools.jackson.databind.JsonNode;
 
-/**
- * Backend boundary to the Python planning engine (docs/contracts/engine-api.md).
- *
- * <p>Requests are relayed as JSON together with the acting user; the {@code data} of the response
- * is returned untouched. The engine owns every planning rule, so nothing here interprets results.
- */
 public interface MlEngineClient {
 
 	JsonNode searchSuppliers(Actor actor, JsonNode request);
@@ -27,17 +21,14 @@ public interface MlEngineClient {
 
 	JsonNode listApprovals(String status);
 
-	/** Runtime telemetry and offline-evaluation headlines (not wrapped in the v1 envelope). */
 	JsonNode telemetry();
 
 	JsonNode getApproval(String approvalId);
 
 	JsonNode decideApproval(Actor approver, String approvalId, String outcome, String rationale);
 
-	/** The served model's forecast for the SKUs from {@code asOf}: what an approved decision relied on. */
 	JsonNode forecastSnapshot(Actor actor, JsonNode request);
 
-	/** Scores recorded outcomes (demand, deliveries, stock) against forecasts and promises. */
 	JsonNode evaluateOutcomes(Actor actor, JsonNode request);
 
 }

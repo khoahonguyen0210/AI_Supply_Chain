@@ -72,7 +72,7 @@ export function SupplierOptionsPanel({
       {search.phase === "done" ? <SupplierResults result={search.result} /> : null}
       {search.phase === "idle" ? (
         <p className="muted">
-          Compare eligible suppliers for this SKU on landed cost, lead time, reliability and quality.
+          Find suppliers that can deliver this product.
         </p>
       ) : null}
     </Panel>

@@ -1,13 +1,3 @@
-"""PostgreSQL/pgvector persistence of the knowledge base (`knowledge_document`, `knowledge_chunk`).
-
-The in-memory `KnowledgeStore` is what retrieval reads; this module makes PostgreSQL the system of
-record behind it. `sync` writes a corpus idempotently (an unchanged document version is skipped, so
-embeddings are computed once and reused across restarts), `load` rebuilds the in-memory store from
-the tables, and `search` runs the vector query in the database with the permission and validity
-filters applied in SQL, so a chunk a role may not read or that is no longer in force never leaves
-the database.
-"""
-
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -28,7 +18,6 @@ from .store import IngestReport, KnowledgeStore, content_sha256
 
 
 def _as_array(value: Any) -> Matrix:
-    """The embedding column as float32, whether the driver gives a pgvector `Vector` or an array."""
     converted = value.to_numpy() if hasattr(value, "to_numpy") else value
     return np.asarray(converted, dtype=np.float32)
 
@@ -55,13 +44,12 @@ class PgKnowledgeStore:
         return connection
 
     def sync(self, documents: Iterable[PolicyDocument], embedder: Embedder) -> IngestReport:
-        """Write the documents: skip unchanged versions (same hash), rewrite changed ones."""
+        """Skip unchanged versions (same hash), rewrite changed ones."""
         if embedder.dim != self.embedding_dim:
             raise ValueError(f"embedder dim {embedder.dim} != store dim {self.embedding_dim}")
         ingested = skipped = written = 0
         with self._connect() as connection:
-            # A document counts as current only if it also has its chunks: the master-data seed
-            # inserts documents without them, and those must still be chunked and embedded.
+            # Current only with its chunks: the master-data seed inserts documents without them.
             current = {
                 (row[0], row[1]): row[2]
                 for row in connection.execute(
@@ -143,7 +131,6 @@ class PgKnowledgeStore:
             )
 
     def load(self) -> KnowledgeStore:
-        """Rebuild the in-memory store retrieval reads from what the tables hold."""
         store = KnowledgeStore(self.embedding_dim)
         with self._connect() as connection:
             documents = {
@@ -173,8 +160,7 @@ class PgKnowledgeStore:
                 FROM knowledge_chunk ORDER BY chunk_id
                 """
             ).fetchall()
-        # Chunk ids grow in the order documents were written, so ordering by them restores the order
-        # the in-memory store had; retrieval breaks score ties by that order.
+        # Chunk ids follow write order, which retrieval uses to break score ties.
         by_document: dict[tuple[str, str], list[tuple[Chunk, Matrix]]] = {}
         for row in rows:
             metadata = dict(row[6])
@@ -199,7 +185,6 @@ class PgKnowledgeStore:
         return store
 
     def search(self, query: Matrix, *, role: str, as_of: date, k: int = 5) -> list[VectorHit]:
-        """The k nearest chunks the role may read and that are in force on `as_of`, by cosine."""
         vector = np.asarray(query, dtype=np.float32).reshape(-1)
         if vector.shape[0] != self.embedding_dim:
             raise ValueError(f"expected a {self.embedding_dim}-dim query, got {vector.shape[0]}")

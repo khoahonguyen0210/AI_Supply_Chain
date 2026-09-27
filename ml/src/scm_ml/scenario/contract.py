@@ -1,9 +1,4 @@
-"""Scenario contract: typed, validated parameters for each supported disruption.
-
-The domain `Scenario` stores `parameters` as a flat `{name: number | text}` mapping so it persists
-and travels as JSON. This module defines what each scenario type accepts, validates it and returns
-a typed model. Factors are multipliers (1.2 = +20%, 0.7 = -30%); a missing scope means everywhere.
-"""
+"""Typed parameters per scenario type; factors are multipliers (1.2 = +20%)."""
 
 from __future__ import annotations
 
@@ -19,8 +14,7 @@ Reduction = Annotated[float, Field(gt=0, le=1, description="Share of capacity th
 OptionalId = Annotated[str | None, Field(min_length=1)]
 
 
-class ScenarioContractError(ValueError):
-    """The scenario's parameters are not valid for its type."""
+class ScenarioContractError(ValueError): ...
 
 
 class DemandShock(DomainModel):
@@ -95,7 +89,6 @@ _ADAPTER: TypeAdapter[ScenarioParameters] = TypeAdapter(
 
 
 def parse_parameters(scenario: Scenario) -> ScenarioParameters:
-    """Validate a domain scenario's flat parameters against its type and return the typed model."""
     payload = {"kind": scenario.scenario_type.value, **scenario.parameters}
     try:
         parsed = _ADAPTER.validate_python(payload)
@@ -115,7 +108,6 @@ def make_scenario(
     parameters: ScenarioParameters,
     created_at: datetime,
 ) -> Scenario:
-    """Build a domain scenario from typed parameters (the inverse of `parse_parameters`)."""
     flat = {
         key: value
         for key, value in parameters.model_dump(exclude={"kind"}).items()
@@ -133,7 +125,6 @@ def make_scenario(
 
 
 def standard_scenarios(created_at: datetime, outage_supplier_id: str) -> list[Scenario]:
-    """The seven disruptions required by the research dossier, each with its stated magnitude."""
     return [
         make_scenario("SCN-DEMAND-20", "Demand +20%", DemandShock(factor=1.2), created_at),
         make_scenario(

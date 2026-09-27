@@ -14,13 +14,7 @@ terraform {
     }
   }
 
-  # A real deployment keeps state remotely, for example:
-  # backend "s3" {
-  #   bucket       = "<state bucket>"
-  #   key          = "scm/terraform.tfstate"
-  #   region       = "us-east-1"
-  #   use_lockfile = true
-  # }
+  # A real deployment would add a remote state backend here (S3 with use_lockfile = true).
 }
 
 provider "aws" {

@@ -13,10 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 
-/**
- * Runs the real servers: the operational port serves metrics, and the API port does not. Tests switch metric
- * export off by default, so it is switched back on here.
- */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
 		properties = { "management.server.port=0", "management.defaults.metrics.export.enabled=true",
 				"management.prometheus.metrics.export.enabled=true" })

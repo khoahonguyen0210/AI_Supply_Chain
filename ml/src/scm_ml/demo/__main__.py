@@ -1,13 +1,3 @@
-"""CLI: the final demo, one planner story told through the running stack's public API.
-
-    uv run python -m scm_ml.demo --password <demo password> [--url http://localhost:3000]
-
-Steps (docs/demo.md): a vague question, clarification, forecast, inventory need, supplier ranking,
-optimised plan, a disruption scenario, policy and contract evidence, the copilot's trade-offs, human
-approval, the recorded decision, and an outcome evaluated later. Everything shown is read from API
-responses; the only simulated input is the later actual demand, labelled SIMULATED.
-"""
-
 from __future__ import annotations
 
 import argparse

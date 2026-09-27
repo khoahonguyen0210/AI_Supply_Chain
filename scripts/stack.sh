@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 # Local stack: `scripts/stack.sh up|smoke|down|reset|logs|ps`.
-# `up` creates .env with random local secrets on first use, builds the images and waits until every
-# service is healthy. `reset` also deletes the database and engine volumes.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

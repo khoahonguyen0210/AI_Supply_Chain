@@ -1,13 +1,3 @@
-"""CLI: request latency of the main API calls against a running deployment.
-
-    uv run python -m scm_ml.benchmark.latency --url http://localhost:3000 --password <demo password>
-
-Each call is made sequentially by one signed-in planner (no concurrency, so this is service time
-plus the proxy hop, not a load test), after a warm-up call. Latency is wall-clock time measured by
-the client. The copilot task is the full agent run (forecast, inventory, sourcing, optimisation,
-scenario, policies) and opens an approval request each time, so it is sampled fewer times.
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -29,7 +19,6 @@ Call = Callable[[httpx.Client], httpx.Response]
 
 
 def calls() -> dict[str, tuple[Call, int]]:
-    """Name -> (request, default sample count)."""
     return {
         "GET /api/skus": (lambda c: c.get("/api/skus"), 50),
         "GET /api/inventory": (lambda c: c.get("/api/inventory", params={"skuId": "SKU-001"}), 50),
@@ -65,11 +54,6 @@ def calls() -> dict[str, tuple[Call, int]]:
 
 
 def timed(client: httpx.Client, call: Call) -> tuple[float, int]:
-    """Milliseconds of one successful call, and how many 429s were waited out first.
-
-    The heavy endpoints are rate limited (30 per user per minute, docs/security.md); a refusal is
-    retried after its Retry-After, outside the timed window, so the result is service time.
-    """
     throttled = 0
     while True:
         start = time.perf_counter()

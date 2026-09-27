@@ -144,14 +144,11 @@ export function Approvals() {
     <div className="stack">
       <div>
         <h1>Approvals</h1>
-        <p className="lede">
-          Purchase orders prepared by the copilot wait here. Each needs the approvers the approval policy
-          requires, and nothing is ordered until they approve.
-        </p>
+        <p className="lede">Orders are only placed once the right people approve them.</p>
       </div>
       <div className="grid-2" style={{ gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.4fr)" }}>
         <Panel
-          title="Queue"
+          title="Requests"
           id="queue"
           actions={
             <label className="row">

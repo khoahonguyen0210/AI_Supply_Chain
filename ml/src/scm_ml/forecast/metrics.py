@@ -1,9 +1,3 @@
-"""Forecast accuracy and interval-coverage metrics.
-
-Shapes: ``actual`` is (series, weeks); predictions are (series, weeks, horizons) where element
-``[s, k, h-1]`` forecasts week ``k`` from an origin ``h`` weeks earlier.
-"""
-
 from __future__ import annotations
 
 import numpy as np
@@ -13,7 +7,6 @@ Array = NDArray[np.float64]
 
 
 def point_metrics(actual: Array, predicted: Array) -> dict[str, float | None]:
-    """MAE, RMSE, bias (mean signed error), WAPE and MAPE (non-zero actuals only)."""
     error = predicted - actual
     nonzero = actual > 0
     total = float(actual.sum())
@@ -36,7 +29,6 @@ def _broadcast(actual: Array, predicted: Array) -> Array:
 
 
 def evaluate_point(actual: Array, predicted: Array) -> dict[str, object]:
-    """Overall metrics plus a breakdown by forecast horizon (1-indexed)."""
     target = _broadcast(actual, predicted)
     return {
         "overall": point_metrics(target, predicted),

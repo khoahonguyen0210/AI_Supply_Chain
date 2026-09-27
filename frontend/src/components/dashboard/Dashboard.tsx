@@ -20,10 +20,8 @@ export function Dashboard() {
   return (
     <div className="stack">
       <div>
-        <h1>Planner dashboard</h1>
-        <p className="lede">
-          Demand, forecast, inventory, supplier options, recommendations and scenarios for one product.
-        </p>
+        <h1>Overview</h1>
+        <p className="lede">Demand, stock and supplier options for one product.</p>
       </div>
       <ResourceView state={state} onRetry={reload} loadingLabel="Loading products…">
         {(skus) => {

@@ -1,7 +1,6 @@
 import type { ScenarioType } from "./api/types";
 
 export interface ScenarioField {
-  /** The parameter name the planning engine's scenario contract expects. */
   key: string;
   label: string;
   kind: "number" | "integer" | "text";
@@ -28,40 +27,36 @@ const SCOPE_SUPPLIER: ScenarioField = {
   placeholder: "all suppliers",
 };
 
-/**
- * The inputs each disruption accepts. Ranges are hints for the form; the planning engine validates the
- * values and its message is shown if they are rejected.
- */
 export const SCENARIO_FORMS: ScenarioForm[] = [
   {
     type: "DEMAND_SHOCK",
-    label: "Demand shock",
-    description: "Customer demand changes by a factor (1.2 is +20%).",
+    label: "Demand changes suddenly",
+    description: "Customers buy more or less than forecast.",
     fields: [
-      { key: "factor", label: "Demand factor", kind: "number", required: true, min: 0.1, max: 10, step: 0.05 },
+      { key: "factor", label: "Demand multiplier (1.2 = +20%)", kind: "number", required: true, min: 0.1, max: 10, step: 0.05 },
       { key: "sku_id", label: "SKU", kind: "text", required: false, placeholder: "all SKUs" },
       { key: "region_id", label: "Region", kind: "text", required: false, placeholder: "all regions" },
     ],
   },
   {
     type: "SUPPLIER_OUTAGE",
-    label: "Supplier outage",
+    label: "A supplier stops delivering",
     description: "A supplier cannot deliver at all.",
     fields: [{ ...SCOPE_SUPPLIER, required: true, placeholder: "SUP-001" }],
   },
   {
     type: "PRICE_SHOCK",
-    label: "Price shock",
-    description: "Purchase prices change by a factor (1.15 is +15%).",
+    label: "Prices change",
+    description: "Suppliers charge more or less per unit.",
     fields: [
-      { key: "factor", label: "Price factor", kind: "number", required: true, min: 0.1, max: 10, step: 0.05 },
+      { key: "factor", label: "Price multiplier (1.15 = +15%)", kind: "number", required: true, min: 0.1, max: 10, step: 0.05 },
       SCOPE_SUPPLIER,
       { key: "sku_id", label: "SKU", kind: "text", required: false, placeholder: "all SKUs" },
     ],
   },
   {
     type: "CAPACITY_REDUCTION",
-    label: "Supplier capacity reduction",
+    label: "Suppliers can deliver less",
     description: "Suppliers can deliver only a share of their usual weekly capacity.",
     fields: [
       {
@@ -79,7 +74,7 @@ export const SCENARIO_FORMS: ScenarioForm[] = [
   },
   {
     type: "LEAD_TIME_SHOCK",
-    label: "Lead time shock",
+    label: "Deliveries arrive late",
     description: "Deliveries take longer.",
     fields: [
       { key: "days", label: "Extra days", kind: "integer", required: true, min: 1, max: 180, step: 1 },
@@ -88,7 +83,7 @@ export const SCENARIO_FORMS: ScenarioForm[] = [
   },
   {
     type: "WAREHOUSE_CAPACITY_REDUCTION",
-    label: "Warehouse capacity reduction",
+    label: "Warehouses have less space",
     description: "Warehouses can hold only a share of their usual capacity.",
     fields: [
       {
@@ -105,14 +100,18 @@ export const SCENARIO_FORMS: ScenarioForm[] = [
   },
   {
     type: "TRANSPORT_COST_SHOCK",
-    label: "Transport cost shock",
-    description: "Shipping costs change by a factor.",
+    label: "Shipping costs change",
+    description: "Moving stock between places costs more or less.",
     fields: [
-      { key: "factor", label: "Cost factor", kind: "number", required: true, min: 0.1, max: 10, step: 0.05 },
+      { key: "factor", label: "Cost multiplier (1.25 = +25%)", kind: "number", required: true, min: 0.1, max: 10, step: 0.05 },
       SCOPE_SUPPLIER,
     ],
   },
 ];
+
+export function scenarioLabel(type: string): string {
+  return SCENARIO_FORMS.find((form) => form.type === type)?.label ?? type.replace(/_/g, " ").toLowerCase();
+}
 
 export function scenarioForm(type: ScenarioType): ScenarioForm {
   const form = SCENARIO_FORMS.find((f) => f.type === type);
@@ -125,7 +124,6 @@ export interface BuiltParameters {
   errors: Record<string, string>;
 }
 
-/** Turns the form's text values into engine parameters; empty optional fields are left out. */
 export function buildParameters(type: ScenarioType, values: Record<string, string>): BuiltParameters {
   const parameters: Record<string, number | string> = {};
   const errors: Record<string, string> = {};

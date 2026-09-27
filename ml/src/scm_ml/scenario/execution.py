@@ -1,12 +1,3 @@
-"""Run baseline and scenario through the same decision pipeline.
-
-Three plans per scenario, as the research dossier prescribes:
-  baseline   the optimized plan for undisturbed inputs;
-  disrupted  that same purchase plan held fixed and executed in the disrupted world (what is
-             actually delivered and what it costs), with fulfillment re-optimized on real stock;
-  response   the plan re-optimized for the disrupted inputs.
-"""
-
 from __future__ import annotations
 
 import time
@@ -77,7 +68,6 @@ def _allocation_problem(
 
 
 def run_pipeline(inputs: PlanningInputs) -> DecisionResult:
-    """Optimize procurement, then allocate the resulting stock to regional demand."""
     problem = procurement_problem(inputs)
     procurement = solve_procurement(problem)
     allocation_problem = _allocation_problem(inputs, problem, list(procurement.lines))
@@ -89,11 +79,6 @@ def run_pipeline(inputs: PlanningInputs) -> DecisionResult:
 def realize_deliveries(
     problem: ProcurementProblem, lines: tuple[PurchaseLine, ...]
 ) -> list[PurchaseLine]:
-    """What a fixed purchase plan actually delivers in `problem`'s world.
-
-    Orders to offers that no longer exist are lost; orders beyond a supplier's remaining capacity
-    are cut back pro rata; the rest are repriced at the scenario's prices and shipping rates.
-    """
     offers = {
         (o.supplier_id, o.sku_id, key.warehouse_id): o
         for key, offs in problem.offers.items()
@@ -129,7 +114,6 @@ def realize_deliveries(
 
 
 def execute_fixed_plan(inputs: PlanningInputs, lines: tuple[PurchaseLine, ...]) -> DecisionResult:
-    """Hold the purchase plan fixed; measure delivery, cost and re-optimized fulfillment."""
     problem = procurement_problem(inputs)
     started = time.perf_counter()
     realized = realize_deliveries(problem, lines)
@@ -151,7 +135,6 @@ def run_scenario(
     scenario: Scenario,
     baseline: DecisionResult | None = None,
 ) -> ScenarioRun:
-    """Baseline, disrupted (baseline plan held) and re-optimized response for one scenario."""
     baseline = baseline or run_pipeline(baseline_inputs)
     applied = apply_scenario(baseline_inputs, scenario)
     disrupted_problem = procurement_problem(applied.inputs)

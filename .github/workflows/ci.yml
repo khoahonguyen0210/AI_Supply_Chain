@@ -1,9 +1,6 @@
 name: CI
 
-# Lint, type checks and tests for all three codebases, the end-to-end planner workflow, the
-# container images with a smoke test of the whole stack, dependency and image vulnerability scans,
-# and versioned images pushed to GitHub Container Registry (main and v* tags only).
-# Nothing here needs a paid service or an API key; the AI regression gate is its own workflow.
+# Lint, type checks, tests, e2e, image build + smoke + scans; pushes images on main and v* tags.
 on:
   push:
     branches: [main]

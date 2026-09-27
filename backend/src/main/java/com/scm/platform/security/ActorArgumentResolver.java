@@ -9,10 +9,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-/**
- * Resolves {@link Actor} controller parameters from the validated access token of the current request, so
- * controllers never read identity from anything the caller can set freely.
- */
+/** Resolves the Actor from the validated token, never from caller-set fields. */
 public class ActorArgumentResolver implements HandlerMethodArgumentResolver {
 
 	@Override
@@ -26,7 +23,6 @@ public class ActorArgumentResolver implements HandlerMethodArgumentResolver {
 		return current();
 	}
 
-	/** The signed-in actor, or a 401 when the request carries no valid token. */
 	public static Actor current() {
 		if (SecurityContextHolder.getContext().getAuthentication() instanceof JwtAuthenticationToken token) {
 			String role = token.getToken().getClaimAsString(TokenService.ROLE_CLAIM);

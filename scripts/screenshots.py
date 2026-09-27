@@ -1,10 +1,6 @@
-"""Screenshots of the running app for the README (docs/images/).
+"""README screenshots of the running app (Playwright on installed Edge or Chrome).
 
-    bash scripts/stack.sh up
-    uv run --with playwright python scripts/screenshots.py --password <demo password>
-
-Uses the installed Microsoft Edge or Chrome through Playwright (`--channel`), so no browser download
-is needed. Playwright is not a project dependency; `uv run --with` brings it for this run only.
+uv run --with playwright python scripts/screenshots.py --password <demo password>
 """
 
 from __future__ import annotations
@@ -28,7 +24,7 @@ def sign_in(page: Page, url: str, password: str) -> None:
     page.get_by_label("User id").fill("planner")
     page.get_by_label("Password").fill(password)
     page.get_by_role("button", name="Sign in").click()
-    page.wait_for_load_state("networkidle")
+    page.get_by_role("navigation", name="Primary").wait_for(timeout=30_000)  # signed in
 
 
 def main() -> int:
@@ -44,12 +40,18 @@ def main() -> int:
     with sync_playwright() as p:
         browser = p.chromium.launch(channel=args.channel)
         page = browser.new_page(viewport={"width": 1440, "height": 900}, device_scale_factor=1)
+        if "landing" in args.pages:  # the sign-in page, before signing in
+            page.goto(args.url)
+            page.wait_for_load_state("networkidle")
+            page.wait_for_timeout(1200)  # entrance animations
+            page.screenshot(path=str(args.out / "landing.png"))
+            print(f"wrote {args.out / 'landing.png'}")
         sign_in(page, args.url, args.password)
-        for name in args.pages:
+        for name in [n for n in args.pages if n != "landing"]:
             page.goto(args.url + PAGES[name])
             page.wait_for_load_state("networkidle")
             if name == "copilot":  # show a finished task, not an empty form
-                page.get_by_label("Your request").fill(QUESTION)
+                page.get_by_label("Your question").fill(QUESTION)
                 page.locator("form button[type=submit]").click()
                 page.get_by_text("Awaiting approval", exact=False).first.wait_for(timeout=120_000)
             page.wait_for_timeout(1500)  # charts and panels finish loading

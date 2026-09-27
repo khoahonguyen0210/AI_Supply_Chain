@@ -1,14 +1,6 @@
 #!/usr/bin/env bash
-# Final benchmark: regenerates every offline experiment artifact under ml/experiments/, then writes
-# docs/benchmarks.md and the README figure from those artifacts only (docs/benchmarks.md, Phase 18).
-#
-#   bash scripts/benchmark.sh            offline suite (synthetic world; about 15 minutes)
-#   bash scripts/benchmark.sh --real     also the real-data forecast (downloads Online Retail II once)
-#   bash scripts/benchmark.sh --report   only rewrite docs/benchmarks.md from the saved artifacts
-#
-# Systems numbers need a running deployment and are measured separately:
-#   bash scripts/stack.sh up && uv run python -m scm_ml.benchmark.latency --password <demo password>
-#   bash scripts/kind.sh up && uv run python -m scm_ml.benchmark.scaling --replicas 1 2 4 --jobs 48 --repeats 3
+# Regenerates every offline benchmark artifact, then docs/benchmarks.md.
+# Usage: bash scripts/benchmark.sh [--real|--report]
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

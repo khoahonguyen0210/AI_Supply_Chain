@@ -77,12 +77,8 @@ export function Copilot() {
   return (
     <div className="stack">
       <div>
-        <h1>Copilot</h1>
-        <p className="lede">
-          Ask about demand, inventory, suppliers, plans, scenarios or policies. The copilot uses the same
-          tools and rules as the rest of the platform, shows what it did, and only requests approval; it
-          never orders anything itself.
-        </p>
+        <h1>Assistant</h1>
+        <p className="lede">Ask about demand, stock or suppliers. The assistant can draft an order, but a manager has to approve it before anything is bought.</p>
       </div>
       <div className="grid-2" style={{ gridTemplateColumns: "minmax(0, 260px) minmax(0, 1fr)" }}>
         <Panel
@@ -128,7 +124,7 @@ export function Copilot() {
           <div className="chat" aria-live="polite">
             {tasks.length === 0 && !sending ? (
               <div className="stack">
-                <p className="muted">Try one of these:</p>
+                <p className="muted">Examples:</p>
                 <div className="row">
                   {EXAMPLES.map((example) => (
                     <button key={example} type="button" onClick={() => void send(example)}>
@@ -147,7 +143,7 @@ export function Copilot() {
           {error ? <Notice tone="bad">{error}</Notice> : null}
           <form className="stack" onSubmit={submit} style={{ marginTop: 12 }}>
             <label className="field">
-              <span>Your request</span>
+              <span>Your question</span>
               <textarea
                 rows={3}
                 value={text}

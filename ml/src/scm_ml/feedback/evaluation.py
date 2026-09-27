@@ -1,9 +1,3 @@
-"""Predicted or planned versus actual: forecast accuracy, supplier delivery, inventory outcome.
-
-These functions are shared by the offline experiment (simulated actuals) and the engine endpoint
-that evaluates outcomes recorded through the backend, so both are scored by the same rules.
-"""
-
 from __future__ import annotations
 
 from collections import defaultdict
@@ -19,8 +13,6 @@ from scm_ml.forecast.metrics import interval_metrics, point_metrics
 
 @dataclass(frozen=True)
 class ForecastOutcome:
-    """One forecast point next to the demand that actually happened in its week."""
-
     sku_id: str
     region_id: str
     week_start: date
@@ -33,8 +25,6 @@ class ForecastOutcome:
 
 @dataclass(frozen=True)
 class DeliveryOutcome:
-    """A purchase order as promised and, once known, as delivered."""
-
     po_id: str
     supplier_id: str
     ordered_quantity: int
@@ -49,8 +39,6 @@ class DeliveryOutcome:
 
 @dataclass(frozen=True)
 class InventoryWeek:
-    """End-of-week stock of one SKU at one warehouse. ``demand`` may be unknown (None)."""
-
     sku_id: str
     warehouse_id: str
     week_start: date
@@ -78,8 +66,6 @@ def _forecast_block(rows: Sequence[ForecastOutcome]) -> dict[str, Any]:
 
 
 def forecast_accuracy(rows: Sequence[ForecastOutcome]) -> dict[str, Any]:
-    """MAE, RMSE, bias, WAPE, MAPE (non-zero actuals) and, when every row has bounds, interval
-    coverage and width; overall and by horizon."""
     if not rows:
         return {"overall": None, "by_horizon": {}}
     by_horizon: dict[int, list[ForecastOutcome]] = defaultdict(list)
@@ -116,11 +102,6 @@ def _delivery_block(rows: Sequence[DeliveryOutcome]) -> dict[str, Any]:
 def delivery_performance(
     rows: Sequence[DeliveryOutcome], promised_reliability: Mapping[str, float] | None = None
 ) -> dict[str, Any]:
-    """On-time, in-full and unit fill rate, delay; per supplier against its promised reliability.
-
-    ``promised_reliability`` is the supplier's on-time probability the plan relied on. Orders not
-    yet delivered are counted as pending and left out of the rates.
-    """
     promised = promised_reliability or {}
     by_supplier: dict[str, list[DeliveryOutcome]] = defaultdict(list)
     for row in rows:
@@ -140,7 +121,6 @@ def delivery_performance(
 
 
 def inventory_outcome(rows: Sequence[InventoryWeek]) -> dict[str, Any]:
-    """Stockouts, unmet demand, fill rate (when demand is known) and ending stock."""
     if not rows:
         return {"cell_weeks": 0}
     known = [r for r in rows if r.demand is not None]
@@ -167,7 +147,6 @@ def inventory_outcome(rows: Sequence[InventoryWeek]) -> dict[str, Any]:
 def compare_inventory(
     planned: Sequence[InventoryWeek], actual: Sequence[InventoryWeek]
 ) -> dict[str, Any]:
-    """Planned versus actual stock path, matched per (SKU, warehouse, week)."""
     plan = {(r.sku_id, r.warehouse_id, r.week_start): r for r in planned}
     pairs = [
         (plan[k], r) for r in actual if (k := (r.sku_id, r.warehouse_id, r.week_start)) in plan

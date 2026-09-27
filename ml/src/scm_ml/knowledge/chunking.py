@@ -1,10 +1,3 @@
-"""Parse a policy document into clauses and chunk it for embedding.
-
-Documents are numbered clauses under a short preamble. Each chunk is one clause (or a window of a
-very long clause) prefixed with the document title and preamble, so a clause such as "Invoices are
-payable within 30 days" still names the supplier it belongs to once it is retrieved on its own.
-"""
-
 from __future__ import annotations
 
 import re
@@ -32,7 +25,6 @@ class Chunk(DomainModel):
 
     @property
     def body(self) -> str:
-        """The clause text without the context prefix."""
         return self.content.removeprefix(self.context).strip()
 
 
@@ -48,7 +40,6 @@ def count_tokens(text: str) -> int:
 
 
 def parse_document(document: PolicyDocument) -> ParsedDocument:
-    """Split content into a preamble and its numbered clauses (single-paragraph SOPs have none)."""
     text = document.content
     starts = [m.start() for m in _CLAUSE_START.finditer(text)]
     if not starts:
@@ -78,7 +69,6 @@ def chunk_document(
     max_tokens: int = MAX_CHUNK_TOKENS,
     overlap: int = OVERLAP_TOKENS,
 ) -> tuple[Chunk, ...]:
-    """Chunk one document; metadata carries everything retrieval filters on."""
     parsed = parse_document(document)
     context = " ".join(part for part in (parsed.title + ".", parsed.preamble) if part.strip(". "))
     metadata: dict[str, Any] = {

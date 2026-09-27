@@ -1,17 +1,3 @@
-"""CLI: worker scaling on the local kind cluster.
-
-    uv run python -m scm_ml.benchmark.scaling --replicas 1 2 4 --jobs 48
-
-For each replica count it scales the `worker` deployment (each pod: a queue worker plus its own
-engine sidecar), waits for the rollout, runs the same batch of optimisation jobs
-(``workers.run_batch``) and records makespan, throughput and per-job wait/run times. After each
-scale-up a small unrecorded warm-up batch reaches every engine first. A run taken across a host
-suspend (laptop standby; see ``workers.ClockWatch``) is discarded and run again. ``--disrupt``
-adds a run at the highest replica count in which one worker pod is force-deleted mid-batch (no
-grace period, as a crash), to record failure behaviour. Results go to one artifact with the
-cluster's resource settings.
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -48,7 +34,6 @@ def scale(context: str, replicas: int) -> None:
 
 
 def pod_settings(context: str) -> dict[str, Any]:
-    """CPU/memory requests and limits of the worker pod's containers, as deployed."""
     return {
         "worker": kubectl(
             context,
@@ -120,7 +105,6 @@ def main(argv: list[str] | None = None) -> int:
         context = args.context
 
         def kill_one_worker() -> str:
-            """Force-delete one worker pod (worker and its engine), as a crash would."""
             victim = kubectl(context, "get", "pods", "-l", "app=worker", "-o", "name").split()[0]
             kubectl(context, "delete", victim, "--grace-period=0", "--force", "--wait=false")
             return victim

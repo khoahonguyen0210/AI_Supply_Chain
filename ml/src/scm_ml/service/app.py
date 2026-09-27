@@ -1,5 +1,3 @@
-"""FastAPI application: the HTTP boundary between the Spring backend and Python."""
-
 from __future__ import annotations
 
 import hmac
@@ -50,8 +48,7 @@ def _error(status: int, code: str, message: str) -> JSONResponse:
 
 
 def model_directories(world: SyntheticWorld) -> tuple[Path, Path]:
-    """The forecast model and dataset to serve: explicit directories, else the model promoted
-    through the feedback loop (``serving.json``), else the world's own model."""
+    """Explicit dirs, else the promoted model (serving.json), else the world's own."""
     model_dir = os.environ.get("SCM_ML_MODEL_DIR")
     dataset_dir = os.environ.get("SCM_ML_DATASET_DIR")
     if model_dir and dataset_dir:
@@ -69,12 +66,7 @@ class MissingInternalTokenError(RuntimeError):
 
 
 def resolve_internal_token(configured: str | None) -> str | None:
-    """The shared secret the backend must present; None only when auth is switched off explicitly.
-
-    The planning engine trusts the actor named in a request, so it must only ever be reachable by
-    the backend. Starting without a secret is therefore an error unless SCM_ML_INSECURE_NO_AUTH=1
-    says the caller means it (local experiments).
-    """
+    """Shared backend token; startup fails without one unless SCM_ML_INSECURE_NO_AUTH=1."""
 
     token = configured if configured is not None else os.environ.get("SCM_ML_INTERNAL_TOKEN")
     if token:
@@ -96,18 +88,6 @@ def create_app(
     *,
     require_token: bool = True,
 ) -> FastAPI:
-    """Build the app; services not given are loaded from the environment.
-
-    Every route except /health needs the shared internal token (see `resolve_internal_token`).
-    Tests that are not about authentication pass `require_token=False`.
-
-    SCM_ML_MODEL_DIR / SCM_ML_DATASET_DIR locate the forecast model (default: the model trained
-    on the default world under SCM_ML_ARTIFACT_ROOT); the planning engine is built
-    on the default synthetic world with SCM_ML_PLANNER (rule|claude), SCM_ML_EMBEDDER
-    (hashing|fastembed), SCM_ML_STATE_PATH (SQLite file for tasks and approvals) and
-    SCM_ML_KNOWLEDGE_DATABASE_URL (PostgreSQL connection string for the knowledge base).
-    """
-
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         world = generate_world(SyntheticConfig()) if forecasts is None or engine is None else None
@@ -157,7 +137,6 @@ def create_app(
 
     @app.get("/health")
     async def health() -> dict[str, str]:
-        """Liveness only; details are behind the token at /v1/model."""
         return {"status": "UP", "service": "scm-ml"}
 
     @app.get("/v1/model")
@@ -182,7 +161,6 @@ def create_app(
 
     @app.get("/v1/telemetry")
     def telemetry_snapshot(request: Request) -> dict[str, Any]:
-        """Runtime counters and latencies, plus the headline offline-evaluation results."""
         return {
             "runtime": request.app.state.engine.telemetry.snapshot(),
             "quality": quality_summary(Path(os.environ.get("SCM_ML_EXPERIMENT_DIR", DEFAULT_ROOT))),
@@ -192,8 +170,7 @@ def create_app(
         service: EngineService = request.app.state.engine
         return service
 
-    # Engine calls are synchronous and CPU-bound, so they are plain `def` endpoints that run in
-    # the threadpool and leave /health responsive while a long optimization runs.
+    # Plain `def` endpoints run in the threadpool, so /health stays up during long solves.
     @app.post("/v1/suppliers/search")
     def search_suppliers(request: Request, body: SupplierSearchRequest) -> EngineResponse:
         return EngineResponse(data=engine_of(request).search_suppliers(body))

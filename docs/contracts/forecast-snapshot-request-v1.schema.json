@@ -2,7 +2,6 @@
   "$defs": {
     "ActorRef": {
       "additionalProperties": false,
-      "description": "The authenticated human a request runs for; authentication itself is the backend's job.",
       "properties": {
         "role": {
           "minLength": 1,
@@ -24,7 +23,6 @@
     }
   },
   "additionalProperties": false,
-  "description": "The forecast a decision relies on, for every region with demand for each SKU.",
   "properties": {
     "actor": {
       "$ref": "#/$defs/ActorRef"

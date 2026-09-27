@@ -1,12 +1,3 @@
-"""Worker scaling benchmark: a fixed batch of queued jobs, drained by however many workers run.
-
-The workload is deterministic (``workload``): the same optimisation plans every run, each with a
-fresh idempotency key. Jobs are submitted in one burst through the public API; the measurement is
-taken from the jobs' own timestamps (``createdAt``, ``startedAt``, ``finishedAt``), so it does not
-depend on polling granularity. An optional disruption (for example deleting a worker pod) runs a
-fixed time after submission, to record failure behaviour.
-"""
-
 from __future__ import annotations
 
 import statistics
@@ -25,7 +16,6 @@ MAX_BATCH = 100  # the job list endpoint returns at most 100 of the caller's job
 
 
 def workload(jobs: int) -> list[dict[str, Any]]:
-    """``jobs`` optimisation plans: four SKUs each, rotating through the catalogue."""
     plans = []
     for index in range(jobs):
         skus = [SKUS[(index * 4 + k) % len(SKUS)] for k in range(4)]
@@ -47,7 +37,6 @@ def percentile(values: list[float], q: float) -> float:
 
 
 def summarize(jobs: list[dict[str, Any]]) -> dict[str, Any]:
-    """Makespan, throughput and per-job wait/run times from the job records."""
     done = [j for j in jobs if j["status"] == "SUCCEEDED"]
     created = [parse_time(j["createdAt"]) for j in jobs]
     finished = [parse_time(j["finishedAt"]) for j in jobs if j.get("finishedAt")]
@@ -96,13 +85,6 @@ def login(base_url: str, user: str, password: str) -> httpx.Client:
 
 
 class ClockWatch:
-    """Largest gap between one-second wall-clock ticks while active.
-
-    A laptop that goes to standby freezes the Docker VM and this process alike; on resume the
-    clocks jump, so the jobs in flight look minutes long. A gap far above the tick interval
-    marks the run as taken across a host suspend, so it can be discarded instead of reported.
-    """
-
     TICK_S = 1.0
     SUSPEND_GAP_S = 15.0
 
@@ -139,7 +121,6 @@ def run_batch(
     disrupt_after_s: float | None = None,
     disrupt: Callable[[], Any] | None = None,
 ) -> dict[str, Any]:
-    """Submit the workload, optionally disrupt, wait for every job, and summarise."""
     with ClockWatch() as clock:
         summary = _run_batch(client, jobs, timeout_s, disrupt_after_s, disrupt)
     summary["max_clock_gap_s"] = round(clock.max_gap_s, 3)

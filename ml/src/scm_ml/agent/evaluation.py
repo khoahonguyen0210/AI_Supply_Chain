@@ -1,11 +1,4 @@
-"""Fixed agent evaluation: scenarios scored on the trace, not only on the final text.
-
-Each case states what a correct run looks like. A case is scored only on the dimensions that apply
-to it, and the overall workflow success needs every applicable dimension plus the expected status.
-Traces are stored so a score can be audited. Results describe the planner under test: with the
-offline `RulePlanner` they measure the harness, guardrails and tools; language-model planning is
-reported separately and is `NOT YET MEASURED` until it is run with an API key.
-"""
+"""Fixed agent evaluation, scored on the trace as well as the final answer."""
 
 from __future__ import annotations
 

@@ -16,11 +16,8 @@ export function Workspace() {
   return (
     <div className="stack">
       <div>
-        <h1>Decision workspace</h1>
-        <p className="lede">
-          Inspect the assumptions, constraints and alternatives behind a purchase plan, see how it holds up
-          under a disruption, and check the policies that apply.
-        </p>
+        <h1>Plan builder</h1>
+        <p className="lede">Build a purchase plan and see how it holds up if something goes wrong.</p>
       </div>
       <PlanBuilder
         onSolved={(next) => {

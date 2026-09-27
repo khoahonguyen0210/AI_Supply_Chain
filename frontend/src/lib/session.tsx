@@ -44,11 +44,7 @@ function writeStored(value: Stored | null): void {
   }
 }
 
-/**
- * Holds the signed-in user. The access token lives in sessionStorage, so it is gone when the tab closes
- * and is never shared between tabs or sent anywhere except the backend. `initialUser` (tests) starts
- * signed in without a token.
- */
+/** Signed-in user; the token lives in sessionStorage, so it ends with the tab. */
 export function SessionProvider({
   children,
   initialUser,

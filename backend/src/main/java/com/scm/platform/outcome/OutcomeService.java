@@ -25,10 +25,6 @@ import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
-/**
- * Outcome capture and evaluation. Java records what happened and gathers it; the engine scores it
- * (docs/feedback-loop.md), so the evaluation rules exist once, in Python.
- */
 @Service
 public class OutcomeService {
 
@@ -87,7 +83,6 @@ public class OutcomeService {
 		return records.size();
 	}
 
-	/** Records a supplier delivery against a purchase order that was approved (or placed). */
 	@Transactional
 	public PurchaseOrderRow recordDelivery(Actor actor, String poId, LocalDate deliveredOn, int deliveredQuantity,
 			String source) {
@@ -104,10 +99,6 @@ public class OutcomeService {
 		return outcomes.purchaseOrder(poId).orElseThrow();
 	}
 
-	/**
-	 * Stores the served model's forecast for an approved recommendation's SKUs over its horizon, so the
-	 * forecast the decision relied on can be compared with actual demand later. Idempotent.
-	 */
 	public int captureForecast(Actor actor, String recommendationId) {
 		RecommendationRow recommendation = approvals.recommendation(recommendationId).orElseThrow(
 				() -> ApiException.notFound("UNKNOWN_RECOMMENDATION", "no recommendation " + recommendationId));
@@ -140,7 +131,7 @@ public class OutcomeService {
 		return stored;
 	}
 
-	/** {@link #captureForecast} that never fails the caller: the approval has already been stored. */
+	/** Never fails the caller: the approval has already been stored. */
 	public void captureForecastQuietly(Actor actor, String recommendationId) {
 		try {
 			captureForecast(actor, recommendationId);
@@ -151,7 +142,6 @@ public class OutcomeService {
 		}
 	}
 
-	/** Gathers forecasts, recorded outcomes and promises; the engine scores them. */
 	public ObjectNode evaluate(Actor actor, String recommendationId) {
 		if (recommendationId != null && approvals.recommendation(recommendationId).isEmpty()) {
 			throw ApiException.notFound("UNKNOWN_RECOMMENDATION", "no recommendation " + recommendationId);

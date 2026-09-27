@@ -28,10 +28,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import tools.jackson.databind.node.ObjectNode;
 
-/**
- * Outcome capture (what actually happened after a decision) and its evaluation. Recording needs a planning
- * role; every write is audited by the audit filter. Records are append-only: a correction is a new record.
- */
 @RestController
 @RequestMapping("/api/outcomes")
 public class OutcomeController {
@@ -91,7 +87,6 @@ public class OutcomeController {
 				source(request.source()));
 	}
 
-	/** Records (again) the forecast an approved recommendation relied on; normally done on approval. */
 	@PostMapping("/forecast-snapshots/{recommendationId}")
 	@ResponseStatus(HttpStatus.CREATED)
 	public Map<String, Integer> captureForecast(Actor actor, @PathVariable String recommendationId) {
@@ -99,7 +94,6 @@ public class OutcomeController {
 		return Map.of("stored", outcomes.captureForecast(actor, recommendationId));
 	}
 
-	/** Forecast versus actual demand, promised versus actual delivery, and stock outcomes. */
 	@GetMapping("/evaluation")
 	public ObjectNode evaluation(Actor actor, @RequestParam(required = false) String recommendationId) {
 		return outcomes.evaluate(actor, recommendationId);

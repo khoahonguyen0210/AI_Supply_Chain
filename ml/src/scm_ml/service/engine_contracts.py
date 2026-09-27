@@ -1,10 +1,3 @@
-"""Wire contracts of the planning-engine endpoints (version 1; JSON uses camelCase).
-
-Requests are typed and validated. Responses wrap the engine result in `data`: the shape of `data`
-is the documented output of the corresponding agent tool (docs/contracts/engine-api.md), so the
-business logic exists once, in Python, and Java only relays it.
-"""
-
 from __future__ import annotations
 
 from datetime import date
@@ -21,8 +14,6 @@ MAX_HORIZON_WEEKS = 8
 
 
 class ActorRef(WireModel):
-    """The authenticated human a request runs for; authentication itself is the backend's job."""
-
     user_id: str = Field(min_length=1)
     role: str = Field(min_length=1)
 
@@ -79,8 +70,6 @@ MAX_OUTCOME_RECORDS = 50_000
 
 
 class ForecastSnapshotRequest(EngineRequest):
-    """The forecast a decision relies on, for every region with demand for each SKU."""
-
     sku_ids: tuple[str, ...] = Field(min_length=1, max_length=20)
     as_of: date
     horizon_weeks: int = Field(default=4, ge=1, le=MAX_HORIZON_WEEKS)
@@ -122,8 +111,6 @@ class InventoryRecord(WireModel):
 
 
 class OutcomeEvaluationRequest(EngineRequest):
-    """Recorded outcomes next to what was forecast and promised; the engine scores them."""
-
     forecasts: tuple[ForecastPointRecord, ...] = Field(default=(), max_length=MAX_OUTCOME_RECORDS)
     demand: tuple[DemandRecord, ...] = Field(default=(), max_length=MAX_OUTCOME_RECORDS)
     deliveries: tuple[DeliveryRecord, ...] = Field(default=(), max_length=MAX_OUTCOME_RECORDS)

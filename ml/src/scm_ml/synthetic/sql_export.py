@@ -1,10 +1,4 @@
-"""Write the synthetic world as a PostgreSQL seed script: ``python -m scm_ml.synthetic.sql_export``.
-
-The script fills the master data, inventory, purchase-order history, weekly demand and the policy
-documents the backend API serves. It is idempotent (``ON CONFLICT DO NOTHING``) and deterministic
-for a given configuration, so it is generated on demand rather than committed. Sales orders are
-left out: demand reaches the database as the weekly series the forecast model was trained on.
-"""
+"""Writes the synthetic world as an idempotent PostgreSQL seed script."""
 
 from __future__ import annotations
 

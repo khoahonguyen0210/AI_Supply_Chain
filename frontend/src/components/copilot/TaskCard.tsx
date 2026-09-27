@@ -7,13 +7,13 @@ import { humanize } from "@/lib/format";
 const TOOL_LABELS: Record<string, string> = {
   get_forecast: "Looked up the demand forecast",
   get_inventory: "Checked inventory",
-  assess_inventory_need: "Assessed the inventory need",
+  assess_inventory_need: "Worked out how much stock is needed",
   search_suppliers: "Compared suppliers",
   get_supplier_performance: "Checked supplier performance",
   search_policies: "Searched contracts and policies",
-  optimize_procurement: "Optimized the purchase plan",
-  plan_fulfillment: "Planned fulfillment",
-  run_scenario: "Stress-tested the plan",
+  optimize_procurement: "Worked out the cheapest purchase plan",
+  plan_fulfillment: "Planned which warehouse ships where",
+  run_scenario: "Tested what could go wrong",
   prepare_purchase_order: "Requested approval for the order",
 };
 
@@ -74,6 +74,27 @@ export function ActionTrace({ steps }: { steps: TraceStep[] }) {
   );
 }
 
+/** Long answers show the first line and conclusion; the rest folds away. */
+function AnswerText({ answer }: { answer: string }) {
+  const lines = answer.split("\n").filter((line) => line.trim() !== "");
+  if (lines.length <= 3) return <div>{answer}</div>;
+  const middle = lines.slice(1, -1);
+  return (
+    <div>
+      <div>{lines[0]}</div>
+      <div style={{ marginTop: 6 }}>{lines[lines.length - 1]}</div>
+      <details style={{ marginTop: 8 }}>
+        <summary>Show the full answer</summary>
+        <div className="stack" style={{ gap: 6, marginTop: 6 }}>
+          {middle.map((line, i) => (
+            <div key={i}>{line}</div>
+          ))}
+        </div>
+      </details>
+    </div>
+  );
+}
+
 /** One request and the assistant's answer, with its status, assumptions, evidence, trace and next step. */
 export function TaskCard({ task }: { task: AgentTask }) {
   return (
@@ -83,7 +104,7 @@ export function TaskCard({ task }: { task: AgentTask }) {
         <div className="row" style={{ marginBottom: 6 }}>
           <StatusBadge status={task.status} />
         </div>
-        <div>{task.answer}</div>
+        <AnswerText answer={task.answer} />
 
         {task.assumptions.length > 0 ? (
           <>
@@ -98,7 +119,7 @@ export function TaskCard({ task }: { task: AgentTask }) {
 
         {task.citations.length > 0 ? (
           <>
-            <h3>Evidence</h3>
+            <h3>Sources</h3>
             <Citations citations={task.citations} />
           </>
         ) : null}
@@ -120,7 +141,7 @@ export function TaskCard({ task }: { task: AgentTask }) {
         ) : null}
 
         {task.status === "AWAITING_APPROVAL" ? (
-          <Notice tone="warn">Nothing has been ordered. People with the right role must approve first.</Notice>
+          <Notice tone="warn">Nothing has been ordered yet. This needs approval first.</Notice>
         ) : null}
 
         {task.violations.length > 0 ? (

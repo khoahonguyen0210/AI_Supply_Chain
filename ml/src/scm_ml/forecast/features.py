@@ -1,10 +1,4 @@
-"""Leakage-safe features for direct multi-horizon forecasting.
-
-A row is (series s, origin week t, horizon h) and forecasts week ``t + h``. Every feature is
-computed from ``values[s, :t+1]`` or from the calendar date of the target week - never from later
-demand.
-Demand features are divided by the series' recent level so one global model serves all volumes.
-"""
+"""Leakage-safe features: only data up to the origin week is used."""
 
 from __future__ import annotations
 
@@ -42,7 +36,6 @@ IntArray = NDArray[np.int64]
 
 
 def _rolling(values: Array, window: int) -> Array:
-    """Mean of up to ``window`` weeks ending at each column (shorter at the start)."""
     cumulative = np.concatenate([np.zeros((values.shape[0], 1)), np.cumsum(values, axis=1)], axis=1)
     ends = np.arange(1, values.shape[1] + 1)
     starts = np.maximum(ends - window, 0)
@@ -51,8 +44,6 @@ def _rolling(values: Array, window: int) -> Array:
 
 
 class OriginFeatures:
-    """Everything derivable from history up to each origin, for all series at once."""
-
     def __init__(self, values: Array) -> None:
         n_series, n_weeks = values.shape
         self.values = values
@@ -77,7 +68,6 @@ def make_features(
     sku_codes: IntArray,
     region_codes: IntArray,
 ) -> tuple[pd.DataFrame, Array]:
-    """Feature matrix and per-row scale for the given (series, origin, horizon) triples."""
     values, scale = origin.values, origin.scale[series, origins]
     columns: dict[str, Array | IntArray] = {}
     for k in range(LAGS):

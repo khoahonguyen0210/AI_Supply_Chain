@@ -152,24 +152,24 @@ afterEach(() => {
 
 async function optimize() {
   await userEvent.click(await screen.findByLabelText("SKU-001"));
-  await userEvent.click(screen.getByRole("button", { name: "Optimize plan" }));
+  await userEvent.click(screen.getByRole("button", { name: "Build plan" }));
 }
 
 describe("Decision workspace", () => {
   it("needs a product before it will optimize", async () => {
     renderWithSession(<Workspace />);
     await screen.findByLabelText("SKU-001");
-    expect(screen.getByRole("button", { name: "Optimize plan" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Build plan" })).toBeDisabled();
   });
 
   it("runs the optimizer as a job and shows assumptions, lines and binding constraints", async () => {
     renderWithSession(<Workspace />);
     await optimize();
 
-    expect(await screen.findByText("All constraints satisfied")).toBeInTheDocument();
-    const plan = screen.getByRole("heading", { name: "Purchase plan" }).closest("section")!;
+    expect(await screen.findByText("Meets every limit")).toBeInTheDocument();
+    const plan = screen.getByRole("heading", { name: "Build a purchase plan" }).closest("section")!;
     expect(within(plan).getByText("forecast × 1.2")).toBeInTheDocument();
-    expect(within(plan).getByText("OPTIMAL")).toBeInTheDocument();
+    expect(within(plan).getByText("Best possible plan found")).toBeInTheDocument();
     expect(within(plan).getByText("$18,250")).toBeInTheDocument();
     expect(within(plan).getByText(/Supplier capacity SUP-1: 92% used/)).toBeInTheDocument();
     expect(within(plan).getByText("$15,800", { selector: "td" })).toBeInTheDocument();
@@ -179,11 +179,11 @@ describe("Decision workspace", () => {
     const { calls } = stubBackendCalls();
     renderWithSession(<Workspace />);
     await userEvent.click(await screen.findByLabelText("SKU-001"));
-    await userEvent.clear(screen.getByLabelText("Demand adjustment (×)"));
-    await userEvent.type(screen.getByLabelText("Demand adjustment (×)"), "1.2");
-    await userEvent.type(screen.getByLabelText("Budget (USD, optional)"), "20000");
-    await userEvent.click(screen.getByRole("button", { name: "Optimize plan" }));
-    await screen.findByText("All constraints satisfied");
+    await userEvent.clear(screen.getByLabelText("Demand change (1.2 = +20%)"));
+    await userEvent.type(screen.getByLabelText("Demand change (1.2 = +20%)"), "1.2");
+    await userEvent.type(screen.getByLabelText("Budget in USD (optional)"), "20000");
+    await userEvent.click(screen.getByRole("button", { name: "Build plan" }));
+    await screen.findByText("Meets every limit");
 
     const submit = calls().find((c) => c.url === "/api/jobs" && c.init.method === "POST")!;
     expect(JSON.parse(submit.init.body as string)).toEqual({
@@ -230,24 +230,24 @@ describe("Decision workspace", () => {
     renderWithSession(<Workspace />);
     expect(screen.getByText(/Optimize a plan first/)).toBeInTheDocument();
     await optimize();
-    await screen.findByText("All constraints satisfied");
+    await screen.findByText("Meets every limit");
 
-    await userEvent.selectOptions(screen.getByLabelText("Disruption"), "SUPPLIER_OUTAGE");
+    await userEvent.selectOptions(screen.getByLabelText("What goes wrong"), "SUPPLIER_OUTAGE");
     await userEvent.type(screen.getByLabelText("Supplier"), "SUP-1");
-    await userEvent.click(screen.getByRole("button", { name: "Run scenario" }));
+    await userEvent.click(screen.getByRole("button", { name: "Check the impact" }));
 
     expect(await screen.findByText(/supplier SUP-1 offers \(SUP-1\): 3.0 -> 0.0/)).toBeInTheDocument();
     expect(screen.getByText("+$9,400")).toBeInTheDocument();
     expect(screen.getByText("-21.0 pts")).toBeInTheDocument();
-    expect(screen.getByText(/Constraints that become binding: SUPPLIER_CAPACITY SUP-2/)).toBeInTheDocument();
+    expect(screen.getByText(/Limits now reached: SUPPLIER_CAPACITY SUP-2/)).toBeInTheDocument();
   });
 
   it("will not run a scenario with a missing required field", async () => {
     renderWithSession(<Workspace />);
     await optimize();
-    await screen.findByText("All constraints satisfied");
-    await userEvent.selectOptions(screen.getByLabelText("Disruption"), "SUPPLIER_OUTAGE");
-    expect(screen.getByRole("button", { name: "Run scenario" })).toBeDisabled();
+    await screen.findByText("Meets every limit");
+    await userEvent.selectOptions(screen.getByLabelText("What goes wrong"), "SUPPLIER_OUTAGE");
+    expect(screen.getByRole("button", { name: "Check the impact" })).toBeDisabled();
     expect(screen.getByText("Supplier is required")).toBeInTheDocument();
   });
 

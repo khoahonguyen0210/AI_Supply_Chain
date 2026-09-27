@@ -2,7 +2,6 @@ import { Notice } from "@/components/ui";
 import type { SupplierSearchResult } from "@/lib/api/types";
 import { formatInt, formatMoney, formatPercent, formatUnitPrice, humanize } from "@/lib/format";
 
-/** The engine's ranked, comparable supplier options and why the others were rejected. */
 export function SupplierResults({ result }: { result: SupplierSearchResult }) {
   const rejected = Object.entries(result.rejected);
   const cheapest = result.cheapestOverall;
@@ -29,12 +28,12 @@ export function SupplierResults({ result }: { result: SupplierSearchResult }) {
               <tr>
                 <th>Rank</th>
                 <th>Supplier</th>
-                <th className="num">Landed cost / unit</th>
+                <th className="num">Cost per unit incl. shipping</th>
                 <th className="num">Total</th>
                 <th className="num">vs cheapest</th>
-                <th className="num">Lead time</th>
-                <th className="num">Reliability</th>
-                <th className="num">Quality</th>
+                <th className="num">Delivery time</th>
+                <th className="num">On-time rate</th>
+                <th className="num">Quality score</th>
               </tr>
             </thead>
             <tbody>
@@ -58,7 +57,7 @@ export function SupplierResults({ result }: { result: SupplierSearchResult }) {
       )}
       {result.tradeOffs.length > 0 ? (
         <div>
-          <h3>Trade-offs</h3>
+          <h3>Pros and cons</h3>
           <ul>
             {result.tradeOffs.map((t) => (
               <li key={t}>{t}</li>

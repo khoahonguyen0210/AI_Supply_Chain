@@ -19,16 +19,16 @@ export function SystemSection({ summary }: { summary: OpsSummary }) {
     <div className="stack">
       <dl className="stats">
         <Stat label="API requests" value={formatInt(api.requests)} hint={`${formatNumber(api.requestsPerSecond)} / s over uptime`} />
-        <Stat label="Error rate (5xx)" value={formatPercent(api.errorRate, 2)} hint={`${formatInt(api.serverErrors)} server, ${formatInt(api.clientErrors)} client errors`} />
-        <Stat label="Latency p50" value={ms(api.p50Millis)} />
-        <Stat label="Latency p95" value={ms(api.p95Millis)} />
+        <Stat label="Server error rate" value={formatPercent(api.errorRate, 2)} hint={`${formatInt(api.serverErrors)} server, ${formatInt(api.clientErrors)} client errors`} />
+        <Stat label="Typical response time" value={ms(api.p50Millis)} />
+        <Stat label="Slowest 5% response time" value={ms(api.p95Millis)} />
       </dl>
       <dl className="stats">
         <Stat label="Queued" value={formatInt(queue.byStatus.QUEUED ?? 0)} hint={`oldest waiting ${formatNumber(queue.oldestQueuedSeconds)} s`} />
         <Stat label="Running" value={formatInt(queue.byStatus.RUNNING ?? 0)} />
         <Stat label="Succeeded" value={formatInt(queue.byStatus.SUCCEEDED ?? 0)} />
         <Stat label="Failed" value={formatInt(queue.byStatus.FAILED ?? 0)} />
-        <Stat label="Worker utilization" value={formatPercent(queue.workerUtilization)} hint="this instance, over uptime" />
+        <Stat label="Worker busy time" value={formatPercent(queue.workerUtilization)} hint="this instance, over uptime" />
       </dl>
       <div className="table-scroll">
         <table>
@@ -91,7 +91,7 @@ export function RuntimeSection({ runtime }: { runtime: AiRuntime }) {
         <strong>Tool errors:</strong> <Counts counts={runtime.tools.errors} />
       </p>
       {models.length === 0 ? (
-        <p className="muted">No language-model calls yet (the offline rule planner makes none).</p>
+        <p className="muted">No language model calls yet.</p>
       ) : (
         <div className="table-scroll">
           <table>
@@ -147,7 +147,7 @@ export function QualitySection({ quality }: { quality: AiQuality }) {
               <dd>{forecast.modelVersion}</dd>
               <dt>Test MAE vs {forecast.selectedBaseline}</dt>
               <dd>{share(forecast.testMaeImprovementVsBaseline)} better</dd>
-              <dt>Interval coverage</dt>
+              <dt>Actuals inside the forecast range</dt>
               <dd>
                 {share(forecast.intervalTestCoverage)} (target {share(forecast.intervalNominalLevel)})
               </dd>
@@ -164,7 +164,7 @@ export function QualitySection({ quality }: { quality: AiQuality }) {
             <dl className="kv">
               <dt>Cases</dt>
               <dd>{rag.cases}</dd>
-              <dt>Retrieval hit@1 / hit@3</dt>
+              <dt>Right document found (first / top 3)</dt>
               <dd>
                 {share(rag.hitAt1)} / {share(rag.hitAt3)}
               </dd>
@@ -172,7 +172,7 @@ export function QualitySection({ quality }: { quality: AiQuality }) {
               <dd>
                 {share(rag.answerAccuracy)} / {share(rag.citationAccuracy)}
               </dd>
-              <dt>Groundedness</dt>
+              <dt>Answers backed by sources</dt>
               <dd>{share(rag.groundedness)}</dd>
               <dt>Restricted-document leaks</dt>
               <dd>{rag.restrictedLeaks}</dd>
@@ -191,21 +191,21 @@ export function QualitySection({ quality }: { quality: AiQuality }) {
             <dl className="kv">
               <dt>Planner</dt>
               <dd>{agent.planner}</dd>
-              <dt>Workflow success</dt>
+              <dt>Tasks done correctly</dt>
               <dd>
                 {share(agent.workflowSuccess)} on {agent.cases} cases
               </dd>
-              <dt>Held-out cases</dt>
+              <dt>Unseen test cases</dt>
               <dd>{share(agent.holdoutWorkflowSuccess)}</dd>
-              <dt>Tool / argument correctness</dt>
+              <dt>Right tool / right inputs</dt>
               <dd>
                 {share(agent.toolCorrectness)} / {share(agent.parameterCorrectness)}
               </dd>
-              <dt>Grounded numbers</dt>
+              <dt>Numbers backed by data</dt>
               <dd>{share(agent.groundedNumbers)}</dd>
-              <dt>Permission compliance</dt>
+              <dt>Permissions respected</dt>
               <dd>{share(agent.permissionCompliance)}</dd>
-              <dt>Appropriate refusal</dt>
+              <dt>Correct refusals</dt>
               <dd>{share(agent.appropriateRefusal)}</dd>
               <dt>Language-model planner</dt>
               <dd>
@@ -229,23 +229,20 @@ export function Operations() {
   return (
     <div className="stack">
       <div>
-        <h1>Operations</h1>
-        <p className="lede">
-          How the platform is running (requests, queue, workers) and how the AI components are behaving, live
-          and in their last offline evaluation. Administrators only.
-        </p>
+        <h1>Monitoring</h1>
+        <p className="lede">How the system and its AI features are doing right now.</p>
       </div>
       <Panel title="System" id="system">
         <ResourceView state={system.state} onRetry={system.reload}>
           {(summary) => <SystemSection summary={summary} />}
         </ResourceView>
       </Panel>
-      <Panel title="AI components, live" id="ai-runtime">
+      <Panel title="AI features, live" id="ai-runtime">
         <ResourceView state={ai.state} onRetry={ai.reload}>
           {(data) => <RuntimeSection runtime={data.runtime} />}
         </ResourceView>
       </Panel>
-      <Panel title="AI components, last offline evaluation" id="ai-quality">
+      <Panel title="AI features, last test run" id="ai-quality">
         <ResourceView state={ai.state} onRetry={ai.reload}>
           {(data) => <QualitySection quality={data.quality} />}
         </ResourceView>

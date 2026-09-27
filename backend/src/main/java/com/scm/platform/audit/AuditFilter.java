@@ -14,12 +14,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerMapping;
 
-/**
- * Records every change a caller makes and every request that was refused (not signed in, not allowed, rate
- * limited). Reads that succeed are not recorded. It runs inside the security chain, after the token is read,
- * so it knows who is acting; it is created by the security configuration and is not a servlet-level filter.
- * Logins are recorded by the login endpoint itself, which knows the user id that was tried.
- */
+/** Audits every change and every refused request (successful reads are not recorded). */
 public class AuditFilter extends OncePerRequestFilter {
 
 	private static final Set<String> READS = Set.of("GET", "HEAD", "OPTIONS");

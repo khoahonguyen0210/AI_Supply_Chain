@@ -1,17 +1,3 @@
-"""Grounded answers: retrieval -> evidence gate -> generation -> deterministic grounding checks.
-
-The language model only drafts the answer text from numbered sources. Everything that decides
-whether the answer may be shown is plain code:
-
-* No relevant evidence -> refuse (or say access is restricted); the model is never called.
-* Two in-force documents that the question points at give different values -> report both verbatim
-  as a conflict instead of letting the model pick one.
-* A draft is accepted only if it cites provided sources and every number in it appears in a cited
-  source. Anything else becomes "insufficient evidence" rather than an unsupported answer.
-* Qualifications (expired, superseded, not yet effective, restricted material exists) are appended
-  by code, so a generator cannot omit them.
-"""
-
 from __future__ import annotations
 
 import re
@@ -120,8 +106,6 @@ class GroundedAnswer(DomainModel):
 
 
 class ExtractiveGenerator:
-    """Deterministic offline generator: quotes the best-matching clause of the best source."""
-
     name = "extractive-stub"
 
     def generate(self, question: str, sources: Sequence[Source]) -> Draft:
@@ -156,8 +140,6 @@ _DRAFT_SCHEMA: dict[str, Any] = {
 
 
 class ClaudeGenerator:
-    """Drafts the answer with an LLM behind the `JsonLlm` protocol (Claude in production)."""
-
     def __init__(self, llm: JsonLlm) -> None:
         self._llm = llm
         self.name = llm.name
@@ -184,17 +166,14 @@ def _numbers(text: str) -> set[str]:
 
 
 def unsupported_text_numbers(answer: str, evidence: str) -> set[str]:
-    """Numbers stated in the answer (citation markers aside) that do not appear in the evidence."""
     return _numbers(_MARKER.sub(" ", answer)) - _numbers(evidence)
 
 
 def unsupported_numbers(answer: str, cited: Sequence[Source]) -> set[str]:
-    """Numbers stated in the answer that appear in none of the cited sources."""
     return unsupported_text_numbers(answer, " ".join(s.hit.chunk.content for s in cited))
 
 
 def _quantities(clause: str) -> dict[str, set[str]]:
-    """Money, percentages and durations in a clause, keyed by kind."""
     found: dict[str, set[str]] = {}
     for m in _VALUE.finditer(clause):
         kind = "usd" if m.group("usd") else (m.group("unit") or "").lower().rstrip("s")
@@ -223,7 +202,6 @@ class GroundedAnswerer:
         return self._generator.name
 
     def _distinctive_title_terms(self) -> dict[str, frozenset[str]]:
-        """Title terms that identify one document id among all documents."""
         titles: dict[str, frozenset[str]] = {}
         for document in self._retriever.store.documents:
             titles[document.document_id] = informative_terms(document.title)
@@ -291,7 +269,6 @@ class GroundedAnswerer:
         return problems
 
     def _conflict(self, question: str, sources: list[Source]) -> tuple[Source, Source] | None:
-        """Two in-force documents the question points at, with different values for one quantity."""
         asked = informative_terms(self._retriever.topic_of(question))
         current = [s for s in sources if s.status == ValidityStatus.CURRENT]
         for i, first in enumerate(current):

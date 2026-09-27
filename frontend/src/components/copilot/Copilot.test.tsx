@@ -54,6 +54,15 @@ afterEach(() => {
 });
 
 describe("TaskCard", () => {
+  it("folds the reasoning of a long answer behind its first line and conclusion", () => {
+    const answer = ["SKU-001, 4-week horizon.", "Forecast 1,070 units.", "Plan costs 78,639.", "Pending approval."];
+    renderWithSession(<TaskCard task={task({ answer: answer.join("\n") })} />);
+    expect(screen.getByText("SKU-001, 4-week horizon.")).toBeVisible();
+    expect(screen.getByText("Pending approval.")).toBeVisible();
+    expect(screen.getByText("Show the full answer")).toBeInTheDocument();
+    expect(screen.getByText("Forecast 1,070 units.")).not.toBeVisible();
+  });
+
   it("shows the answer with its status, assumptions, evidence and next steps", () => {
     renderWithSession(<TaskCard task={task()} />);
     expect(screen.getByText("AWAITING APPROVAL")).toBeInTheDocument();
@@ -82,7 +91,7 @@ describe("TaskCard", () => {
     renderWithSession(<ActionTrace steps={task().trace} />);
     expect(screen.getByText("How this was worked out (2 steps)")).toBeInTheDocument();
     expect(screen.getByText("Looked up the demand forecast")).toBeInTheDocument();
-    expect(screen.getByText("Stress-tested the plan")).toBeInTheDocument();
+    expect(screen.getByText("Tested what could go wrong")).toBeInTheDocument();
     expect(screen.getByText(/re-planned after a result/)).toBeInTheDocument();
     expect(screen.getByText(/failed \(INVALID_SCENARIO\)/)).toBeInTheDocument();
     expect(screen.getByText(/"skuId":"SKU-001"/)).toBeInTheDocument();
@@ -127,13 +136,13 @@ describe("Copilot", () => {
     });
     renderWithSession(<Copilot />);
 
-    await userEvent.type(await screen.findByLabelText("Your request"), "What should I do about SKU-001?");
+    await userEvent.type(await screen.findByLabelText("Your question"), "What should I do about SKU-001?");
     await userEvent.click(screen.getByRole("button", { name: "Send" }));
 
     expect(await screen.findByText(/I prepared an order of 1,100 units/)).toBeInTheDocument();
     expect(sent[0]).toEqual({ text: "What should I do about SKU-001?" });
 
-    await userEvent.type(screen.getByLabelText("Your request"), "And for SKU-002?");
+    await userEvent.type(screen.getByLabelText("Your question"), "And for SKU-002?");
     await userEvent.click(screen.getByRole("button", { name: "Send" }));
     await screen.findAllByText(/I prepared an order/);
     expect(sent[1]).toEqual({ text: "And for SKU-002?", conversationId: "c-1" });
@@ -156,7 +165,7 @@ describe("Copilot", () => {
       "/api/agent/tasks": () => errorResponse(503, "ML_SERVICE_UNAVAILABLE", "ML service is unreachable"),
     });
     renderWithSession(<Copilot />);
-    await userEvent.type(await screen.findByLabelText("Your request"), "hello there");
+    await userEvent.type(await screen.findByLabelText("Your question"), "hello there");
     await userEvent.click(screen.getByRole("button", { name: "Send" }));
     expect(await screen.findByText("ML service is unreachable")).toBeInTheDocument();
   });
@@ -178,7 +187,7 @@ describe("Copilot", () => {
   it("does not send an empty request", async () => {
     stubBackend({ "/api/agent/conversations": [] });
     renderWithSession(<Copilot />);
-    await screen.findByLabelText("Your request");
+    await screen.findByLabelText("Your question");
     expect(screen.getByRole("button", { name: "Send" })).toBeDisabled();
   });
 });

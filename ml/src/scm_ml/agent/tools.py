@@ -1,9 +1,3 @@
-"""Typed tools the agent can call. Each wraps existing, tested business logic; none recomputes it.
-
-A tool takes validated arguments and returns plain JSON data, or raises `ToolError` for a failure
-the planner can react to. Numbers the agent reports must come from these results.
-"""
-
 from __future__ import annotations
 
 from collections import defaultdict
@@ -157,7 +151,7 @@ def get_inventory(tc: ToolContext, args: GetInventoryArgs) -> dict[str, Any]:
 
 
 def assess_inventory_need(tc: ToolContext, args: AssessInventoryArgs) -> dict[str, Any]:
-    """Net purchase requirement per warehouse: demand + safety stock - on hand - incoming."""
+    """Net need per warehouse: demand + safety stock - on hand - incoming."""
     ctx = tc.planning
     ctx.require_sku(args.sku_id)
     primary = serving_warehouse(ctx.world.lanes)
@@ -290,7 +284,6 @@ def get_supplier_performance(tc: ToolContext, args: SupplierPerformanceArgs) -> 
 
 
 def search_policies(tc: ToolContext, args: SearchPoliciesArgs) -> dict[str, Any]:
-    """Grounded answer from contracts, SLAs, policies and SOPs, filtered to the actor's role."""
     answer = tc.planning.answerer.answer(args.question, role=tc.actor.role, as_of=tc.planning.as_of)
     return {
         "question": args.question,
@@ -471,7 +464,7 @@ def _scenario_fields(scenario_type: ScenarioType) -> str:
 
 
 def prepare_purchase_order(tc: ToolContext, args: PreparePurchaseOrderArgs) -> dict[str, Any]:
-    """Consequential: opens a human approval request. It places and commits nothing."""
+    """Opens a human approval request; it places and commits nothing."""
     ctx = tc.planning
     record = ctx.plan(args.plan_id, tc.actor.user_id)
     metrics = record.result.procurement.metrics

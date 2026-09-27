@@ -13,7 +13,6 @@ type Load =
   | { phase: "error"; message: string }
   | { phase: "done"; result: SupplierSearchResult };
 
-/** The other suppliers the planner could have used for one purchase line, ranked by the engine. */
 export function AlternativesPanel({
   line,
   onClose,
@@ -46,8 +45,7 @@ export function AlternativesPanel({
       }
     >
       <p className="muted">
-        The plan buys {formatInt(line.quantity)} units from {line.supplierId}. Other eligible suppliers
-        for the same quantity:
+        Other suppliers that could deliver these {formatInt(line.quantity)} units:
       </p>
       {load.phase === "loading" ? <p role="status">Comparing suppliers…</p> : null}
       {load.phase === "error" ? <Notice tone="bad">{load.message}</Notice> : null}

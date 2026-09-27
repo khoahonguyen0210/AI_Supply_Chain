@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 # Local Kubernetes: `scripts/kind.sh up|scale N|smoke|status|down`.
-# `up` builds the images (docker compose build), creates the kind cluster `scm`, loads the images,
-# generates infrastructure/kubernetes/secrets.env with random values on first use, applies the
-# manifests and waits for every deployment and the seed job.
-# kind is used from PATH, else from .tools/ (downloaded there, checksum-verified, on first use).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

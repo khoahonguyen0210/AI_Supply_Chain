@@ -8,10 +8,7 @@ export type Resource<T> =
   | { phase: "error"; message: string }
   | { phase: "ready"; data: T };
 
-/**
- * Loads a value when `key` changes (pass `null` to skip) and exposes `reload`. Stale responses are aborted,
- * so quickly switching the key never shows the previous key's data.
- */
+/** Reloads when `key` changes (null skips) and aborts stale requests. */
 export function useResource<T>(
   key: string | null,
   load: (signal: AbortSignal) => Promise<T>,

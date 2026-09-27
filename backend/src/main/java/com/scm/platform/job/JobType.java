@@ -7,11 +7,6 @@ import java.time.LocalDate;
 import java.util.List;
 import tools.jackson.databind.JsonNode;
 
-/**
- * The kinds of long-running work the queue runs. The payload type only checks that the request is
- * well-formed at submission; ranges and planning rules are the engine's and fail the job with the
- * engine's own error code.
- */
 public enum JobType {
 
 	FORECAST(ForecastPayload.class),

@@ -32,10 +32,7 @@ export function weeklyHistory(demand: DemandPoint[], region: string): HistoryPoi
     .map(([date, value]) => ({ date, value }));
 }
 
-/**
- * The forecast of one region with its interval, or all regions summed. Intervals are per region and cannot
- * be added, so the caller must not draw the summed lower/upper as an interval.
- */
+/** One region's forecast with its range, or all regions summed (no range: ranges can't be added). */
 export function forecastBand(forecasts: ForecastResponse[], region: string): ForecastBandPoint[] {
   const chosen = region === ALL ? forecasts : forecasts.filter((f) => f.regionId === region);
   const byWeek = new Map<string, ForecastBandPoint>();
@@ -70,7 +67,7 @@ export function DemandForecastPanel({ skuId }: { skuId: string }) {
   });
 
   return (
-    <Panel title="Demand and forecast" id="demand-forecast">
+    <Panel title="Sales and forecast" id="demand-forecast">
       <ResourceView state={state} onRetry={reload} loadingLabel="Loading demand and forecast…">
         {(data) => <Body data={data} region={region} onRegion={setRegion} />}
       </ResourceView>
@@ -130,8 +127,7 @@ function Body({
       </dl>
       {region === ALL ? (
         <Notice>
-          Prediction intervals are per region and cannot be added together, so the all-regions view shows
-          the point forecast only. Pick a region to see its interval.
+          Choose a region to see the forecast range.
         </Notice>
       ) : null}
       <TimeSeriesChart

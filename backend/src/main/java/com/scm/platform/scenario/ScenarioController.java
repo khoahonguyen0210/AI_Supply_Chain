@@ -27,10 +27,6 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
 
-/**
- * Saved scenario definitions and their runs. Parameters are the engine's scenario contract and are
- * validated by the engine when a scenario runs; a run is an async {@code SCENARIO} job.
- */
 @RestController
 @RequestMapping("/api/scenarios")
 public class ScenarioController {
@@ -84,7 +80,6 @@ public class ScenarioController {
 				.orElseThrow(() -> ApiException.notFound("UNKNOWN_SCENARIO", "no scenario " + scenarioId));
 	}
 
-	/** Queues a run of the scenario against a plan spec; poll the returned job for the comparison. */
 	@PostMapping("/{scenarioId}/runs")
 	public ResponseEntity<JobView> run(Actor actor, @PathVariable String scenarioId,
 			@RequestHeader(name = "Idempotency-Key", required = false) String idempotencyKey,

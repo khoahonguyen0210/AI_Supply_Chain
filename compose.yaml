@@ -1,9 +1,4 @@
-# Complete local stack. Start it with `bash scripts/stack.sh up` (creates .env with random local
-# secrets on first run, then `docker compose up --build --wait`). See docs/containers.md.
-#
-# Start order: postgres -> backend (runs the migrations) -> seed (one-shot) -> engine -> frontend.
-# Published ports bind to 127.0.0.1 only; the engine is never published because it trusts the actor
-# named by the backend.
+# Local stack: `bash scripts/stack.sh up`. Ports bind to 127.0.0.1; the engine is never published.
 name: scm
 
 x-db-conninfo: &db-conninfo "host=postgres port=5432 dbname=${POSTGRES_DB:-scm} user=${POSTGRES_USER:-scm} password=${POSTGRES_PASSWORD:?run scripts/stack.sh up or copy .env.example to .env}"

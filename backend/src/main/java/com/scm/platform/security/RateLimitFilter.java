@@ -18,11 +18,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.filter.OncePerRequestFilter;
 import tools.jackson.databind.json.JsonMapper;
 
-/**
- * Caps how fast one caller can use the API. Every call counts against a per-user limit (per client address
- * when nobody is signed in, which also caps floods of bad tokens); calls that start heavy work count against a
- * second, tighter limit. Created by the security configuration, inside the chain after the token is read.
- */
+/** Per-user rate limit for all calls, plus a tighter one for heavy work. */
 public class RateLimitFilter extends OncePerRequestFilter {
 
 	private static final Set<String> HEAVY_POST_PATHS = Set.of("/api/jobs", "/api/agent/tasks",

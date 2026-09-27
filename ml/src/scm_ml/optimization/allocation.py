@@ -1,18 +1,3 @@
-"""Inventory/fulfillment allocation: ship warehouse stock to regional demand.
-
-Variables: f[s, w, r] integer units of SKU s shipped from warehouse w to region r (the lane must
-exist and meet the transit limit), u[s, r] unmet demand, and an elastic service shortfall g[s, r].
-
-Minimise  shipping cost + stockout penalty * unmet + SERVICE_VIOLATION_PENALTY * g
-subject to  sum_w f[s, w, r] + u[s, r] = demand[s, r]
-            sum_r f[s, w, r] <= stock[s, w]
-            u[s, r] - g[s, r] <= (1 - service target) * demand[s, r]
-
-Because supply, demand and lane costs are linear and integral this is a transportation problem, so
-the integer optimum is found directly. Service impact is measured (unmet units, fill rate, transit
-days) and constraint breaches are reported rather than hidden.
-"""
-
 from __future__ import annotations
 
 import math
@@ -111,11 +96,6 @@ class AllocationPlan(DomainModel):
 def stock_after_procurement(
     problem: ProcurementProblem, lines: Sequence[PurchaseLine]
 ) -> dict[CellKey, int]:
-    """On-hand plus incoming plus expected arrivals (reliability-derated, rounded down).
-
-    Lines whose offer is not usable in this problem (for example a supplier that is out) deliver
-    nothing, matching how `evaluate_plan` treats them.
-    """
     arrivals: dict[CellKey, float] = defaultdict(float)
     for line in lines:
         key = CellKey(line.sku_id, line.warehouse_id)
@@ -128,7 +108,6 @@ def stock_after_procurement(
 
 
 def regional_demand(demand: Mapping[tuple[str, str], float]) -> dict[tuple[str, str], int]:
-    """Whole units to serve: forecast demand rounded up."""
     return {key: math.ceil(value - 1e-9) for key, value in demand.items() if value > 1e-9}
 
 
@@ -311,10 +290,6 @@ def solve_allocation(problem: AllocationProblem) -> AllocationPlan:
 
 
 def nearest_warehouse_rule(problem: AllocationProblem) -> list[Shipment]:
-    """Baseline: each region, in order, ships from its cheapest lane first, then the next cheapest.
-
-    First come first served: regions processed earlier can drain stock a later region needs.
-    """
     lanes_by_region: dict[str, list[FulfillmentLane]] = defaultdict(list)
     for lane in problem.usable_lanes():
         lanes_by_region[lane.region_id].append(lane)

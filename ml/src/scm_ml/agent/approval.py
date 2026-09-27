@@ -1,12 +1,3 @@
-"""Human approval of consequential actions.
-
-The agent can only *request* approval (`ApprovalService.request`); nothing it can call decides one.
-Who must approve follows the purchase-order approval policy (POL-APPROVAL v2 in the knowledge
-base): a buyer may approve up to the manager threshold, procurement manager approval is needed above
-it, and finance approval is also needed above the finance threshold. Above the manager threshold a
-requester cannot approve their own request.
-"""
-
 from __future__ import annotations
 
 import re
@@ -53,10 +44,6 @@ class ApprovalPolicy:
 
     @classmethod
     def from_documents(cls, documents: Iterable[PolicyDocument], as_of: date) -> ApprovalPolicy:
-        """Thresholds from the purchase-order approval policy version in force on `as_of`.
-
-        Falls back to the defaults when no such document or clause exists.
-        """
         in_force = [
             d for d in documents if d.document_id == APPROVAL_POLICY_ID and d.is_effective_on(as_of)
         ]
@@ -97,7 +84,7 @@ class ApprovalService:
     def request(
         self, task_id: str, recommendation: Recommendation, requester: Actor, order_value: float
     ) -> ApprovalRecord:
-        """Open a pending approval. The recommendation cannot be acted on until it is approved."""
+        """Opens a pending approval; nothing can act on the recommendation until approved."""
         pending = recommendation.model_copy(
             update={"status": RecommendationStatus.PENDING_APPROVAL}
         )

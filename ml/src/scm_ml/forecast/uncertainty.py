@@ -1,9 +1,3 @@
-"""Prediction intervals: quantile models plus conformalized quantile regression (CQR) offsets.
-
-Offsets are fitted per horizon on the validation window in series-scale units, then widen (or
-shrink) the raw quantile band so that it reaches the nominal coverage on exchangeable data.
-"""
-
 from __future__ import annotations
 
 import math
@@ -22,7 +16,6 @@ INTERVAL_LEVEL = 0.8  # = QUANTILES[1] - QUANTILES[0]
 
 
 def _scale_matrix(values: Array, start: int, end: int, horizons: int) -> Array:
-    """Series scale at each walk-forward origin, shaped (series, weeks, horizons)."""
     scale = OriginFeatures(values).scale
     weeks = np.arange(start, end)
     return np.stack([scale[:, weeks - h] for h in range(1, horizons + 1)], axis=2)
@@ -37,7 +30,6 @@ def raw_interval(
     end: int,
     horizons: int,
 ) -> tuple[Array, Array, Array]:
-    """(point, lower, upper) from the quantile models with ordering enforced, uncalibrated."""
     point = predict_matrix(model, "point", values, week0, series, start, end, horizons)
     low = predict_matrix(model, LOWER, values, week0, series, start, end, horizons)
     high = predict_matrix(model, UPPER, values, week0, series, start, end, horizons)
@@ -48,7 +40,6 @@ def raw_interval(
 def fit_offsets(
     model: ForecastModel, panel: ForecastPanel, split: TemporalSplit, horizons: int
 ) -> dict[str, float]:
-    """Per-horizon CQR offsets from validation-window conformity scores."""
     val, test = split_indices(panel, split)
     _, lower, upper = raw_interval(
         model, panel.values, panel.weeks[0], panel.series, val, test, horizons
@@ -86,7 +77,6 @@ def predict_interval(
     horizons: int,
     calibrated: bool = True,
 ) -> tuple[Array, Array, Array]:
-    """(point, lower, upper); calibrated intervals use the stored CQR offsets."""
     point, lower, upper = raw_interval(model, values, week0, series, start, end, horizons)
     if not calibrated:
         return point, lower, upper

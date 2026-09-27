@@ -1,15 +1,3 @@
-"""Retraining on captured actuals, a fair current-versus-candidate comparison, gated promotion.
-
-1. ``retrain``: append the captured actuals to the current model's history, hold out the newest
-   ``holdout_weeks``, train a candidate on everything before them (same code, config and seed as
-   the current model), and score current, candidate and the 13-week moving average on the held-out
-   weeks with identical walk-forward inputs. The report records data checksums and code revision.
-2. The gate checks the report: the candidate must beat the current model's MAE by the required
-   margin and keep calibrated interval coverage near nominal. Passing does not deploy anything.
-3. ``promote``: a named person approves a report that passed its gate; only then is the served-model
-   pointer (``serving.json``) rewritten. Every promotion is appended to ``promotions.jsonl``.
-"""
-
 from __future__ import annotations
 
 import hashlib
@@ -60,7 +48,6 @@ class PromotionGate(DomainModel):
     """Calibrated interval coverage must lie within this distance of the nominal level."""
 
     def check(self, current: dict[str, Any], candidate: dict[str, Any]) -> list[str]:
-        """Reasons the candidate fails; empty when it passes."""
         reasons: list[str] = []
         limit = current["mae"] * (1 - self.min_mae_improvement)
         if not candidate["mae"] < limit:
@@ -79,7 +66,6 @@ class PromotionGate(DomainModel):
 
 
 def read_actuals(path: Path) -> pd.DataFrame:
-    """Captured weekly demand: columns sku_id, region_id, week_start, quantity (others ignored)."""
     frame = pd.read_csv(path, dtype={"sku_id": str, "region_id": str})
     missing = {"sku_id", "region_id", "week_start", "quantity"} - set(frame.columns)
     if missing:
@@ -88,8 +74,7 @@ def read_actuals(path: Path) -> pd.DataFrame:
 
 
 def extend_panel(history: ForecastPanel, actuals: pd.DataFrame) -> ForecastPanel:
-    """``history`` followed by the captured weeks. The weeks must continue the history without a
-    gap; series must be known; a (series, week) with no record is zero demand, as in the history."""
+    """History plus captured weeks, which must continue it without a gap."""
     frame = actuals.copy()
     frame["week_start"] = pd.to_datetime(frame["week_start"]).dt.date
     if frame.duplicated(["sku_id", "region_id", "week_start"]).any():
@@ -155,7 +140,7 @@ def retrain(
     root: Path = DEFAULT_ARTIFACT_ROOT,
     train: Callable[..., ForecastModel] = train_forecaster,
 ) -> dict[str, Any]:
-    """Train and score a candidate; never touches the served model. Returns the report."""
+    """Train and score a candidate; never touches the served model."""
     if current.dataset_id != history.dataset_id:
         raise ValueError("history must be the dataset the current model was trained on")
     config = config or current.config
@@ -237,11 +222,7 @@ def promote(
     note: str | None = None,
     clock: Callable[[], datetime] = lambda: datetime.now(UTC),
 ) -> dict[str, Any]:
-    """Point serving at the candidate of a report that passed its gate, on a named approval.
-
-    Refuses when the gate failed, nobody is named, or the artifacts on disk are not the ones that
-    were evaluated (model version or dataset checksum changed since the report was written).
-    """
+    """Serve a passed candidate; refuses without a named approver or if artifacts changed."""
     approver = approved_by.strip()
     if not approver:
         raise PromotionError("an approver must be named; promotion is never automatic")
@@ -280,7 +261,6 @@ def promote(
 
 
 def serving_directories(root: Path) -> tuple[Path, Path] | None:
-    """The promoted model and dataset directories, or None when nothing has been promoted."""
     path = root / SERVING_FILE
     if not path.exists():
         return None

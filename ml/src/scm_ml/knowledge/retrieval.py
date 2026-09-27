@@ -1,17 +1,4 @@
-"""Hybrid retrieval: vector + lexical scoring -> metadata filtering -> rule-based reranking.
-
-Filtering and ranking follow the document lifecycle rules:
-
-* Role permission is a hard filter. A chunk the asking role may not read is never returned; the
-  result only counts how many restricted chunks would have ranked among the top hits, so the answer
-  layer can say access is restricted without disclosing content.
-* Validity is a soft signal. Expired, superseded and not-yet-effective documents stay retrievable
-  (an expired contract must still be citable, with a qualification) but are labelled and ranked
-  below current ones.
-* A supplier named in the question boosts that supplier's chunks, demotes company-wide chunks and
-  excludes every other supplier's chunks: another supplier's clause is never evidence about the
-  named one.
-"""
+"""Hybrid retrieval (vector + lexical) with role filtering and validity-aware reranking."""
 
 from __future__ import annotations
 

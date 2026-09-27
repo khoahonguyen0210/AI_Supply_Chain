@@ -1,9 +1,4 @@
-"""Headline results of the offline evaluations, read from the stored experiment artifacts.
-
-These are measured on fixed datasets and cases, not on live traffic: they show how good the models
-and the agent were when last evaluated, and with what code revision. A value that was never measured
-stays `NOT YET MEASURED`; nothing is estimated here.
-"""
+"""Headline results of the offline evaluations, read from saved artifacts."""
 
 from __future__ import annotations
 

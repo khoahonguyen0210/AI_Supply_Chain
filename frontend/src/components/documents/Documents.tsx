@@ -31,7 +31,6 @@ function DocumentText({ documentId, version }: { documentId: string; version: st
   );
 }
 
-/** The contracts, SLAs, policies and SOPs the signed-in role is allowed to read. */
 export function Documents() {
   const { user, ready } = useSession();
   const params = useSearchParams();
@@ -49,14 +48,11 @@ export function Documents() {
     <div className="stack">
       <div>
         <h1>Documents</h1>
-        <p className="lede">
-          Only documents your role may read are listed. Superseded versions are hidden unless you ask for
-          them.
-        </p>
+        <p className="lede">Policies and contracts you have access to.</p>
       </div>
       <div className="grid-2" style={{ gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.4fr)" }}>
         <Panel
-          title="Library"
+          title="All documents"
           id="library"
           actions={
             <>
@@ -77,7 +73,7 @@ export function Documents() {
                   checked={includeSuperseded}
                   onChange={(e) => setIncludeSuperseded(e.target.checked)}
                 />
-                <span>Include superseded</span>
+                <span>Show older versions</span>
               </label>
             </>
           }

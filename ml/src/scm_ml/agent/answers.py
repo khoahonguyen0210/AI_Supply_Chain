@@ -1,8 +1,4 @@
-"""Compose final answers from tool results only.
-
-Every number below is read from an observation, so the numerical-grounding guardrail passes by
-construction for the rule-based planner; it exists to catch a model that writes its own numbers.
-"""
+"""Builds final answers only from tool results, so every number is grounded."""
 
 from __future__ import annotations
 

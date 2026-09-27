@@ -27,8 +27,8 @@ export function RecommendationBody({ detail }: { detail: RecommendationDetail })
         <p style={{ marginTop: 0 }}>{r.summary}</p>
         <dl className="stats">
           <Stat label="Status" value={<StatusBadge status={r.status} />} />
-          <Stat label="Objective (total cost)" value={formatMoney(r.objectiveValue)} />
-          <Stat label="Expected service level" value={formatPercent(r.expectedServiceLevel)} />
+          <Stat label="Total cost (incl. shortage penalties)" value={formatMoney(r.objectiveValue)} />
+          <Stat label="Expected demand covered" value={formatPercent(r.expectedServiceLevel)} />
           <Stat label="Order value" value={formatMoney(orderValue)} hint={`+ ${formatMoney(shipping)} shipping`} />
         </dl>
         <p className="muted">
@@ -49,12 +49,12 @@ export function RecommendationBody({ detail }: { detail: RecommendationDetail })
             </ul>
           )}
         </Panel>
-        <Panel title="Evidence" id="evidence">
+        <Panel title="Sources" id="evidence">
           <Citations citations={r.citations} />
         </Panel>
       </div>
 
-      <Panel title="Purchase lines" id="lines">
+      <Panel title="What to buy" id="lines">
         <div className="table-scroll">
           <table>
             <thead>
@@ -133,7 +133,7 @@ export function RecommendationDetailView({ id }: { id: string }) {
     <div className="stack">
       <div>
         <p>
-          <Link href="/workspace">← Decision workspace</Link>
+          <Link href="/workspace">← Plan builder</Link>
         </p>
         <h1>Recommendation {id}</h1>
       </div>

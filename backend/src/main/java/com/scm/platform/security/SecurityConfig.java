@@ -39,10 +39,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import tools.jackson.databind.json.JsonMapper;
 
-/**
- * The authentication boundary: every {@code /api} call except health and login needs a valid signed bearer
- * token, sessions are not used, and the role in the token is what authorization decisions are made on.
- */
+/** Every /api call except health and login needs a valid bearer token; no sessions. */
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
 public class SecurityConfig {
@@ -79,11 +76,7 @@ public class SecurityConfig {
 		return decoder;
 	}
 
-	/**
-	 * Operational endpoints live on their own port (management.server.port) and are open there, for scrapers
-	 * and probes on a private network. Nothing is mapped under /actuator on the API port, so this opens nothing
-	 * there.
-	 */
+	/** Actuator lives on the management port only, so nothing is exposed on the API port. */
 	@Bean
 	@Order(1)
 	SecurityFilterChain managementChain(HttpSecurity http) {

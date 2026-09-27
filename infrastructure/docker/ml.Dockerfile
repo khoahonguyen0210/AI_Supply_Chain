@@ -1,9 +1,4 @@
-# Python planning engine (forecasting, sourcing, optimisation, scenarios, RAG, agent) and its one-shot
-# jobs (database seed, retraining, evaluations). Build context: repository root.
-#
-# The synthetic forecast model is trained during the build and the embedding model is downloaded
-# during the build, so a container starts without network access or a shared volume. Both are
-# deterministic for a given source revision.
+# Planning engine image. The forecast model and embedding model are built in, so it runs offline.
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS build
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy UV_PROJECT_ENVIRONMENT=/opt/venv UV_PYTHON_DOWNLOADS=0
 RUN apt-get update \

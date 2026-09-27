@@ -1,10 +1,3 @@
-"""Evaluation of outcomes recorded through the backend (real or labelled simulated data).
-
-The backend sends what it stored: the forecast snapshot taken when a recommendation was approved,
-recorded weekly demand, purchase orders with their recorded deliveries, and recorded stock. The
-same scoring functions as the offline experiment are applied.
-"""
-
 from __future__ import annotations
 
 from datetime import date

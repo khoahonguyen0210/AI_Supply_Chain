@@ -1,10 +1,3 @@
-"""The offline feedback experiment: decide at ``as_of``, let the simulated future happen, compare.
-
-Decision path replayed: forecast (served model) -> procurement plan (the network MILP over all
-SKUs, as in the optimization benchmark) -> every plan line treated as approved and placed at
-``as_of`` (a simulated approval) -> simulated deliveries, demand and inventory -> evaluation.
-"""
-
 from __future__ import annotations
 
 import hashlib
@@ -63,7 +56,6 @@ def sha256_file(path: Path) -> str:
 def _forecasts(
     service: ForecastService, world: SyntheticWorld, actual: pd.DataFrame, horizons: int
 ) -> tuple[list[ForecastOutcome], list[ForecastOutcome], dict[tuple[str, str, Any], float]]:
-    """Model and 13-week moving-average forecasts from ``as_of``, next to the actuals."""
     truth = {
         (sku, region, week): float(quantity)
         for sku, region, week, quantity in zip(
@@ -113,8 +105,7 @@ def run_feedback_experiment(
     params = params or ProcurementParams()
     world, future = generate_world_with_future(cfg)
     if service.history.dataset_id != panel_from_world(world).dataset_id:
-        # The replay needs the model that existed at as_of; a model whose history runs past
-        # as_of has seen the very actuals it would be scored on.
+        # Replay with the model that existed at as_of; a later one has seen the actuals.
         raise ValueError("the forecast model must be the one trained on this world's history")
     rng = outcome_rng(cfg)
     weeks = future_weeks(world, FORECAST_WEEKS)
@@ -168,8 +159,7 @@ def run_feedback_experiment(
     placed_actual = simulate_deliveries(placed, reliability, rng)
     every_order = open_actual + placed_actual
 
-    # 5. inventory over the plan horizon: as planned (forecast demand, promised deliveries)
-    #    and as it happened (actual demand, actual deliveries)
+    # 5. inventory over the plan horizon, as planned and as it happened
     forecast_demand = warehouse_week_demand(
         world, {k: v for k, v in points.items() if k[2] in plan_weeks}
     )
@@ -264,7 +254,6 @@ def _write_outcomes(
     destination: dict[str, tuple[str, str]],
     inventory: list[InventoryWeek],
 ) -> dict[str, str]:
-    """The simulated actuals as CSV files (input for retraining), with their checksums."""
     directory.mkdir(parents=True, exist_ok=True)
     frames = {
         "demand_actuals.csv": demand.assign(

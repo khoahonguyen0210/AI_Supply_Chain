@@ -3,18 +3,13 @@ package com.scm.platform.security;
 import java.time.Clock;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Token buckets, one per key. A bucket holds up to {@code perMinute} tokens and refills continuously at
- * {@code perMinute / 60} tokens a second, so a burst up to the limit is fine and the long-run rate is capped.
- * State is per process; behind several instances each applies the limit on its own.
- */
+/** Token bucket per key; state is per process. */
 public class RateLimiter {
 
 	private static final int PURGE_ABOVE = 10_000;
 
 	private static final long IDLE_NANOS = 10L * 60 * 1_000_000_000L;
 
-	/** The answer to one attempt: allowed, or how long until a token is available. */
 	public record Decision(boolean allowed, long retryAfterSeconds) {
 	}
 

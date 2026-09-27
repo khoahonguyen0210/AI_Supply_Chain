@@ -1,16 +1,4 @@
-"""Guardrails: deterministic checks around the planner, enforced whatever model plans.
-
-* input validation and refusal of requests that ask to bypass approval or the rules;
-* authorization of each tool call against the actor's role;
-* strict validation of tool arguments;
-* sanity checks on tool results before a planner may rely on them;
-* numerical grounding: every number in a final answer must come from a tool result, the policy
-  evidence or the user's own message.
-
-Document permission filtering lives in retrieval (a role never receives chunks it may not read);
-action confirmation is structural: no tool can approve, and the only consequential tool opens an
-approval request.
-"""
+"""Deterministic guardrails: validation, authorization, result checks and grounded numbers."""
 
 from __future__ import annotations
 

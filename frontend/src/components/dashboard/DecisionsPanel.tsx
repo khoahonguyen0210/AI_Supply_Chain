@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { scenarioLabel } from "@/lib/scenarios";
 import { EmptyState, Panel, ResourceView, StatusBadge } from "@/components/ui";
 import { listRecommendations, listScenarios } from "@/lib/api/decisions";
-import { formatDate, formatMoney, formatPercent, humanize } from "@/lib/format";
+import { formatDate, formatMoney, formatPercent } from "@/lib/format";
 import { useSession } from "@/lib/session";
 import { useResource } from "@/lib/useResource";
 
@@ -16,7 +17,7 @@ export function RecommendationsPanel() {
     <Panel
       title="Recommendations"
       id="recommendations"
-      actions={<Link href="/copilot">Ask the copilot</Link>}
+      actions={<Link href="/copilot">Ask the assistant</Link>}
     >
       <ResourceView state={state} onRetry={reload}>
         {(rows) =>
@@ -32,9 +33,9 @@ export function RecommendationsPanel() {
                   <tr>
                     <th>Recommendation</th>
                     <th>Status</th>
-                    <th className="num">Objective</th>
-                    <th className="num">Expected service</th>
-                    <th>Horizon</th>
+                    <th className="num">Total cost</th>
+                    <th className="num">Demand covered</th>
+                    <th>Planning period</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -71,18 +72,18 @@ export function ScenariosPanel() {
     listScenarios(signal),
   );
   return (
-    <Panel title="Scenarios" id="scenarios" actions={<Link href="/workspace">Open workspace</Link>}>
+    <Panel title="What-if tests" id="scenarios" actions={<Link href="/workspace">Open in plan builder</Link>}>
       <ResourceView state={state} onRetry={reload}>
         {(rows) =>
           rows.length === 0 ? (
             <EmptyState>
-              No saved scenarios. Define a disruption in the decision workspace to stress a plan.
+              No what-if tests saved yet. Build a plan in the plan builder, then check what could go wrong.
             </EmptyState>
           ) : (
             <ul className="stack" style={{ listStyle: "none", padding: 0, margin: 0 }}>
               {rows.slice(0, 8).map((s) => (
                 <li key={s.scenarioId}>
-                  <strong>{s.name}</strong> <span className="muted">{humanize(s.scenarioType)}</span>
+                  <strong>{s.name}</strong> <span className="muted">{scenarioLabel(s.scenarioType)}</span>
                   <div className="muted">
                     {Object.entries(s.parameters)
                       .map(([k, v]) => `${k}: ${v}`)

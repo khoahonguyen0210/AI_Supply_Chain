@@ -1,10 +1,3 @@
-"""The agent loop: task -> plan -> guarded tool call -> observation -> re-plan -> final answer.
-
-The runner owns everything the planner must not decide for itself: it validates the request,
-authorizes and validates each tool call, sanity-checks results, rejects final answers whose numbers
-are not backed by tool results, records a trace, persists task state and caps the number of steps.
-"""
-
 from __future__ import annotations
 
 import json

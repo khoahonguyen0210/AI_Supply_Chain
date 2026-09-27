@@ -9,7 +9,6 @@ export const TEST_TOKEN = "test-access-token";
 
 export const PLANNER: Profile = { userId: "pat", displayName: "Pat", role: "planner" };
 
-/** Renders the page as a signed-in user (a planner unless told otherwise), with a token on every request. */
 export function renderWithSession(ui: ReactElement, user: Profile = PLANNER) {
   setAccessToken(TEST_TOKEN);
   return render(<SessionProvider initialUser={user}>{ui}</SessionProvider>);
@@ -17,10 +16,6 @@ export function renderWithSession(ui: ReactElement, user: Profile = PLANNER) {
 
 type Handler = (url: string, init: RequestInit) => unknown;
 
-/**
- * Stubs `fetch` with a router: the first route whose path prefix matches answers. A handler may return a
- * value (sent as 200 JSON) or a Response. Unmatched requests fail the test loudly.
- */
 export function stubBackend(routes: Record<string, Handler | unknown>) {
   const calls: { url: string; init: RequestInit }[] = [];
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init: RequestInit = {}) => {

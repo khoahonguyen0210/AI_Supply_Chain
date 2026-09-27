@@ -1,12 +1,3 @@
-"""Runtime telemetry of the planning engine: what actually happened while serving requests.
-
-Counts and latencies of forecasts, tool calls, retrieval answers, agent tasks and model calls, kept
-in process and exposed as a JSON snapshot. Nothing here measures quality against ground truth (that
-is the offline evaluation, summarised separately); it shows rates of success, refusal and guardrail
-findings in live traffic, plus model latency and token use. Cost is reported only when per-token
-prices are configured, because a price must not be invented.
-"""
-
 from __future__ import annotations
 
 import math
@@ -32,8 +23,6 @@ def _percentile(sorted_values: list[float], fraction: float) -> float:
 
 @dataclass
 class _Series:
-    """Count, failures and recent latencies of one kind of operation."""
-
     count: int = 0
     failures: int = 0
     total_seconds: float = 0.0
@@ -59,8 +48,6 @@ class _Series:
 
 @dataclass(frozen=True)
 class Prices:
-    """USD per million tokens, from the environment; absent means cost is not reported."""
-
     input_per_mtok: float | None = None
     output_per_mtok: float | None = None
 
@@ -94,7 +81,6 @@ class Telemetry:
 
     @contextmanager
     def timed(self) -> Iterator[list[float]]:
-        """Yields a one-item list that receives the elapsed seconds when the block ends."""
         box = [0.0]
         start = time.perf_counter()
         try:
@@ -120,7 +106,6 @@ class Telemetry:
                 self._guardrails[violation.split(":")[0]] += 1
 
     def answer(self, status: str, seconds: float) -> None:
-        """A policy answer; `status` is ANSWERED, INSUFFICIENT_EVIDENCE, CONFLICTING, etc."""
         with self._lock:
             self._retrieval[status] += 1
             self._answers.add(seconds, status == "ANSWERED")

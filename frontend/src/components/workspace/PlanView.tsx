@@ -8,49 +8,54 @@ import {
   humanize,
 } from "@/lib/format";
 
-/** What the optimizer assumed: the inputs the planner chose plus the solver's own status. */
+const SOLVER_STATUS_TEXT: Record<string, string> = {
+  OPTIMAL: "Best possible plan found",
+  LIMIT_REACHED: "Good plan, search stopped at the time limit",
+  INFEASIBLE: "No plan can meet all the limits",
+  UNBOUNDED: "The problem is not set up correctly",
+  ERROR: "The calculation failed",
+};
+
 export function PlanAssumptions({ spec, plan }: { spec: PlanSpec; plan: PlanResult }) {
   return (
     <dl className="kv">
       <dt>Products</dt>
       <dd>{spec.skuIds.join(", ")}</dd>
-      <dt>Horizon</dt>
+      <dt>Planning period</dt>
       <dd>{plan.horizonWeeks} weeks</dd>
       <dt>Demand</dt>
       <dd>
         forecast × {plan.demandMultiplier}
-        {plan.demandMultiplier === 1 ? " (no adjustment)" : ""}
+        {plan.demandMultiplier === 1 ? " (as forecast)" : ""}
       </dd>
-      <dt>Service level target</dt>
+      <dt>Share of demand to cover</dt>
       <dd>{formatPercent(plan.serviceLevelTarget, 0)}</dd>
       <dt>Budget</dt>
       <dd>{plan.budget === null ? "none" : formatMoney(plan.budget)}</dd>
-      <dt>Solver</dt>
-      <dd>{plan.solverStatus}</dd>
+      <dt>Optimizer result</dt>
+      <dd title={plan.solverStatus}>{SOLVER_STATUS_TEXT[plan.solverStatus] ?? plan.solverStatus}</dd>
     </dl>
   );
 }
 
-/** The optimizer's output: objective, service, violations, the purchase lines and what constrains them. */
 export function PlanView({
   plan,
   onAlternatives,
 }: {
   plan: PlanResult;
-  /** Offered for each purchase line so the planner can look at the other suppliers. */
   onAlternatives?: (line: PlanResult["lines"][number]) => void;
 }) {
   return (
     <div className="stack">
       <dl className="stats">
-        <Stat label="Objective (total cost)" value={formatMoney(plan.objective)} />
+        <Stat label="Total cost (incl. shortage penalties)" value={formatMoney(plan.objective)} />
         <Stat label="Order value" value={formatMoney(plan.orderValue)} hint={`${plan.orders} orders`} />
         <Stat
-          label="Demand covered"
+          label="Demand covered by the plan"
           value={formatPercent(plan.fillRate)}
           hint={`${formatInt(plan.unmetDemand)} of ${formatInt(plan.totalDemand)} units unmet`}
         />
-        <Stat label="Customer fill rate" value={formatPercent(plan.customerFillRate)} />
+        <Stat label="Customer orders filled" value={formatPercent(plan.customerFillRate)} />
       </dl>
 
       {plan.violations.length > 0 ? (
@@ -60,12 +65,12 @@ export function PlanView({
         </Notice>
       ) : (
         <p>
-          <Badge tone="good">All constraints satisfied</Badge>
+          <Badge tone="good">Meets every limit</Badge>
         </p>
       )}
 
       <div>
-        <h3>Purchase lines</h3>
+        <h3>What to buy</h3>
         {plan.lines.length === 0 ? (
           <p className="muted">The plan buys nothing.</p>
         ) : (
@@ -123,7 +128,7 @@ export function PlanView({
           </ul>
         </div>
         <div>
-          <h3>Constraints closest to binding</h3>
+          <h3>Limits it comes closest to</h3>
           {plan.bindingConstraints.length === 0 ? (
             <p className="muted">None reported.</p>
           ) : (

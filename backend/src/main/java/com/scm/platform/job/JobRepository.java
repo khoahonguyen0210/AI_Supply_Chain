@@ -14,11 +14,7 @@ import org.springframework.stereotype.Repository;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
-/**
- * Persistence of the job queue. All state transitions are single atomic statements, and the ones a
- * worker performs are fenced by {@code locked_by}, so a worker that lost its lease cannot overwrite
- * the outcome recorded by whoever took the job over.
- */
+/** Worker updates are fenced by locked_by, so a lost lease can't overwrite. */
 @Repository
 public class JobRepository {
 
@@ -38,7 +34,7 @@ public class JobRepository {
 		this.mapper = this::mapRow;
 	}
 
-	/** Inserts the job, or returns empty when the (type, idempotency key) pair already exists. */
+	/** Empty when the (type, idempotency key) pair already exists. */
 	public Optional<Job> insertIfAbsent(JobType type, String key, String requestHash, JsonNode payload,
 			String submittedBy, String submittedRole, int maxAttempts) {
 		return jdbc.sql("""
@@ -67,7 +63,6 @@ public class JobRepository {
 				.query(mapper).optional();
 	}
 
-	/** Number of jobs in each status. */
 	public java.util.Map<JobStatus, Long> countsByStatus() {
 		java.util.Map<JobStatus, Long> counts = new java.util.EnumMap<>(JobStatus.class);
 		for (JobStatus status : JobStatus.values()) {
@@ -80,7 +75,6 @@ public class JobRepository {
 		return counts;
 	}
 
-	/** Seconds the longest-waiting runnable job has waited, or 0 when nothing is waiting. */
 	public double oldestQueuedAgeSeconds() {
 		return jdbc.sql("""
 				SELECT COALESCE(EXTRACT(EPOCH FROM now() - min(run_after)), 0)
@@ -93,10 +87,6 @@ public class JobRepository {
 				.param("by", submittedBy).param("limit", limit).query(mapper).list();
 	}
 
-	/**
-	 * Takes the next runnable job: a queued job that is due, or a running job whose lease expired.
-	 * Jobs whose lease expired with no attempts left are failed first instead of being run again.
-	 */
 	public Optional<Job> claim(String workerId, Duration lease) {
 		jdbc.sql("""
 				UPDATE job SET status = 'FAILED', error_code = 'LEASE_EXPIRED',
@@ -119,7 +109,7 @@ public class JobRepository {
 				.query(mapper).optional();
 	}
 
-	/** Records the durable result. Returns false when the worker no longer owns the job. */
+	/** False when the worker no longer owns the job. */
 	public boolean succeed(UUID id, String workerId, JsonNode result) {
 		return jdbc.sql("""
 				UPDATE job SET status = 'SUCCEEDED', result = CAST(:result AS jsonb), last_error = NULL,
@@ -137,7 +127,6 @@ public class JobRepository {
 				.update() == 1;
 	}
 
-	/** Puts the job back in the queue to run again after {@code delay}. */
 	public boolean requeue(UUID id, String workerId, String lastError, Duration delay) {
 		return jdbc.sql("""
 				UPDATE job SET status = 'QUEUED', last_error = :error, run_after = now() + make_interval(secs => :delay),

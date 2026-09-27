@@ -14,7 +14,6 @@ type Ask =
   | { phase: "error"; message: string }
   | { phase: "done"; answer: DocumentAnswer };
 
-/** Ask the contracts, SLAs and policies a question; the answer is cited or says why it is not given. */
 export function EvidencePanel() {
   const [question, setQuestion] = useState("");
   const [ask, setAsk] = useState<Ask>({ phase: "idle" });
@@ -32,7 +31,7 @@ export function EvidencePanel() {
   }
 
   return (
-    <Panel title="Evidence from contracts and policies" id="evidence">
+    <Panel title="Ask about policies and contracts" id="evidence">
       <form className="form-row" onSubmit={submit}>
         <label className="field" style={{ flex: "1 1 320px" }}>
           <span>Question</span>

@@ -1,9 +1,3 @@
-"""Naive, moving-average and seasonal-naive baselines under walk-forward evaluation.
-
-Every baseline forecasts week ``w`` from an origin ``h`` weeks earlier and may only read values at
-or before that origin (``w - h``).
-"""
-
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -23,14 +17,11 @@ def _target_columns(start: int, end: int) -> np.ndarray:
 
 
 def naive(values: Array, start: int, end: int, horizons: int) -> Array:
-    """Repeat the last observed week."""
     weeks = _target_columns(start, end)
     return np.stack([values[:, weeks - h] for h in range(1, horizons + 1)], axis=2)
 
 
 def moving_average(window: int) -> Baseline:
-    """Mean of the ``window`` weeks ending at the origin (fewer if history is short)."""
-
     def predict(values: Array, start: int, end: int, horizons: int) -> Array:
         cumulative = np.concatenate(
             [np.zeros((values.shape[0], 1)), np.cumsum(values, axis=1)], axis=1
@@ -49,7 +40,6 @@ def moving_average(window: int) -> Baseline:
 
 
 def seasonal_naive(values: Array, start: int, end: int, horizons: int) -> Array:
-    """Same week last year; falls back to naive when a year of history is unavailable."""
     weeks = _target_columns(start, end)
     fallback = naive(values, start, end, horizons)
     last_year = weeks - SEASON

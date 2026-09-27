@@ -1,5 +1,3 @@
-"""Simple procurement heuristics: the baselines the optimizer is benchmarked against."""
-
 from __future__ import annotations
 
 import math
@@ -26,13 +24,6 @@ def reorder_up_to(
     catalog: SourcingCatalog,
     choice: SupplierChoice = SupplierChoice.CHEAPEST,
 ) -> list[PurchaseLine]:
-    """Per cell, order what is missing to cover demand + safety stock from one preferred supplier.
-
-    The planner's rule of thumb: need = demand + safety stock - stock on hand and on order, raised
-    to the supplier's MOQ, filled from the best supplier first and spilling over to the next when
-    that supplier's capacity runs out. It ignores supplier reliability, the budget and warehouse
-    capacity, so it can leave demand uncovered or violate constraints; the evaluator reports both.
-    """
     remaining_capacity: dict[str, int] = defaultdict(int)
     lines: list[PurchaseLine] = []
     for key, cell in problem.cells.items():

@@ -14,10 +14,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.stereotype.Component;
 
-/**
- * Queue and worker metrics: queue depth, running and failed jobs come from the database (so they are right
- * across several instances); durations, outcomes and this worker's utilization are measured in-process.
- */
 @Component
 public class JobMetrics {
 
@@ -52,7 +48,7 @@ public class JobMetrics {
 		}
 	}
 
-	/** Counts by status, refreshed at most once a second so a scrape storm does not hammer the database. */
+	/** Refreshed at most once a second so a scrape storm does not hammer the database. */
 	public Map<JobStatus, Long> counts() {
 		long now = System.nanoTime();
 		if (now - cachedAtNanos > TimeUnit.SECONDS.toNanos(1) || cachedCounts.isEmpty()) {
@@ -62,7 +58,6 @@ public class JobMetrics {
 		return cachedCounts;
 	}
 
-	/** Records one finished attempt. {@code outcome} is succeeded, retried or failed. */
 	public void attemptFinished(JobType type, String outcome, Duration elapsed) {
 		durations.get(type).record(elapsed);
 		busyNanos.addAndGet(elapsed.toNanos());

@@ -1,11 +1,4 @@
-"""Planners: decide the next action from the task and what the tools have returned so far.
-
-`RulePlanner` is deterministic and offline: it parses the request into an intent and walks a fixed
-playbook, reading observations to decide whether a step succeeded, must be retried with corrected
-arguments (re-planning) or ends the task. `ClaudePlanner` asks a language model for the same
-decision through the `JsonLlm` protocol. Both return the same `Action` types, so the runner,
-guardrails and evaluation treat them identically.
-"""
+"""Planners pick the next action: RulePlanner (offline, deterministic) or ClaudePlanner."""
 
 from __future__ import annotations
 

@@ -1,13 +1,3 @@
-"""Deterministic document corpus: contracts, SLAs, policies, SOPs, certifications, specifications.
-
-Every document carries version, effective and expiry metadata and a role list. The text is generated
-from the synthetic world so it agrees with the structured master data (payment terms, order limits,
-contract status), and each generated fact is recorded as ground truth for the RAG evaluation.
-
-The corpus deliberately contains the hard cases retrieval must handle: superseded versions, an
-expired contract, two current documents that disagree, and documents restricted to some roles.
-"""
-
 from __future__ import annotations
 
 import statistics
@@ -50,8 +40,6 @@ class Expectation(StrEnum):
 
 
 class GroundTruth(DomainModel):
-    """A question whose correct behaviour is known from how the corpus was generated."""
-
     fact_id: str = Field(min_length=1)
     question: str = Field(min_length=1)
     role: str = Field(description="Role of the person asking.")
@@ -140,8 +128,6 @@ class _Builder:
                 conflicting_document_ids=conflicts,
             )
         )
-
-    # ---- per supplier -------------------------------------------------------------------
 
     def supplier_documents(self) -> None:
         contracts = {c.supplier_id: c for c in self.world.contracts}
@@ -371,8 +357,6 @@ calendar year.
             forbidden="3%",
         )
 
-    # ---- enterprise-wide policies -------------------------------------------------------
-
     def policy_documents(self) -> None:
         approval_v1 = (10_000, 50_000)
         approval_v2 = (15_000, 75_000)
@@ -579,7 +563,6 @@ Product specification for the {category} category.
 
 
 def build_corpus(world: SyntheticWorld) -> Corpus:
-    """Generate the full corpus for a world; identical worlds give identical corpora."""
     builder = _Builder(world)
     builder.supplier_documents()
     builder.policy_documents()

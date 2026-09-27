@@ -141,15 +141,15 @@ describe("Dashboard", () => {
     backend();
     renderWithSession(<Dashboard />);
 
-    expect(await screen.findByRole("heading", { name: "Demand and forecast" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Sales and forecast" })).toBeInTheDocument();
     expect(await screen.findByText(/Model lgbm-test/)).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /forecast to 2025-01-06/ })).toBeInTheDocument();
     expect(await screen.findByText("Buy 100 widgets from Acme")).toBeInTheDocument();
     expect(screen.getByText("PENDING APPROVAL")).toBeInTheDocument();
-    expect(await screen.findByText(/No saved scenarios/)).toBeInTheDocument();
+    expect(await screen.findByText(/No what-if tests saved yet/)).toBeInTheDocument();
 
-    expect(await screen.findByText("Below safety stock")).toBeInTheDocument();
-    expect(screen.getByText("Above safety stock")).toBeInTheDocument();
+    expect(await screen.findByText("Below safety buffer")).toBeInTheDocument();
+    expect(screen.getByText("Above safety buffer")).toBeInTheDocument();
   });
 
   it("sends the signed-in user's token with every request", async () => {
@@ -166,17 +166,17 @@ describe("Dashboard", () => {
   it("explains that summed regions have no prediction interval", async () => {
     backend();
     renderWithSession(<Dashboard />);
-    expect(await screen.findByText(/cannot be added together/)).toBeInTheDocument();
+    expect(await screen.findByText(/Choose a region to see the forecast range/)).toBeInTheDocument();
 
     await userEvent.selectOptions(screen.getByLabelText("Region"), "R1");
-    expect(screen.queryByText(/cannot be added together/)).not.toBeInTheDocument();
-    expect(await screen.findByText("80% interval")).toBeInTheDocument();
+    expect(screen.queryByText(/Choose a region to see the forecast range/)).not.toBeInTheDocument();
+    expect(await screen.findByText("Likely range (80%)")).toBeInTheDocument();
   });
 
   it("compares suppliers for the chosen warehouse and quantity and warns about an ineligible cheapest", async () => {
     const { calls } = backend();
     renderWithSession(<Dashboard />);
-    await screen.findByText("Below safety stock");
+    await screen.findByText("Below safety buffer");
 
     await userEvent.clear(screen.getByLabelText("Quantity (units)"));
     await userEvent.type(screen.getByLabelText("Quantity (units)"), "200");
@@ -208,7 +208,7 @@ describe("Dashboard", () => {
     expect(alert).toBeInTheDocument();
     fail = false;
     await userEvent.click(screen.getByRole("button", { name: "Retry" }));
-    await waitFor(() => expect(screen.getByText("Below safety stock")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Below safety buffer")).toBeInTheDocument());
   });
 
   it("explains an empty database instead of rendering broken panels", async () => {

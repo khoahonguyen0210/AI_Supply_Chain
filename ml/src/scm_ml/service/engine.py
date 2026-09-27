@@ -1,10 +1,4 @@
-"""Planning-engine use cases behind the service: every call runs through the agent's guarded tools.
-
-Tools are the single implementation of supplier search, optimization, scenarios and policy answers.
-This module only authorizes, validates and result-checks a call the same way the agent runtime does,
-and turns failures into stable error codes. A lock serializes calls because the planning context and
-the state store are shared, mutable and not thread-safe.
-"""
+"""Engine use cases; every call goes through the agent's guarded tools, under a lock."""
 
 from __future__ import annotations
 
@@ -81,10 +75,6 @@ _SNAKE_KEY = re.compile(r"[a-z][a-z0-9]*(_[a-z0-9]+)+")
 
 
 def camelize(value: Any) -> Any:
-    """Recursively convert snake_case object keys to the wire's camelCase.
-
-    Keys that are data (supplier ids like `SUP-1`) are not snake_case identifiers and stay as is.
-    """
     if isinstance(value, dict):
         return {
             to_camel(k) if isinstance(k, str) and _SNAKE_KEY.fullmatch(k) else k: camelize(v)
@@ -177,7 +167,7 @@ class EngineService:
             return _wire(self._invoke("optimize_procurement", request.actor, arguments))
 
     def run_scenario(self, request: ScenarioRunRequest) -> dict[str, Any]:
-        """Solve the plan afresh, then stress it: callers never depend on server-side plan ids."""
+        """Solve afresh, then stress: callers never depend on server-side plan ids."""
         with self._lock:
             plan = self._invoke("optimize_procurement", request.actor, _plan_args(request.plan))
             scenario = self._invoke(
@@ -230,12 +220,6 @@ class EngineService:
         return _wire(record.model_dump(mode="json"))
 
     def forecast_snapshot(self, request: ForecastSnapshotRequest) -> dict[str, Any]:
-        """The served model's forecast for every region with demand for the SKUs.
-
-        Recorded by the backend when a recommendation is approved, so it can later be compared
-        with actual demand even after the served model changes. Forecast errors (for example an
-        `as_of` beyond the history) surface as the forecast endpoint's errors.
-        """
         service = self._planning.service
         points: list[dict[str, Any]] = []
         with self._lock:
@@ -268,7 +252,6 @@ class EngineService:
         )
 
     def evaluate_outcomes(self, request: OutcomeEvaluationRequest) -> dict[str, Any]:
-        """Score recorded outcomes against forecasts and promises (no shared state is touched)."""
         return _wire(evaluate_recorded(request))
 
     def decide_approval(self, approval_id: str, request: ApprovalDecisionRequest) -> dict[str, Any]:
@@ -296,12 +279,6 @@ def build_engine(
     state_path: Path | str = ":memory:",
     knowledge_url: str | None = None,
 ) -> EngineService:
-    """Wire knowledge base, planner, approvals and durable state around one world and model.
-
-    With `knowledge_url` (a PostgreSQL connection string) the knowledge base lives there:
-    the corpus is synced (unchanged documents are skipped, so embeddings are computed once) and
-    retrieval runs on what the database holds.
-    """
     # A promoted model may have been trained on the world's history plus captured actuals.
     if not extends(forecasts.history, panel_from_world(world)):
         raise ValueError("the forecast model was not trained on this world's demand history")

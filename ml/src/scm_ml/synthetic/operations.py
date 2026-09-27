@@ -1,5 +1,3 @@
-"""Operational state: historical purchase orders, current inventory and warehouse capacity."""
-
 from __future__ import annotations
 
 import math
@@ -42,12 +40,6 @@ def generate_purchase_orders(
     specs: list[WarehouseSpec],
     pending: dict[str, tuple[date, int]] | None = None,
 ) -> list[PurchaseOrder]:
-    """Simulate past replenishment; deliveries still pending at ``as_of`` stay open.
-
-    The delivery of an open order is drawn like any other but kept out of the world. Pass
-    ``pending`` to receive it (order id -> delivery date and quantity): it is the future the
-    feedback loop compares plans with, never an input to planning.
-    """
     reliability = {s.supplier_id: s.reliability for s in suppliers}
     offers_by_sku: dict[str, list[SupplierOffer]] = defaultdict(list)
     for offer in offers:
@@ -105,7 +97,6 @@ def generate_inventory_and_warehouses(
     sales_orders: list[SalesOrder],
     purchase_orders: list[PurchaseOrder],
 ) -> tuple[list[InventoryPosition], list[Warehouse]]:
-    """Stock each warehouse relative to its recent demand and size capacity to its stock."""
     home: dict[str, str] = {}
     for region_id in {lane.region_id for lane in lanes}:
         best = min(

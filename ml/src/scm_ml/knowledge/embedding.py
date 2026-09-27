@@ -1,11 +1,3 @@
-"""Text embedders behind one protocol.
-
-`FastEmbedEmbedder` is the real model (BAAI/bge-small-en-v1.5, ONNX, 384-dim, matching the pgvector
-column). `HashingEmbedder` is a deterministic offline stand-in (signed hashed unigrams and
-bigrams) so tests and CI need no model download; it captures lexical overlap only and is never
-used to report retrieval quality of the real model.
-"""
-
 from __future__ import annotations
 
 import hashlib

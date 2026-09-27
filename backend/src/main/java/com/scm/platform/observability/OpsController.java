@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import tools.jackson.databind.JsonNode;
 
-/** Operational view for admins: API latency and errors, queue depth and worker state. */
 @RestController
 @RequestMapping("/api/ops")
 public class OpsController {
@@ -38,10 +37,6 @@ public class OpsController {
 		this.audit = audit;
 	}
 
-	/**
-	 * Request statistics since this instance started; the rate is over that uptime, not a sliding window.
-	 * Latencies are milliseconds.
-	 */
 	public record ApiStats(long requests, long serverErrors, long clientErrors, double errorRate,
 			double p50Millis, double p95Millis, double requestsPerSecond, long uptimeSeconds) {
 	}
@@ -72,7 +67,6 @@ public class OpsController {
 		return new Summary(api, queue);
 	}
 
-	/** The audit trail, newest first, optionally for one user or one outcome (SUCCESS, DENIED, FAILED, LIMITED). */
 	@GetMapping("/audit")
 	public List<AuditService.Entry> audit(Actor actor, @RequestParam(required = false) String user,
 			@RequestParam(required = false) AuditService.Outcome outcome,
@@ -81,10 +75,6 @@ public class OpsController {
 		return audit.recent(user, outcome, limit);
 	}
 
-	/**
-	 * Live forecast, tool, agent, retrieval and model telemetry from the planning engine, with the headline
-	 * results of its offline evaluations (which are measured on fixed cases, not on live traffic).
-	 */
 	@GetMapping("/ai")
 	public JsonNode ai(Actor actor) {
 		Roles.require(actor, ADMINS);

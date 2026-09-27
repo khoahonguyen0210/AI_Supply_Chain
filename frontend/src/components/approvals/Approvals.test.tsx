@@ -97,7 +97,7 @@ describe("Approvals", () => {
       "/api/approvals": () => [approved ? { ...PENDING, status: "APPROVED" } : PENDING],
     });
     renderWithSession(<Approvals />);
-    await userEvent.type(await screen.findByLabelText("Rationale (optional)"), "ok to proceed");
+    await userEvent.type(await screen.findByLabelText("Reason (optional)"), "ok to proceed");
     await userEvent.click(screen.getByRole("button", { name: "Approve" }));
 
     expect(await screen.findByText(/Approved purchase orders were created/)).toBeInTheDocument();
@@ -134,7 +134,7 @@ describe("Approvals", () => {
     const { calls } = stubBackend({ "/api/approvals": [] });
     renderWithSession(<Approvals />);
     expect(await screen.findByText("Nothing to show.")).toBeInTheDocument();
-    const queue = screen.getByRole("heading", { name: "Queue" }).closest("section")!;
+    const queue = screen.getByRole("heading", { name: "Requests" }).closest("section")!;
     await userEvent.selectOptions(within(queue).getByRole("combobox"), "ALL");
     await screen.findByText("Nothing to show.");
     expect(calls.map((c) => c.url)).toContain("/api/approvals");

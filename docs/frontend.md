@@ -32,7 +32,15 @@ display-only.
   decide is the engine's rule, and its refusal reason is shown. Nothing is ordered until the policy's
   approvers have approved.
 * **Accessibility.** Charts have a text summary (`role="img"` with a label), forms use labelled fields,
-  status never relies on colour alone (badges carry text), and light/dark themes follow the system.
+  status never relies on colour alone (badges carry text), and animations are switched off under
+  `prefers-reduced-motion`.
+* **Look.** One dark theme, defined as CSS variables at the top of `src/app/globals.css`: a near-black
+  canvas with a soft radial glow and a faint dot grid, Ubuntu for headings, Manrope for text, Geist Mono
+  for ids, white primary buttons beside outlined ones, rounded thin-bordered cards with hover states, and
+  a staggered fade-in when a page loads. Signed out, the sign-in form sits in a landing hero with an
+  example recommendation (numbers from the demo run of the synthetic company) and four feature cards.
+  Text is kept short: one-line page intros, and a long copilot answer shows its first line and its
+  conclusion, with the rest folded under "Show the full answer".
 
 ## Tests and checks
 

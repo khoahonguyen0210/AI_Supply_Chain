@@ -1,20 +1,3 @@
-"""Simulated actuals for the synthetic company: what happens after ``as_of``.
-
-Nothing after the planning date exists in the data, so the feedback loop continues the same
-generative process, with the same seed, past ``as_of``:
-
-* demand: the world's demand process (popularity, region weights, seasonality, trend) evaluated
-  for later weeks, with no promotions, drawn from a separate random stream;
-* deliveries of purchase orders open at ``as_of``: the outcome the generator already drew for them
-  but kept out of the world;
-* deliveries of newly placed orders: the generator's supplier behaviour (on time with the
-  supplier's reliability, otherwise 1-10 days late and half the time 70-95% short);
-* inventory: weekly stock per SKU and warehouse, receipts at the start of the week, demand served
-  from stock, unmet demand lost.
-
-Everything here is labelled SIMULATED wherever it is stored or reported.
-"""
-
 from __future__ import annotations
 
 from collections import defaultdict
@@ -44,7 +27,6 @@ def future_weeks(world: SyntheticWorld, n_weeks: int) -> list[date]:
 def simulate_demand(
     world: SyntheticWorld, future: HiddenFuture, rng: np.random.Generator, n_weeks: int
 ) -> pd.DataFrame:
-    """Weekly units per SKU x region for the ``n_weeks`` weeks starting at ``as_of``."""
     first = world.config.n_weeks
     units = continue_demand(future.demand, rng, np.arange(first, first + n_weeks))
     weeks = future_weeks(world, n_weeks)
@@ -62,7 +44,6 @@ def simulate_deliveries(
     reliability: Mapping[str, float],
     rng: np.random.Generator,
 ) -> list[DeliveryOutcome]:
-    """Deliver each order the way the generator's suppliers behave (in the given order)."""
     delivered: list[DeliveryOutcome] = []
     for order in orders:
         on_time = rng.random() < reliability[order.supplier_id]
@@ -89,7 +70,6 @@ def simulate_deliveries(
 def warehouse_week_demand(
     world: SyntheticWorld, regional: Mapping[CellWeek, float]
 ) -> dict[CellWeek, float]:
-    """(sku, region, week) demand moved to the warehouse that serves the region."""
     serves = serving_warehouse(world.lanes)
     totals: dict[CellWeek, float] = defaultdict(float)
     for (sku_id, region_id, week), value in regional.items():
@@ -105,9 +85,6 @@ def receipts_by_week(
     *,
     as_promised: bool,
 ) -> dict[CellWeek, float]:
-    """Units arriving per (sku, warehouse, week). ``as_promised`` uses the promised date and
-    quantity (what a plan assumes); otherwise the actual delivery. Earlier arrivals count in the
-    first week; arrivals after the last week are not received in the window."""
     receipts: dict[CellWeek, float] = defaultdict(float)
     for d in deliveries:
         when = d.expected_delivery if as_promised else d.delivered_on
@@ -127,7 +104,6 @@ def simulate_inventory(
     demand: Mapping[CellWeek, float],
     receipts: Mapping[CellWeek, float],
 ) -> list[InventoryWeek]:
-    """Week by week: stock plus receipts serves demand; what cannot be served is lost."""
     rows: list[InventoryWeek] = []
     for position in sorted(world.inventory, key=lambda p: (p.sku_id, p.warehouse_id)):
         stock = float(position.on_hand)

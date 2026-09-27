@@ -1,15 +1,3 @@
-"""Fixed RAG evaluation set and metrics.
-
-The set is the corpus ground truth (normal, superseded-value, expired, conflicting and
-permission-restricted questions) plus questions the corpus cannot answer. Missing-evidence
-questions are split into a `calibration` batch, used while choosing the evidence-gate threshold, and
-a `holdout` batch written afterwards, so the report shows how much the gate was fitted to its data.
-
-Metrics are computed per pipeline configuration (embedder + generator). With the offline extractive
-generator they measure retrieval, the evidence gate and the grounding checks; they say nothing about
-the quality of Claude-written answers, which is reported as `NOT YET MEASURED`.
-"""
-
 from __future__ import annotations
 
 import re
@@ -142,12 +130,11 @@ def _current_version(corpus: Corpus, document_id: str) -> str:
 
 
 def mentions(text: str, phrase: str) -> bool:
-    """Whole-token, case-insensitive containment, so "No" does not match "not"."""
+    """Whole-token, case-insensitive match, so "No" does not match "not"."""
     return re.search(rf"(?<!\w){re.escape(phrase)}(?!\w)", text, re.IGNORECASE) is not None
 
 
 def _first_rank(retriever: Retriever, case: EvalCase, corpus: Corpus, depth: int) -> int | None:
-    """1-based rank at which every gold document is in the results, or None."""
     result = retriever.retrieve(case.question, role=case.role, as_of=corpus.as_of, k=depth)
     ranks = []
     for document_id, version in case.gold:

@@ -1,11 +1,3 @@
-"""CLI for the feedback loop (see docs/feedback-loop.md).
-
-python -m scm_ml.feedback evaluate                  # simulate actuals, evaluate the decision
-python -m scm_ml.feedback retrain                   # candidate model + promotion report
-python -m scm_ml.feedback promote --report R --approved-by USER
-python -m scm_ml.feedback serving                   # which model is served
-"""
-
 from __future__ import annotations
 
 import argparse

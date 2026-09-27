@@ -11,11 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import tools.jackson.databind.JsonNode;
 
-/**
- * The approval workflow around the engine's rules. The engine decides who may approve and when an
- * approval is complete; this service relays the decision, stores what the engine returned and, once an
- * approval is complete, creates the approved purchase orders.
- */
 @Service
 public class ApprovalService {
 
@@ -35,17 +30,13 @@ public class ApprovalService {
 		this.outcomes = outcomes;
 	}
 
-	/** Stores an engine approval record and its recommendation; safe to repeat. */
 	@Transactional
 	public void mirror(JsonNode approval) {
 		repository.upsertRecommendation(approval.path("recommendation"));
 		repository.upsertApproval(approval);
 	}
 
-	/**
-	 * Relays a human decision. An engine refusal (not authorized, already decided, self-approval) is
-	 * returned to the caller unchanged and nothing is stored.
-	 */
+	/** An engine refusal is returned unchanged and nothing is stored. */
 	public ApprovalRow decide(Actor approver, String approvalId, String outcome, String rationale) {
 		JsonNode record = engine.decideApproval(approver, approvalId, outcome, rationale);
 		ApprovalRow stored = transaction.execute(status -> store(approver, approvalId, outcome, rationale, record));

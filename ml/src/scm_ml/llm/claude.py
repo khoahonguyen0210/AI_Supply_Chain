@@ -1,9 +1,3 @@
-"""Claude implementation of `JsonLlm` using the Anthropic SDK and structured outputs.
-
-The API key is read from `ANTHROPIC_API_KEY` by the SDK; nothing here stores or logs it. The client
-is injectable so tests run without a key or network access.
-"""
-
 from __future__ import annotations
 
 import json

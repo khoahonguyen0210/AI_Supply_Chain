@@ -17,7 +17,6 @@ type Run =
   | { phase: "done"; result: ScenarioRunResult }
   | { phase: "error"; message: string };
 
-/** Define a disruption, save it, and stress the current plan with it (a scenario job). */
 export function ScenarioPanel({ planSpec }: { planSpec: PlanSpec | null }) {
   const [type, setType] = useState<ScenarioType>("DEMAND_SHOCK");
   const [name, setName] = useState("");
@@ -55,14 +54,14 @@ export function ScenarioPanel({ planSpec }: { planSpec: PlanSpec | null }) {
   }
 
   return (
-    <Panel title="Scenario stress test" id="scenario">
+    <Panel title="What if something goes wrong?" id="scenario">
       {planSpec === null ? (
-        <p className="muted">Optimize a plan first; scenarios are run against it.</p>
+        <p className="muted">Optimize a plan first, then test it here.</p>
       ) : (
         <form className="stack" onSubmit={submit}>
           <div className="form-row">
             <label className="field">
-              <span>Disruption</span>
+              <span>What goes wrong</span>
               <select value={type} onChange={(e) => choose(e.target.value as ScenarioType)}>
                 {SCENARIO_FORMS.map((f) => (
                   <option key={f.type} value={f.type}>
@@ -97,7 +96,7 @@ export function ScenarioPanel({ planSpec }: { planSpec: PlanSpec | null }) {
               className="primary"
               disabled={run.phase === "running" || errors.length > 0}
             >
-              {run.phase === "running" ? "Running…" : "Run scenario"}
+              {run.phase === "running" ? "Running…" : "Check the impact"}
             </button>
           </div>
           <p className="muted">{form.description}</p>

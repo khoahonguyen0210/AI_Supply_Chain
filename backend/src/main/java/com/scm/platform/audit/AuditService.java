@@ -8,11 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
-/**
- * The audit trail: who did what, from where, and how it ended. Entries are append-only (a database trigger
- * forbids update and delete). A failure to write an entry is logged loudly but does not fail the request:
- * refusing every action whenever the audit table has a problem would be an outage caused by the safeguard.
- */
+/** Append-only; a write failure is logged but never fails the request. */
 @Service
 public class AuditService {
 
@@ -49,7 +45,6 @@ public class AuditService {
 		}
 	}
 
-	/** The most recent entries, newest first, optionally for one user or one outcome. */
 	public List<Entry> recent(String actorUser, Outcome outcome, int limit) {
 		return jdbc.sql("""
 				SELECT audit_id, at, actor_user, actor_role, action, resource, outcome, status, client_ip, detail

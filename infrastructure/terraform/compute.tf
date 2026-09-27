@@ -1,10 +1,4 @@
-# ECS on Fargate, the same topology as the kind deployment (docs/kubernetes.md):
-#   frontend  behind the load balancer, the only public entry
-#   backend   API, job worker off, reached as http://backend:8080 through Service Connect
-#   engine    the single stateful engine (agent tasks, approvals on EFS), http://engine:8001
-#   worker    backend with the job worker on + its own stateless engine sidecar on 127.0.0.1,
-#             scaled 1..N on CPU
-#   seed      one-off task (aws ecs run-task) that loads the synthetic world, like the seed job
+# ECS Fargate services, same layout as the kind deployment: frontend, backend, engine, worker, seed.
 resource "aws_ecs_cluster" "main" {
   name = local.name
 
@@ -464,10 +458,7 @@ resource "aws_ecs_service" "frontend" {
   depends_on = [aws_lb_listener.http]
 }
 
-# --- worker scaling -----------------------------------------------------------------------------
-# CPU tracks queue pressure here because a worker is CPU-bound while it runs a job
-# (docs/kubernetes.md measures that). Scaling on queue depth would need the backend's
-# scm_jobs{status="QUEUED"} gauge exported to CloudWatch (an ADOT collector sidecar).
+# Worker scaling: target-tracks CPU, since a worker is CPU-bound while it runs a job.
 
 resource "aws_appautoscaling_target" "worker" {
   service_namespace  = "ecs"

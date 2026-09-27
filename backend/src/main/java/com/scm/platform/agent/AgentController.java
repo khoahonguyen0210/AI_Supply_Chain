@@ -24,11 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import tools.jackson.databind.JsonNode;
 
-/**
- * The copilot. A task is one request run by the engine's agent as the calling user; tasks are grouped in
- * conversations. When a task ends awaiting approval, its recommendation and approval request are stored
- * so they appear in the approval queue.
- */
 @RestController
 @RequestMapping("/api/agent")
 public class AgentController {
@@ -55,7 +50,6 @@ public class AgentController {
 	public record ConversationView(ConversationRow conversation, List<TaskRow> tasks) {
 	}
 
-	/** Runs the request through the agent and returns the stored task. */
 	@PostMapping("/tasks")
 	public ResponseEntity<TaskRow> run(Actor actor, @Valid @RequestBody TaskRequest request) {
 		UUID conversationId = request.conversationId() == null ? null : ownConversation(actor, request.conversationId());
@@ -95,7 +89,7 @@ public class AgentController {
 				repository.tasks(conversationId));
 	}
 
-	/** A conversation is private to its creator; anyone else gets the same 404 as for a missing one. */
+	/** A conversation is private to its creator; others get the same 404 as for a missing one. */
 	private UUID ownConversation(Actor actor, UUID conversationId) {
 		return repository.conversation(conversationId).filter(c -> c.userId().equals(actor.userId()))
 				.map(ConversationRow::conversationId)

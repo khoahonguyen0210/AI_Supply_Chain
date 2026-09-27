@@ -1,10 +1,6 @@
-"""CLI: the final benchmark report, built only from saved experiment artifacts.
+"""CLI: write docs/benchmarks.md from saved artifacts (missing ones show NOT YET MEASURED).
 
-    uv run python -m scm_ml.benchmark.report [--experiments DIR] [--out docs/benchmarks.md]
-
-Every number in the report is read from a JSON file under ``ml/experiments``; nothing is computed
-from live systems here. A missing artifact is reported as NOT YET MEASURED, never estimated.
-``scripts/benchmark.sh`` regenerates the artifacts and then this report.
+uv run python -m scm_ml.benchmark.report
 """
 
 from __future__ import annotations

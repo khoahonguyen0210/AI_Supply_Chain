@@ -1,12 +1,4 @@
-"""End to end: the whole stack running for real.
-
-PostgreSQL (pgvector) + the Spring backend (the built jar) + the Python planning engine, driven only
-through the public HTTP API as real people with real tokens. The scenario is the planner workflow
-from a question to a recommendation, an approval by the people the policy requires, and the approved
-orders.
-
-Slow (builds the jar, starts three services), so it runs only when SCM_E2E=1 (`scripts/e2e.sh`).
-"""
+"""End-to-end planner workflow on the real stack; runs only with SCM_E2E=1."""
 
 from __future__ import annotations
 
@@ -180,8 +172,6 @@ def stack(tmp_path_factory: pytest.TempPathFactory) -> Iterator[dict[str, Any]]:
 
 
 class Client:
-    """A signed-in person talking to the public API."""
-
     def __init__(self, base: str, user_id: str) -> None:
         self.http = httpx.Client(base_url=base, timeout=120)
         response = self.http.post("/api/auth/login", json={"userId": user_id, "password": PASSWORD})

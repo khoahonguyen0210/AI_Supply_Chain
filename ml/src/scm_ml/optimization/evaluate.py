@@ -1,9 +1,3 @@
-"""Score any procurement plan against the problem: cost, service and explicit violations.
-
-The evaluator does not trust whoever produced the plan: it recomputes everything from the purchase
-lines, so the optimizer and the heuristics are judged by exactly the same rules.
-"""
-
 from __future__ import annotations
 
 from collections import defaultdict

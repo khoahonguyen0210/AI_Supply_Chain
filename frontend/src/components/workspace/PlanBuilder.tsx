@@ -17,7 +17,6 @@ export interface SolvedPlan {
   plan: PlanResult;
 }
 
-/** Choose products and planning assumptions, run the optimizer as a job, and inspect its output. */
 export function PlanBuilder({
   onSolved,
   onAlternatives,
@@ -38,11 +37,11 @@ export function PlanBuilder({
   const problems: string[] = [];
   if (selected.length === 0) problems.push("Choose at least one product.");
   if (selected.length > MAX_SKUS) problems.push(`Choose at most ${MAX_SKUS} products.`);
-  if (!(Number(horizon) >= 1 && Number(horizon) <= 8)) problems.push("Horizon is 1 to 8 weeks.");
-  if (!(Number(multiplier) > 0)) problems.push("Demand adjustment must be above 0.");
+  if (!(Number(horizon) >= 1 && Number(horizon) <= 8)) problems.push("Plan for 1 to 8 weeks.");
+  if (!(Number(multiplier) > 0)) problems.push("Demand change must be above 0.");
   if (budget !== "" && !(Number(budget) > 0)) problems.push("Budget must be above 0.");
   if (!(Number(serviceLevel) >= 50 && Number(serviceLevel) <= 100)) {
-    problems.push("Service level is 50 to 100%.");
+    problems.push("Share of demand to cover must be 50 to 100%.");
   }
 
   async function submit(event: FormEvent) {
@@ -68,7 +67,7 @@ export function PlanBuilder({
 
   const running = state.phase === "running";
   return (
-    <Panel title="Purchase plan" id="plan">
+    <Panel title="Build a purchase plan" id="plan">
       <form className="stack" onSubmit={submit}>
         <fieldset className="field" style={{ border: "none", padding: 0, margin: 0 }}>
           <legend className="muted">Products (up to {MAX_SKUS})</legend>
@@ -94,11 +93,11 @@ export function PlanBuilder({
         </fieldset>
         <div className="form-row">
           <label className="field">
-            <span>Horizon (weeks)</span>
+            <span>Weeks to plan for</span>
             <input type="number" min={1} max={8} value={horizon} onChange={(e) => setHorizon(e.target.value)} />
           </label>
           <label className="field">
-            <span>Demand adjustment (×)</span>
+            <span>Demand change (1.2 = +20%)</span>
             <input
               type="number"
               min={0.1}
@@ -108,7 +107,7 @@ export function PlanBuilder({
             />
           </label>
           <label className="field">
-            <span>Service level (%)</span>
+            <span>Share of demand to cover (%)</span>
             <input
               type="number"
               min={50}
@@ -118,11 +117,11 @@ export function PlanBuilder({
             />
           </label>
           <label className="field">
-            <span>Budget (USD, optional)</span>
+            <span>Budget in USD (optional)</span>
             <input type="number" min={1} value={budget} onChange={(e) => setBudget(e.target.value)} />
           </label>
           <button type="submit" className="primary" disabled={running || problems.length > 0}>
-            {running ? "Optimizing…" : "Optimize plan"}
+            {running ? "Building…" : "Build plan"}
           </button>
         </div>
         {problems.length > 0 && selected.length > 0 ? <Notice tone="warn">{problems[0]}</Notice> : null}

@@ -1,8 +1,4 @@
-# Job workers. One pod = one queue worker (backend image, worker on) + its own planning engine as a
-# native sidecar, reached on localhost. The pod is the scaling unit, so every worker always has a
-# whole engine to itself: no load balancing across engines, no shared state (the sidecar's state is
-# scratch; forecast, optimisation and scenario jobs are stateless).
-# Scale with `scripts/kind.sh scale N`.
+# Job workers: each pod is a queue worker plus its own engine sidecar. Scale with `scripts/kind.sh scale N`.
 apiVersion: apps/v1
 kind: Deployment
 metadata:

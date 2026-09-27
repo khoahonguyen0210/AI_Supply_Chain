@@ -9,10 +9,6 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 import tools.jackson.databind.JsonNode;
 
-/**
- * Forecast snapshots and realised outcomes (V7). Every table is append-only; reads take the latest row
- * per key, so a correction is simply a newer record.
- */
 @Repository
 public class OutcomeRepository {
 
@@ -40,7 +36,7 @@ public class OutcomeRepository {
 		this.jdbc = jdbc;
 	}
 
-	/** The ids among {@code ids} that are not in {@code table.column} (a fixed, trusted identifier pair). */
+	/** {@code table.column} must be a fixed, trusted identifier pair. */
 	public List<String> missing(String table, String column, Collection<String> ids) {
 		if (ids.isEmpty()) {
 			return List.of();
@@ -85,7 +81,6 @@ public class OutcomeRepository {
 				.param("unmet", unmetUnits).param("source", source).param("by", recordedBy).update();
 	}
 
-	/** Appends the delivery record and moves the purchase order to DELIVERED with the latest figures. */
 	public void recordDelivery(String poId, LocalDate deliveredOn, int deliveredQuantity, String source,
 			String recordedBy) {
 		jdbc.sql("""
@@ -109,7 +104,6 @@ public class OutcomeRepository {
 				.optional();
 	}
 
-	/** Forecast points, for one recommendation or (null) for every approved recommendation. */
 	public List<SnapshotRow> snapshots(String recommendationId) {
 		return jdbc.sql("""
 				SELECT recommendation_id, model_version, sku_id, region_id, week_start, horizon, point, lower_bound,
@@ -123,7 +117,6 @@ public class OutcomeRepository {
 				.list();
 	}
 
-	/** Latest recorded demand for the weeks a forecast snapshot covers. */
 	public List<DemandRow> demandForSnapshots(String recommendationId) {
 		return jdbc.sql("""
 				SELECT DISTINCT ON (d.sku_id, d.region_id, d.week_start) d.sku_id, d.region_id, d.week_start,
@@ -138,7 +131,6 @@ public class OutcomeRepository {
 				.list();
 	}
 
-	/** Purchase orders created from approved recommendations, with their latest recorded delivery. */
 	public List<DeliveryRow> deliveries(String recommendationId) {
 		return jdbc.sql("""
 				SELECT p.po_id, p.supplier_id, p.quantity, p.expected_delivery, d.delivered_on, d.delivered_quantity,
@@ -156,10 +148,6 @@ public class OutcomeRepository {
 				.list();
 	}
 
-	/**
-	 * Latest recorded stock per (SKU, warehouse, week): for one recommendation, the cells it ordered for from
-	 * its horizon start; otherwise every record.
-	 */
 	public List<InventoryRow> inventory(String recommendationId) {
 		return jdbc.sql("""
 				SELECT DISTINCT ON (i.sku_id, i.warehouse_id, i.week_start) i.sku_id, i.warehouse_id, i.week_start,

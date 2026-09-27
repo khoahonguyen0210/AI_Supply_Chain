@@ -1,12 +1,6 @@
-"""Smoke test against a running deployment (Docker Compose or kind), through the public frontend.
+"""Smoke test through the frontend of a running deployment.
 
-Signs in as the demo accounts and walks the planner workflow: question -> recommendation awaiting
-approval -> approvals by the roles the policy names -> approved; then one queued optimisation job.
-
-    SCM_SMOKE_URL=http://localhost:3000 SCM_SMOKE_PASSWORD=<demo password> \
-        uv run pytest tests/smoke -m smoke
-
-`scripts/stack.sh smoke` and `scripts/kind.sh smoke` fill both in from the generated secrets.
+SCM_SMOKE_URL=http://localhost:3000 SCM_SMOKE_PASSWORD=<pw> uv run pytest tests/smoke
 """
 
 from __future__ import annotations

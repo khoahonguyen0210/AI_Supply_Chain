@@ -12,7 +12,6 @@ import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
-/** The job handlers. Each one relays to the Python engine; none contains planning logic. */
 @Configuration(proxyBeanMethods = false)
 public class JobHandlers {
 
@@ -32,11 +31,6 @@ public class JobHandlers {
 		return handler(JobType.SCENARIO, job -> engine.runScenario(job.actor(), job.payload()));
 	}
 
-	/**
-	 * Runs a list of requests through the agent and summarises how each ended. A task the engine rejects is
-	 * recorded in the result rather than failing or retrying the batch, because every agent run is stored
-	 * and a retry would repeat the ones that already ran.
-	 */
 	@Bean
 	JobHandler batchEvaluationJobHandler(MlEngineClient engine, JsonMapper json) {
 		return handler(JobType.BATCH_EVALUATION, job -> {

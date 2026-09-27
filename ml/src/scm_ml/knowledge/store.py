@@ -1,11 +1,3 @@
-"""In-memory knowledge store and the ingestion pipeline: load -> parse -> chunk -> embed -> store.
-
-The store mirrors the `knowledge_document` / `knowledge_chunk` tables of the pgvector schema
-(content hash per document, chunks with embedding and metadata), so the same records can be written
-to PostgreSQL by the backend. Ingestion is idempotent: a document version whose content hash is
-unchanged is skipped; changed content replaces its chunks.
-"""
-
 from __future__ import annotations
 
 import hashlib

@@ -30,10 +30,6 @@ const sleep = (ms: number, signal?: AbortSignal) =>
     );
   });
 
-/**
- * Polls a job until it ends and returns its result. A failed job raises the job's own error code, so the
- * caller sees why it failed rather than a generic message.
- */
 export async function waitForJob<R>(jobId: string, options: PollOptions = {}): Promise<R> {
   const { signal, intervalMs = 1000, timeoutMs = 5 * 60_000, onUpdate } = options;
   const deadline = Date.now() + timeoutMs;
@@ -51,7 +47,6 @@ export async function waitForJob<R>(jobId: string, options: PollOptions = {}): P
   }
 }
 
-/** Submits a job and waits for its result. */
 export async function runJob<R>(
   type: JobType,
   payload: unknown,

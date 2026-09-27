@@ -11,11 +11,7 @@ export type JobRun<R> =
   | { phase: "done"; result: R }
   | { phase: "error"; message: string; code?: string };
 
-/**
- * Runs one long job at a time: submit, poll, expose progress and the result. A new run aborts the previous
- * poll and leaving the page stops polling. Each run gets a fresh idempotency key, so a transport retry of
- * the same submission cannot queue the work twice.
- */
+/** Each run gets a fresh idempotency key. */
 export function useJobRun<R>(): {
   state: JobRun<R>;
   run: (type: JobType, payload: unknown, idempotencyKey?: string) => Promise<R | undefined>;

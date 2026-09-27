@@ -1,9 +1,6 @@
-"""CLI: the README results figure, drawn as SVG from the saved experiment artifacts.
+"""CLI: draw the README results figure (SVG) from saved artifacts.
 
-    uv run python -m scm_ml.benchmark.figure [--experiments ml/experiments] [--out FILE]
-
-Like the report, every bar is read from a JSON artifact; a missing artifact leaves its panel out.
-The SVG carries light and dark colours (prefers-color-scheme), so it reads on either GitHub theme.
+uv run python -m scm_ml.benchmark.figure
 """
 
 from __future__ import annotations
@@ -67,7 +64,7 @@ def _forecast(art: Artifact, title: str) -> Panel:
     model = art["model"]["test"]["overall"]["mae"]
     return Panel(
         title,
-        f"test MAE, lower is better ({100 * (1 - model / ref):.1f}% lower)",
+        f"units off per week, lower is better ({100 * (1 - model / ref):.1f}% smaller error)",
         [
             Bar(
                 "13-week average" if baseline == "moving_average_13" else baseline,
@@ -75,19 +72,19 @@ def _forecast(art: Artifact, title: str) -> Panel:
                 False,
                 f"{ref:.1f}",
             ),
-            Bar("LightGBM", model, True, f"{model:.1f}"),
+            Bar("this app", model, True, f"{model:.1f}"),
         ],
     )
 
 
 def forecast_synthetic(root: Path) -> Panel | None:
     art = load(root, "forecast/synthetic.json")
-    return None if art is None else _forecast(art, "Demand forecast, synthetic")
+    return None if art is None else _forecast(art, "Forecast error, sample company")
 
 
 def forecast_real(root: Path) -> Panel | None:
     art = load(root, "forecast/real.json")
-    return None if art is None else _forecast(art, "Demand forecast, real retail data")
+    return None if art is None else _forecast(art, "Forecast error, real store data")
 
 
 def procurement(root: Path) -> Panel | None:
@@ -96,13 +93,13 @@ def procurement(root: Path) -> Panel | None:
         return None
     case = art["cases"]["base"]
     rows = (
-        ("cheapest supplier", "heuristic_cheapest", False),
-        ("weighted ranking", "heuristic_weighted", False),
-        ("MILP optimizer", "milp", True),
+        ("always cheapest", "heuristic_cheapest", False),
+        ("always top-ranked", "heuristic_weighted", False),
+        ("this app", "milp", True),
     )
     return Panel(
-        "Procurement plan cost",
-        "total cost incl. stockout penalty, lower is better",
+        "Cost of a 4-week purchase plan",
+        "lower is better",
         [
             Bar(label, case[key]["objective"], ours, f"{case[key]['objective'] / 1000:,.0f}k")
             for label, key, ours in rows
@@ -119,11 +116,11 @@ def outage(root: Path) -> Panel | None:
         return None
     held, reopt = scenario["disrupted"]["fill_rate"], scenario["response"]["fill_rate"]
     return Panel(
-        "Supplier outage response",
-        "fill rate, higher is better",
+        "A supplier stops delivering",
+        "share of demand covered, higher is better",
         [
-            Bar("hold the plan", held, False, f"{100 * held:.1f}%"),
-            Bar("re-optimize", reopt, True, f"{100 * reopt:.1f}%"),
+            Bar("keep the plan", held, False, f"{100 * held:.1f}%"),
+            Bar("re-plan", reopt, True, f"{100 * reopt:.1f}%"),
         ],
     )
 
@@ -135,11 +132,11 @@ def retrieval(root: Path) -> Panel | None:
         return None
     ref, ours = hashing["retrieval"]["hit@1"], dense["retrieval"]["hit@1"]
     return Panel(
-        "Policy and contract retrieval",
-        f"hit@1 on {dense['retrieval']['questions']} questions, higher is better",
+        "Finding the right document",
+        f"right document first, {dense['retrieval']['questions']} questions",
         [
-            Bar("hashing baseline", ref, False, f"{ref:.2f}"),
-            Bar("bge-small hybrid", ours, True, f"{ours:.2f}"),
+            Bar("keyword match", ref, False, f"{100 * ref:.0f}%"),
+            Bar("this app", ours, True, f"{100 * ours:.0f}%"),
         ],
     )
 
@@ -159,7 +156,7 @@ def scaling(root: Path) -> Panel | None:
         bars.append(
             Bar(f"{replicas} worker{'s' if replicas > 1 else ''}", median, True, f"{median:.1f}")
         )
-    return Panel("Job throughput on kind", "optimization jobs per minute, median of runs", bars)
+    return Panel("More workers, more jobs done", "plan-building jobs per minute", bars)
 
 
 PANELS: tuple[Callable[[Path], Panel | None], ...] = (
@@ -211,11 +208,11 @@ def render(root: Path) -> str:
         f'<rect class="surface" width="{WIDTH}" height="{height}" rx="8"/>',
         '<text class="title" x="16" y="28">Measured results</text>',
         '<rect class="ours" x="16" y="40" width="12" height="12" rx="2"/>',
-        '<text class="note" x="34" y="50">this platform</text>',
+        '<text class="note" x="34" y="50">this app</text>',
         '<rect class="reference" x="130" y="40" width="12" height="12" rx="2"/>',
-        '<text class="note" x="148" y="50">reference policy or baseline</text>',
+        '<text class="note" x="148" y="50">simple approach</text>',
         '<text class="note" x="944" y="50" text-anchor="end">'
-        "synthetic company unless noted; from ml/experiments</text>",
+        "sample company unless noted; from ml/experiments</text>",
     ]
     for i, panel in enumerate(panels):
         body += _panel_svg(panel, (i % COLUMNS) * PANEL_W, HEADER_H + (i // COLUMNS) * PANEL_H)

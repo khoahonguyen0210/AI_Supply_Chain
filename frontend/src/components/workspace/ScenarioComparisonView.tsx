@@ -1,4 +1,5 @@
 import { Notice, Stat } from "@/components/ui";
+import { scenarioLabel } from "@/lib/scenarios";
 import type { ScenarioComparison } from "@/lib/api/types";
 import {
   formatInt,
@@ -6,21 +7,17 @@ import {
   formatPercent,
   formatSignedMoney,
   formatSignedPercentPoints,
-  humanize,
 } from "@/lib/format";
 
-/**
- * Baseline, disrupted and re-optimized outcomes of one scenario. "Disrupted" is the baseline purchase plan
- * held fixed in the disrupted world; "response" is the plan re-optimized for it.
- */
+/** Current plan vs. the same plan under the disruption vs. a re-optimized plan. */
 export function ScenarioComparisonView({ comparison: c }: { comparison: ScenarioComparison }) {
   return (
     <div className="stack">
-      <h3>{humanize(c.scenarioType)}</h3>
+      <h3>{scenarioLabel(c.scenarioType)}</h3>
       <div>
         <h4 style={{ margin: "0 0 4px" }}>What changed</h4>
         {c.assumptionsChanged.length === 0 ? (
-          <p className="muted">No assumption changed; this scenario does not touch the plan&apos;s inputs.</p>
+          <p className="muted">This test doesn&apos;t change anything in the plan.</p>
         ) : (
           <ul>
             {c.assumptionsChanged.map((a) => (
@@ -30,34 +27,34 @@ export function ScenarioComparisonView({ comparison: c }: { comparison: Scenario
         )}
       </div>
       <dl className="stats">
-        <Stat label="Baseline cost" value={formatMoney(c.baselineObjective)} />
+        <Stat label="Cost of the current plan" value={formatMoney(c.baselineObjective)} />
         <Stat
-          label="Cost if nothing changes"
+          label="Cost if we keep the plan"
           value={formatSignedMoney(c.disruptedObjectiveDelta)}
           hint="baseline plan, disrupted world"
         />
         <Stat
-          label="Cost after re-planning"
+          label="Cost if we re-plan"
           value={formatSignedMoney(c.responseObjectiveDelta)}
           hint="plan re-optimized"
         />
-        <Stat label="Resilience cost" value={formatMoney(c.resilienceCost)} hint="what the disruption costs" />
-        <Stat label="Re-planning benefit" value={formatMoney(c.responseBenefit)} hint="saved by responding" />
+        <Stat label="Extra cost vs. the current plan" value={formatMoney(c.resilienceCost)} hint="what the disruption costs" />
+        <Stat label="Saved by re-planning" value={formatMoney(c.responseBenefit)} hint="saved by responding" />
       </dl>
       <dl className="stats">
         <Stat
-          label="Service if nothing changes"
+          label="Demand covered if we keep the plan"
           value={formatSignedPercentPoints(c.serviceDeltaDisrupted)}
         />
         <Stat
-          label="Service after re-planning"
+          label="Demand covered if we re-plan"
           value={formatSignedPercentPoints(c.serviceDeltaResponse)}
           hint={`${formatPercent(c.baselineCustomerFillRate)} → ${formatPercent(c.responseCustomerFillRate)} fill`}
         />
-        <Stat label="Purchase lines changed" value={formatInt(c.changedPurchaseLines)} />
+        <Stat label="Order lines changed" value={formatInt(c.changedPurchaseLines)} />
       </dl>
       {c.newlyBinding.length > 0 ? (
-        <Notice tone="warn">Constraints that become binding: {c.newlyBinding.join("; ")}.</Notice>
+        <Notice tone="warn">Limits now reached: {c.newlyBinding.join("; ")}.</Notice>
       ) : null}
       {c.supplierShifts.length > 0 ? (
         <div className="table-scroll">
@@ -68,8 +65,8 @@ export function ScenarioComparisonView({ comparison: c }: { comparison: Scenario
             <thead>
               <tr>
                 <th>Supplier</th>
-                <th className="num">Baseline units</th>
-                <th className="num">Response units</th>
+                <th className="num">Units now</th>
+                <th className="num">Units after re-planning</th>
               </tr>
             </thead>
             <tbody>

@@ -18,11 +18,11 @@ describe("TimeSeriesChart", () => {
       <TimeSeriesChart history={history} forecast={forecast} intervalLevel={0.8} />,
     );
     const chart = screen.getByRole("img");
-    expect(chart).toHaveAccessibleName(/from 2024-12-09, forecast to 2025-01-06 with 80% interval/);
+    expect(chart).toHaveAccessibleName(/from 2024-12-09, forecast to 2025-01-06, likely range 80%/);
     expect(container.querySelector(".chart-history")).not.toBeNull();
     expect(container.querySelector(".chart-forecast")).not.toBeNull();
     expect(container.querySelector(".chart-band")).not.toBeNull();
-    expect(screen.getByText("80% interval")).toBeInTheDocument();
+    expect(screen.getByText("Likely range (80%)")).toBeInTheDocument();
   });
 
   it("renders history alone without a band", () => {

@@ -12,10 +12,6 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 import tools.jackson.databind.JsonNode;
 
-/**
- * Durable copy of recommendations, approvals and decisions. The engine decides; this stores what it
- * returned. Decisions are append-only (database trigger).
- */
 @Repository
 public class ApprovalRepository {
 
@@ -49,7 +45,6 @@ public class ApprovalRepository {
 		this.json = json;
 	}
 
-	/** Stores the engine's recommendation (idempotent; a later call refreshes its status). */
 	public void upsertRecommendation(JsonNode rec) {
 		jdbc.sql("""
 				INSERT INTO recommendation (recommendation_id, created_at, summary, objective_value,
@@ -121,10 +116,7 @@ public class ApprovalRepository {
 				.param("approval", approvalId).param("role", approverRole).update();
 	}
 
-	/**
-	 * Creates the purchase orders of a fully approved recommendation, one per line, in status APPROVED
-	 * (placing them with suppliers happens outside this system). Idempotent.
-	 */
+	/** One APPROVED purchase order per line of a fully approved recommendation; idempotent. */
 	public int createPurchaseOrders(String approvalId, String recommendationId) {
 		return jdbc.sql("""
 				INSERT INTO purchase_order (po_id, supplier_id, sku_id, warehouse_id, quantity, unit_price, status,
@@ -211,7 +203,6 @@ public class ApprovalRepository {
 		return array == null ? List.of() : List.of((String[]) array.getArray());
 	}
 
-	/** A Postgres array literal ({a,b}) for a JSON array of strings. */
 	private static String pgArray(JsonNode values) {
 		List<String> quoted = new ArrayList<>();
 		for (JsonNode value : values) {
