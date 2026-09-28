@@ -18,7 +18,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.filter.OncePerRequestFilter;
 import tools.jackson.databind.json.JsonMapper;
 
-/** Per-user rate limit for all calls, plus a tighter one for heavy work. */
 public class RateLimitFilter extends OncePerRequestFilter {
 
 	private static final Set<String> HEAVY_POST_PATHS = Set.of("/api/jobs", "/api/agent/tasks",
@@ -39,7 +38,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {
 		String path = request.getRequestURI();
-		return !path.startsWith("/api/") || path.equals("/api/health") || path.equals("/api/auth/login");
+		return !path.startsWith("/api/") || path.equals("/api/health") || path.equals("/api/auth/login")
+				|| path.equals("/api/auth/register");
 	}
 
 	@Override

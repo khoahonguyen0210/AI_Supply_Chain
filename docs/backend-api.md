@@ -5,13 +5,15 @@ approval record. Every planning computation (forecast, supplier ranking, optimiz
 policy answers, agent runs, approval rules) is relayed to the Python engine
 (`docs/contracts/engine-api.md`); the Java side never recomputes them.
 
-Until token authentication lands (Phase 11) a caller is identified by `X-User-Id` and `X-User-Role`
-headers (`planner`, `procurement_manager`, `finance`, `admin`). A request without them is `401`.
+Callers sign in (`POST /api/auth/login`) or create a planner account (`POST /api/auth/register`) and send
+the returned token as `Authorization: Bearer <token>`; the role in it (`planner`, `procurement_manager`,
+`finance`, `admin`) decides what they may do ([security.md](security.md)). A request without it is `401`.
 Errors always use `{ timestamp, status, code, message, path, violations }`; an engine failure keeps
 the engine's status and code.
 
 | Area | Endpoints |
 | --- | --- |
+| Auth | `POST /api/auth/login`, `POST /api/auth/register`, `GET /api/auth/me` |
 | Forecasts | `POST /api/forecasts` (synchronous), or a `FORECAST` job |
 | Data | `GET /api/skus`, `GET /api/demand?skuId&regionId&weeks`, `GET /api/inventory?skuId` |
 | Suppliers | `GET /api/suppliers?regionId&certification&minReliability`, `GET /api/suppliers/{id}` (contracts, offers), `GET /api/suppliers/{id}/performance`, `POST /api/suppliers/search` (ranking; planning roles) |

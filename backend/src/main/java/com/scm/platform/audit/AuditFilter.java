@@ -14,7 +14,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerMapping;
 
-/** Audits every change and every refused request (successful reads are not recorded). */
+/** Audits every change and every refused request; successful reads are not recorded. */
 public class AuditFilter extends OncePerRequestFilter {
 
 	private static final Set<String> READS = Set.of("GET", "HEAD", "OPTIONS");
@@ -31,7 +31,8 @@ public class AuditFilter extends OncePerRequestFilter {
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {
 		String path = request.getRequestURI();
-		return !path.startsWith("/api/") || path.equals("/api/auth/login") || path.equals("/api/health");
+		return !path.startsWith("/api/") || path.equals("/api/auth/login")
+				|| path.equals("/api/auth/register") || path.equals("/api/health");
 	}
 
 	@Override

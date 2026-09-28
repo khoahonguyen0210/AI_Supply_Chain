@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { getMe, login } from "./api/auth";
+import { getMe, login, register } from "./api/auth";
 import type { Profile } from "./api/auth";
 import { setAccessToken, setUnauthorizedHandler } from "./api/client";
 
@@ -14,11 +14,11 @@ interface Stored {
 }
 
 interface AuthValue {
-  /** The signed-in user, or null when nobody is. */
   user: Profile | null;
-  /** False until a stored session has been checked with the backend, so nothing fetches too early. */
+  /** False until a stored session is checked, so nothing fetches too early. */
   ready: boolean;
   signIn: (userId: string, password: string) => Promise<void>;
+  signUp: (userId: string, displayName: string, password: string) => Promise<void>;
   signOut: () => void;
 }
 
@@ -44,7 +44,7 @@ function writeStored(value: Stored | null): void {
   }
 }
 
-/** Signed-in user; the token lives in sessionStorage, so it ends with the tab. */
+/** The token lives in sessionStorage, so it ends with the tab. */
 export function SessionProvider({
   children,
   initialUser,
@@ -91,18 +91,26 @@ export function SessionProvider({
     setUser(response.user);
   }, []);
 
-  const value = useMemo(() => ({ user, ready, signIn, signOut }), [user, ready, signIn, signOut]);
+  const signUp = useCallback(async (userId: string, displayName: string, password: string) => {
+    const response = await register(userId.trim(), displayName.trim(), password);
+    setAccessToken(response.accessToken);
+    writeStored({ token: response.accessToken, expiresAt: response.expiresAt });
+    setUser(response.user);
+  }, []);
+
+  const value = useMemo(
+    () => ({ user, ready, signIn, signUp, signOut }),
+    [user, ready, signIn, signUp, signOut],
+  );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-/** The sign-in state, for the shell and the login page. */
 export function useAuth(): AuthValue {
   const value = useContext(AuthContext);
   if (!value) throw new Error("useAuth must be used inside SessionProvider");
   return value;
 }
 
-/** The signed-in user, for pages. They are only rendered once someone is signed in. */
 export function useSession(): { user: Profile; ready: true } {
   const { user } = useAuth();
   if (!user) throw new Error("useSession needs a signed-in user");

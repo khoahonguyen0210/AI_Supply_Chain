@@ -44,36 +44,27 @@ answers questions about company policies and supplier contracts, quoting the exa
 
 <div align="center">
 
-![Measured results](docs/images/results.svg)
+![What the app achieved](docs/images/results.svg)
 
 </div>
 
-The planning results come from a made-up sample company (fixed random seed, planning date 2024-12-30). The
-forecast was also tested on real sales data from an online store. Every number below comes from a saved result
-file in `ml/experiments/`; the full tables are in [`docs/benchmarks.md`](docs/benchmarks.md).
+In plain words, compared with the simple way most teams plan today:
 
-| What was measured | Simple approach | This app |
-|---|---|---|
-| Forecast error, sample company (units off per week, on average) | 33.9 with a 13-week average | **30.2**, 11.1% smaller |
-| Forecast error, real store data | 58.2 with a 13-week average | **56.9**, 2.1% smaller |
-| Cost of a 4-week purchase plan (40 products, 3 warehouses) | 348,675 if you always pick the cheapest supplier; 357,384 if you always pick the top-ranked one | **302,532**, 13% and 15% cheaper, with no limit broken |
-| Same plan with a 15% smaller budget | both simple rules go over budget | **stays within budget** and still covers all demand |
-| A supplier stops delivering | keep the plan: 94.1% of demand covered, cost 412,045 | **re-plan**: 100% covered, cost 306,750 |
+- **Better forecasts.** The app's sales forecasts are 11% more accurate than a simple 13-week average. On real
+  data from an online store the gain is smaller: 2%.
+- **Cheaper plans.** Its purchase plans cost 13% less than always buying from the cheapest supplier, without
+  breaking any limit (order sizes, supplier capacity, warehouse space). When the budget is cut by 15%, it still
+  stays within budget; the simple rules go over.
+- **Ready for problems.** If a supplier suddenly stops delivering, re-planning still covers 100% of demand,
+  compared with 94% if you keep the old plan.
+- **Right answers from documents.** For questions about policies and contracts, the right document comes up first
+  94% of the time, every answer shows its source, and people never see documents they aren't allowed to read.
+- **Safe by design.** In all 40 test cases, the assistant never placed an order without approval.
+- **Fast.** Most pages load in about 10-60 ms, and a full assistant answer takes under 1 second.
 
-| Other results | |
-|---|---|
-| Finding the right policy or contract (56 test questions) | the right document comes first for **94%** of the 34 questions that have an answer; every answer cites its source; restricted documents are **never** shown to the wrong role |
-| Assistant safety (40 test cases) | it **never** orders without approval and **always** respects permissions |
-| Assistant on new, unseen tasks | solves all **31** practice tasks but only **2 of 9** new ones, so it does not generalize well yet |
-| Forecast ranges | actual sales fall inside the "likely range" **88%** of the time on the sample company (the range is a bit too wide) and **78%** on real data (target: 80%) |
-| Retraining with new data | the new model was slightly worse (31.28 vs 31.18 units off), so it was **not** used |
-| Speed (local Docker) | lists and lookups **11-14 ms**, a forecast **59 ms**, a policy question **100 ms**, a full assistant answer **under 1 second** |
-| More workers for big jobs | **32 → 79 → 100** jobs per minute with 1, 2 and 4 workers |
-
-How each number was produced: [`docs/forecasting.md`](docs/forecasting.md), [`docs/optimization.md`](docs/optimization.md),
-[`docs/scenarios.md`](docs/scenarios.md), [`docs/rag-evaluation.md`](docs/rag-evaluation.md),
-[`docs/agent-evaluation.md`](docs/agent-evaluation.md), [`docs/kubernetes.md`](docs/kubernetes.md). Weak results are listed
-under [Limitations](#limitations).
+All results were measured on a made-up sample company, and every number comes from a saved result file in
+`ml/experiments/`. What still doesn't work well is listed under [Limitations](#limitations). The detailed tables
+are in [`docs/benchmarks.md`](docs/benchmarks.md).
 
 ## How it works
 
@@ -175,8 +166,8 @@ bash scripts/stack.sh up
 
 It prints the address and a password at the end. The password is also saved in `.env` as `SCM_DEMO_PASSWORD`.
 
-**2. Open http://localhost:3000 and sign in.** There is no sign-up page. Four demo accounts are created for you,
-all with that same password:
+**2. Open http://localhost:3000.** Click **Create an account** to make your own (it can plan and use the assistant),
+or sign in with one of the four demo accounts, which all use that password:
 
 | User id | What they can do |
 |---|---|
@@ -259,6 +250,7 @@ Re-run from a fresh copy of the repository, it reproduced every saved result; on
 | Method | Endpoint | What it does |
 |---|---|---|
 | POST | `/api/auth/login` | Sign in, returns a token |
+| POST | `/api/auth/register` | Create a planner account and sign in |
 | POST | `/api/agent/tasks` | Ask the assistant |
 | POST | `/api/forecasts` | Forecast demand with a likely range |
 | POST | `/api/suppliers/search` | List suppliers that can deliver, best first |
@@ -283,6 +275,7 @@ default in `.env.example` and `application.yml`.
 | `SCM_JWT_SECRET` | Key used to sign sign-in tokens (at least 32 characters, no default) |
 | `SCM_ML_INTERNAL_TOKEN` | Shared password between the backend and the planning engine |
 | `SCM_DEMO_PASSWORD` | Password of the four demo accounts |
+| `SCM_SECURITY_ALLOWSIGNUP` | `false` turns off "Create an account" (default `true`) |
 | `POSTGRES_HOST`, `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | Database connection |
 | `SCM_ML_PLANNER` | `rule` (default, works offline) or `claude` |
 | `ANTHROPIC_API_KEY` | Only needed for `SCM_ML_PLANNER=claude` |
@@ -312,7 +305,7 @@ each AWS piece is listed in [`docs/cloud.md`](docs/cloud.md).
 
 ## Security
 
-You sign in with a password and get a token that lasts 8 hours by default. Every request checks your role
+You sign in with a password and get a token that lasts 8 hours by default. Anyone can create an account, but new accounts only get the planner role; approval roles are given by an admin. Every request checks your role
 (planner, procurement manager, finance or admin). Requests are rate-limited, every change and every refused
 request is written to an audit log that can't be edited, and the planning engine only accepts requests from the
 backend. The ports are only open on your own machine. The demo accounts are for local use. Details:
@@ -331,6 +324,8 @@ backend. The ports are only open on your own machine. The demo accounts are for 
 - The planning engine keeps assistant state in one SQLite file, so it runs as a single copy; only the background
   workers scale.
 - The CI pipeline has not run on GitHub yet, and the Terraform has not been deployed.
+- The forecast's "likely range" is a bit too wide on the sample company (real sales fall inside it 88% of the time
+  instead of 80%), and a retrained model on new data was slightly worse, so it was not used.
 
 ## Glossary
 

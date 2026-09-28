@@ -58,6 +58,8 @@ def test_figure_is_drawn_from_the_artifacts(tmp_path: Path) -> None:
 
     svg = draw(EXPERIMENTS)
     forecast = json.loads((EXPERIMENTS / "forecast/synthetic.json").read_text(encoding="utf-8"))
-    assert f"{forecast['model']['test']['overall']['mae']:.1f}" in svg
-    assert svg.count('class="title"') == 7  # the header and six panels
-    assert draw(tmp_path).count('class="title"') == 1  # no artifacts, no panels
+    ref = forecast["baselines"][forecast["selected_baseline"]]["test"]["overall"]["mae"]
+    mae = forecast["model"]["test"]["overall"]["mae"]
+    assert f"{100 * (1 - mae / ref):.0f}%" in svg
+    assert svg.count('class="tile"') == 4
+    assert draw(tmp_path).count('class="tile"') == 0  # no artifacts, no tiles

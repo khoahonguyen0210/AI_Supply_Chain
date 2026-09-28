@@ -39,7 +39,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import tools.jackson.databind.json.JsonMapper;
 
-/** Every /api call except health and login needs a valid bearer token; no sessions. */
+/** Every /api call except health and login needs a bearer token; no sessions. */
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
 public class SecurityConfig {
@@ -76,7 +76,7 @@ public class SecurityConfig {
 		return decoder;
 	}
 
-	/** Actuator lives on the management port only, so nothing is exposed on the API port. */
+	/** Actuator lives on the management port only, never on the API port. */
 	@Bean
 	@Order(1)
 	SecurityFilterChain managementChain(HttpSecurity http) {
@@ -101,7 +101,7 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable()) // no cookies or sessions: bearer tokens are not sent by the browser on their own
 				.sessionManagement(sessions -> sessions.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(requests -> requests
-						.requestMatchers("/api/health", "/api/auth/login").permitAll()
+						.requestMatchers("/api/health", "/api/auth/login", "/api/auth/register").permitAll()
 						.requestMatchers("/api/ops/**").hasRole("admin")
 						.requestMatchers("/api/**").authenticated()
 						.anyRequest().denyAll())

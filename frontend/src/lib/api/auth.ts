@@ -16,4 +16,7 @@ export interface LoginResponse {
 export const login = (userId: string, password: string) =>
   apiPost<LoginResponse>("/api/auth/login", { userId, password });
 
+export const register = (userId: string, displayName: string, password: string) =>
+  apiPost<LoginResponse>("/api/auth/register", { userId, displayName, password });
+
 export const getMe = (signal?: AbortSignal) => apiGet<Profile>("/api/auth/me", signal);

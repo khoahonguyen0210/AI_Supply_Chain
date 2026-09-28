@@ -16,6 +16,23 @@ export function loginMessage(error: unknown): string {
   return "Sign-in failed. Try again.";
 }
 
+/** What to tell someone whose new account could not be created. */
+export function signUpMessage(error: unknown): string {
+  if (error instanceof ApiError) {
+    if (error.code === "USER_ID_TAKEN") return "That user id is already taken. Pick another one.";
+    if (error.code === "VALIDATION_FAILED") {
+      const fields = new Set(error.body?.violations.map((v) => v.field) ?? []);
+      if (fields.has("password")) return "Use a password of at least 12 characters.";
+      if (fields.has("userId")) return "Use 3 to 64 letters, digits, dots, dashes or underscores for the user id.";
+      return "Fill in your name, a user id and a password.";
+    }
+    if (error.code === "SIGN_UP_DISABLED") return "Sign-up is turned off. Ask an administrator for an account.";
+    if (error.code === "RATE_LIMITED") return error.message;
+    if (error.code === "NETWORK_ERROR") return "The server cannot be reached. Try again in a moment.";
+  }
+  return "The account could not be created. Try again.";
+}
+
 const STEPS: { title: string; text: string }[] = [
   {
     title: "Ask a question",
@@ -59,25 +76,37 @@ const FEATURES: { title: string; text: string; icon: string }[] = [
 ];
 
 export function LoginForm() {
-  const { signIn } = useAuth();
+  const { signIn, signUp } = useAuth();
+  const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
+  const [displayName, setDisplayName] = useState("");
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const signingUp = mode === "sign-up";
+
+  function switchMode(next: "sign-in" | "sign-up") {
+    setMode(next);
+    setError(null);
+    setPassword("");
+  }
 
   async function submit(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
     setError(null);
     try {
-      await signIn(userId, password);
+      if (signingUp) await signUp(userId, displayName, password);
+      else await signIn(userId, password);
     } catch (failure) {
-      setError(loginMessage(failure));
+      setError(signingUp ? signUpMessage(failure) : loginMessage(failure));
       setPassword("");
     } finally {
       setBusy(false);
     }
   }
+
+  const ready = Boolean(userId && password && (!signingUp || displayName.trim()));
 
   return (
     <div className="landing">
@@ -92,8 +121,19 @@ export function LoginForm() {
           </p>
 
           <section id="sign-in" className="login-card" aria-labelledby="login-heading">
-            <h2 id="login-heading">Sign in</h2>
+            <h2 id="login-heading">{signingUp ? "Create an account" : "Sign in"}</h2>
             <form className="login-form" onSubmit={submit}>
+              {signingUp ? (
+                <label className="field field-wide">
+                  <span>Your name</span>
+                  <input
+                    value={displayName}
+                    autoComplete="name"
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    required
+                  />
+                </label>
+              ) : null}
               <label className="field">
                 <span>User id</span>
                 <input
@@ -108,14 +148,21 @@ export function LoginForm() {
                 <input
                   type="password"
                   value={password}
-                  autoComplete="current-password"
+                  autoComplete={signingUp ? "new-password" : "current-password"}
+                  minLength={signingUp ? 12 : undefined}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </label>
+              {signingUp ? (
+                <p className="field-hint">
+                  At least 12 characters. New accounts can plan and ask the assistant; approving orders needs a role
+                  from an administrator.
+                </p>
+              ) : null}
               <div className="login-actions">
-                <button type="submit" className="primary" disabled={busy || !userId || !password}>
-                  {busy ? "Signing in…" : "Sign in"}
+                <button type="submit" className="primary" disabled={busy || !ready}>
+                  {signingUp ? (busy ? "Creating…" : "Create account") : busy ? "Signing in…" : "Sign in"}
                   <span className="arrow" aria-hidden="true">
                     →
                   </span>
@@ -126,6 +173,16 @@ export function LoginForm() {
               </div>
               {error ? <Notice tone="bad">{error}</Notice> : null}
             </form>
+            <p className="switch-mode">
+              {signingUp ? "Already have an account? " : "New here? "}
+              <button
+                type="button"
+                className="link-button"
+                onClick={() => switchMode(signingUp ? "sign-in" : "sign-up")}
+              >
+                {signingUp ? "Sign in instead" : "Create an account"}
+              </button>
+            </p>
           </section>
         </div>
 

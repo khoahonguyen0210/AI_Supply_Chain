@@ -151,3 +151,37 @@ describe("AppShell sign-in", () => {
     expect(window.sessionStorage.getItem("scm.session")).toBeNull();
   });
 });
+
+describe("AppShell sign-up", () => {
+  it("creates an account and signs the new planner in", async () => {
+    let sent: unknown = null;
+    stubBackend({
+      "/api/auth/register": (_url: string, init: RequestInit) => {
+        sent = JSON.parse(String(init.body));
+        return { ...LOGIN, user: { userId: "sam", displayName: "Sam", role: "planner" } };
+      },
+    });
+    shell();
+    await userEvent.click(await screen.findByRole("button", { name: "Create an account" }));
+    expect(screen.getByRole("heading", { name: "Create an account" })).toBeInTheDocument();
+    await userEvent.type(screen.getByLabelText("Your name"), "Sam");
+    await userEvent.type(screen.getByLabelText("User id"), "sam");
+    await userEvent.type(screen.getByLabelText("Password"), "a-long-new-password");
+    await userEvent.click(screen.getByRole("button", { name: "Create account" }));
+    expect(await screen.findByText("secret planning page")).toBeInTheDocument();
+    expect(sent).toEqual({ userId: "sam", displayName: "Sam", password: "a-long-new-password" });
+  });
+
+  it("explains a taken user id", async () => {
+    stubBackend({
+      "/api/auth/register": () => errorResponse(409, "USER_ID_TAKEN", "that user id is already taken"),
+    });
+    shell();
+    await userEvent.click(await screen.findByRole("button", { name: "Create an account" }));
+    await userEvent.type(screen.getByLabelText("Your name"), "Pat Two");
+    await userEvent.type(screen.getByLabelText("User id"), "pat");
+    await userEvent.type(screen.getByLabelText("Password"), "a-long-new-password");
+    await userEvent.click(screen.getByRole("button", { name: "Create account" }));
+    expect(await screen.findByText("That user id is already taken. Pick another one.")).toBeInTheDocument();
+  });
+});

@@ -6,11 +6,11 @@ import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
-/** Security settings (scm.security); the JWT secret has no default and must be 32+ bytes. */
+/** The JWT secret has no default and must be 32+ bytes. */
 @ConfigurationProperties(prefix = "scm.security")
 public record SecurityProperties(String jwtSecret, @DefaultValue("8h") Duration tokenTtl,
 		@DefaultValue List<BootstrapUser> bootstrapUsers, @DefaultValue RateLimits rateLimit,
-		@DefaultValue("false") boolean trustForwardedFor) {
+		@DefaultValue("false") boolean trustForwardedFor, @DefaultValue("true") boolean allowSignUp) {
 
 	public static final int MIN_SECRET_BYTES = 32;
 
@@ -26,17 +26,17 @@ public record SecurityProperties(String jwtSecret, @DefaultValue("8h") Duration 
 		}
 	}
 
-	/** Properties with the default rate limits, for code that builds them by hand. */
 	public static SecurityProperties of(String jwtSecret, Duration tokenTtl, List<BootstrapUser> bootstrapUsers) {
-		return new SecurityProperties(jwtSecret, tokenTtl, bootstrapUsers, new RateLimits(10, 5, 300, 30), false);
+		return new SecurityProperties(jwtSecret, tokenTtl, bootstrapUsers, new RateLimits(10, 5, 300, 30, 5), false,
+				true);
 	}
 
-	/** Requests allowed per minute (login per IP and per user, API, heavy work). */
 	public record RateLimits(@DefaultValue("10") int loginPerIp, @DefaultValue("5") int loginPerUser,
-			@DefaultValue("300") int apiPerUser, @DefaultValue("30") int expensivePerUser) {
+			@DefaultValue("300") int apiPerUser, @DefaultValue("30") int expensivePerUser,
+			@DefaultValue("5") int signUpPerIp) {
 
 		public RateLimits {
-			if (loginPerIp < 1 || loginPerUser < 1 || apiPerUser < 1 || expensivePerUser < 1) {
+			if (loginPerIp < 1 || loginPerUser < 1 || apiPerUser < 1 || expensivePerUser < 1 || signUpPerIp < 1) {
 				throw new IllegalStateException("rate limits must be at least 1 per minute");
 			}
 		}

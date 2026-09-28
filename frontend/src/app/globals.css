@@ -1383,3 +1383,22 @@ details > summary:hover {
     transform: none;
   }
 }
+
+/* ---- sign-up --------------------------------------------------------------------------------- */
+
+.field-wide,
+.field-hint {
+  grid-column: 1 / -1;
+}
+
+.field-hint {
+  margin: -2px 0 0;
+  color: var(--faint);
+  font-size: 0.8rem;
+}
+
+.switch-mode {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}

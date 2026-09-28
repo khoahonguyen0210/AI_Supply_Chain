@@ -18,8 +18,13 @@ browser --(bearer token)--> Spring backend --(shared secret + actor)--> Python p
 
 * `POST /api/auth/login` (user id + password) returns a signed HS256 JWT (`sub` = user id, `role`,
   issuer `scm-backend`, expiry `scm.security.token-ttl`, 8 h by default). Everything under `/api`
-  except `/api/health` and `/api/auth/login` needs `Authorization: Bearer <token>`; sessions and
-  cookies are not used (so there is no CSRF surface).
+  except `/api/health`, `/api/auth/login` and `/api/auth/register` needs `Authorization: Bearer <token>`;
+  sessions and cookies are not used (so there is no CSRF surface).
+* `POST /api/auth/register` (user id, display name, password of 12+ characters) creates an account and
+  signs it in. Self sign-up always gives the `planner` role; approval roles only come from an admin
+  (bootstrap users). A user id that already exists in any letter case is refused (`409 USER_ID_TAKEN`),
+  sign-ups are limited per client address (`rate-limit.sign-up-per-ip`, 5 per minute), every attempt is
+  audited (`SIGN_UP`), and `scm.security.allow-sign-up=false` turns it off (`403 SIGN_UP_DISABLED`).
 * Passwords are stored as BCrypt hashes. A wrong password, an unknown user and a deactivated account
   produce the identical response, and an unknown user costs the same time to reject as a wrong
   password.
