@@ -1,4 +1,4 @@
-"""Builds final answers only from tool results, so every number is grounded."""
+"""Final answers are built only from tool results, so every number is grounded."""
 
 from __future__ import annotations
 
@@ -9,8 +9,6 @@ from .models import TraceStep
 
 
 class Observations:
-    """Read access to what the tools returned during one task."""
-
     def __init__(self, steps: list[TraceStep]) -> None:
         self.steps = steps
 
@@ -142,12 +140,16 @@ def plan_text(obs: Observations) -> str:
     return text
 
 
+def _change(delta: float) -> str:
+    return f"{n(abs(delta))} {'less' if delta < 0 else 'more'}"
+
+
 def scenario_text(result: dict[str, Any]) -> str:
     params = ", ".join(f"{k}={v}" for k, v in result["parameters"].items())
     base = (
         f"{result['scenario_type']} ({params})"
-        f": holding the plan costs {n(result['disrupted_objective_delta'])} more; re-optimizing "
-        f"costs {n(result['response_objective_delta'])} more (resilience cost "
+        f": holding the plan costs {_change(result['disrupted_objective_delta'])}; re-optimizing "
+        f"costs {_change(result['response_objective_delta'])} (resilience cost "
         f"{n(result['resilience_cost'])}) and saves {n(result['response_benefit'])} versus holding "
         f"the plan; customer fill rate after response {pct(result['response_customer_fill_rate'])}."
     )

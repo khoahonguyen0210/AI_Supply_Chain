@@ -1,8 +1,3 @@
-"""CLI: write docs/benchmarks.md from saved artifacts (missing ones show NOT YET MEASURED).
-
-uv run python -m scm_ml.benchmark.report
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -296,12 +291,39 @@ AGENT_DIMENSIONS = (
 )
 
 
+FIRST_RUNS = (
+    ("holdout-v2", "agent/synthetic-rule-planner-v2-first-run.json"),
+    ("holdout-v3", "agent/synthetic-rule-planner-v3-first-run.json"),
+    ("holdout-v4", "agent/synthetic-rule-planner-v4-first-run.json"),
+)
+
+
 def agent_section(root: Path) -> list[str]:
     relative = "agent/synthetic-rule-planner.json"
     art = load(root, relative)
     out = ["## Agent: workflow and tool use", ""]
     if art is None:
         return out + missing(relative)
+
+    # each unseen set is scored once, before anything is changed because of it
+    first = [
+        [
+            f"`{split}`",
+            num(run["by_split"][split]["workflow_success"]),
+            num(run["by_split"][split]["cases"]),
+        ]
+        for split, path in FIRST_RUNS
+        if (run := load(root, path)) is not None and split in run["by_split"]
+    ]
+    if first:
+        out += table(["Unseen set, first and only scoring", "Workflow success", "Cases"], first)
+        out += [
+            "",
+            "Each unseen set was committed before the planner changes it measures and scored once;"
+            " after that it counts as seen. Planner changes between sets are in the git history.",
+            "",
+        ]
+
     rows = [["workflow success (all cases)", num(art["workflow_success"]), num(art["cases"])]]
     for split, result in art["by_split"].items():
         rows.append(
@@ -311,13 +333,13 @@ def agent_section(root: Path) -> list[str]:
         d = art["dimensions"].get(dim)
         if d is not None:
             rows.append([dim.replace("_", " "), num(d["pass_rate"]), num(d["applicable"])])
-    out += table(["Metric", "Pass rate", "Cases"], rows)
+    out += table(["Metric (current planner, all cases)", "Pass rate", "Cases"], rows)
     out += [
         "",
-        f"Planner: `{art['planner']}` (deterministic, offline). The hold-out cases were "
-        "written after "
-        "the planner and were not used to tune it, so the hold-out score is the honest one. "
-        f"Claude planner: {art.get('llm_planner_metrics', NOT_MEASURED)}.",
+        f"Planner: `{art['planner']}` (keyword rules plus embedding-based intent matching, offline,"
+        " deterministic). The current scores include cases that were used to improve the planner,"
+        " so the first-run scores above are the honest measure of unseen requests."
+        f" Claude planner: {art.get('llm_planner_metrics', NOT_MEASURED)}.",
         source(relative, art),
         "",
     ]

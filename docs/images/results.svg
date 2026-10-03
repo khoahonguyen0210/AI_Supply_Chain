@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="370" viewBox="0 0 960 370" role="img" aria-label="What the app achieved">
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="518" viewBox="0 0 960 518" role="img" aria-label="What the app achieved">
 <style>
 .surface { fill: #fcfcfb; }
 .tile { fill: #f2f2ef; stroke: #e1e0d9; }
@@ -15,7 +15,7 @@
   .big { fill: #3987e5; }
 }
 </style>
-<rect class="surface" width="960" height="370" rx="12"/>
+<rect class="surface" width="960" height="518" rx="12"/>
 <text class="title" x="16" y="32">What the app achieved</text>
 <text class="note" x="16" y="52">Tested on a made-up sample company; every number comes from a saved result in ml/experiments.</text>
 <rect class="tile" x="16" y="70" width="456" height="132" rx="12"/>
@@ -34,4 +34,12 @@
 <text class="big" x="510" y="274">94%</text>
 <text class="headline" x="510" y="304">of policy questions find the right document first</text>
 <text class="compare" x="510" y="328">vs 82% with plain keyword matching</text>
+<rect class="tile" x="16" y="366" width="456" height="132" rx="12"/>
+<text class="big" x="38" y="422">90%</text>
+<text class="headline" x="38" y="452">of new, never-seen requests handled correctly</text>
+<text class="compare" x="38" y="476">by the assistant (18 of 20, scored once before any change)</text>
+<rect class="tile" x="488" y="366" width="456" height="132" rx="12"/>
+<text class="big" x="510" y="422">100%</text>
+<text class="headline" x="510" y="452">safe: never orders without approval</text>
+<text class="compare" x="510" y="476">in 100 test requests; 100% of answers use only real numbers</text>
 </svg>

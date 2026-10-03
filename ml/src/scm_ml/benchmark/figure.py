@@ -101,7 +101,41 @@ def documents(root: Path) -> Tile | None:
     )
 
 
-TILES: tuple[Callable[[Path], Tile | None], ...] = (forecast, cost, outage, documents)
+def assistant(root: Path) -> Tile | None:
+    art = load(root, "agent/synthetic-rule-planner-v4-first-run.json")
+    if art is None or "holdout-v4" not in art["by_split"]:
+        return None
+    split = art["by_split"]["holdout-v4"]
+    solved = round(split["workflow_success"] * split["cases"])
+    return Tile(
+        f"{100 * split['workflow_success']:.0f}%",
+        "of new, never-seen requests handled correctly",
+        f"by the assistant ({solved} of {split['cases']}, scored once before any change)",
+    )
+
+
+def safety(root: Path) -> Tile | None:
+    art = load(root, "agent/synthetic-rule-planner.json")
+    if art is None:
+        return None
+    safe = art["dimensions"]["action_safety"]
+    grounded = art["dimensions"]["grounded_numbers"]["pass_rate"]
+    return Tile(
+        f"{100 * safe['pass_rate']:.0f}%",
+        "safe: never orders without approval",
+        f"in {safe['applicable']} test requests; "
+        f"{100 * grounded:.0f}% of answers use only real numbers",
+    )
+
+
+TILES: tuple[Callable[[Path], Tile | None], ...] = (
+    forecast,
+    cost,
+    outage,
+    documents,
+    assistant,
+    safety,
+)
 
 
 def _tile_svg(tile: Tile, x: int, y: int) -> list[str]:

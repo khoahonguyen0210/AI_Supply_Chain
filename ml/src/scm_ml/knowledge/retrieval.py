@@ -1,5 +1,3 @@
-"""Hybrid retrieval (vector + lexical) with role filtering and validity-aware reranking."""
-
 from __future__ import annotations
 
 import math
@@ -71,6 +69,17 @@ _QUESTION_WORDS = frozenset(
         "would",
         "you",
         "your",
+        # request filler ("show me", "tell me", "please give me")
+        "show",
+        "tell",
+        "give",
+        "me",
+        "please",
+        "know",
+        "like",
+        "want",
+        "need",
+        "let",
     ]
 )
 _IRREGULAR = {"paid": "pay", "pays": "pay", "paying": "pay"}
@@ -81,8 +90,7 @@ SUPPLIER_MATCH_BONUS = 0.35
 GENERIC_DOCUMENT_PENALTY = 0.15
 TOP_K = 5
 RESTRICTED_PROBE_K = 5
-# Calibrated on the fixed evaluation set: answerable questions score >= 0.6 on their best chunk and
-# questions the corpus cannot answer score <= 0.5 (docs/knowledge-retrieval.md).
+# Calibrated: answerable questions score >= 0.6, unanswerable ones <= 0.5.
 MIN_COVERAGE = 0.55
 
 
@@ -125,7 +133,7 @@ def tokenize(text: str) -> list[str]:
 
 
 def stem(token: str) -> str:
-    """Crude suffix stripping so "quarterly"/"quarter" and "pays"/"paid" meet; not a stemmer."""
+    """Crude suffix stripping so "quarterly" and "quarter" meet; not a stemmer."""
     if token in _IRREGULAR:
         return _IRREGULAR[token]
     for suffix in ("ly", "ing", "ed", "es", "s"):
@@ -135,13 +143,16 @@ def stem(token: str) -> str:
     return token[:-1] if len(token) > 4 and token.endswith("e") else token
 
 
+_GENERIC = frozenset(["term", "detail", "information", "info", "condition"])
+
+
 def informative_terms(text: str) -> frozenset[str]:
-    """Stemmed content words, without stopwords, question filler and one-letter tokens."""
-    return frozenset(stem(t) for t in tokenize(text) if t not in _QUESTION_WORDS and len(t) > 1)
+    terms = frozenset(stem(t) for t in tokenize(text) if t not in _QUESTION_WORDS and len(t) > 1)
+    specific = terms - _GENERIC
+    return specific if specific else terms
 
 
 def term_coverage(topic_terms: frozenset[str], chunk_terms: frozenset[str]) -> float:
-    """Share of the question's content terms found in the chunk (1.0 for an empty question)."""
     if not topic_terms:
         return 1.0
     return len(topic_terms & chunk_terms) / len(topic_terms)
@@ -191,6 +202,10 @@ class Retriever:
         self._supplier_names = self._names_by_supplier()
 
     @property
+    def embedder(self) -> Embedder:
+        return self._embedder
+
+    @property
     def store(self) -> KnowledgeStore:
         return self._store
 
@@ -208,11 +223,10 @@ class Retriever:
         return frozenset(found)
 
     def topic_of(self, query: str) -> str:
-        """The query text that is scored, without supplier mentions."""
         return self.topic(query, self.mentioned_suppliers(query))
 
     def topic(self, query: str, suppliers: frozenset[str]) -> str:
-        """The query without supplier mentions: suppliers are matched on metadata, not text."""
+        """Suppliers are matched on metadata, not text, so their mentions are removed."""
         topic = _SUPPLIER_ID.sub(" ", query)
         for supplier_id in suppliers:
             name = self._supplier_names.get(supplier_id)

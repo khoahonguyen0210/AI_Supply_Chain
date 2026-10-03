@@ -150,10 +150,10 @@ def test_invalid_horizon_triggers_a_replan_that_is_disclosed(harness: Harness) -
     assert "maximum of 8 weeks" in run.answer and run.status == TaskStatus.COMPLETED
 
 
-def test_unauthorized_tool_is_denied_and_the_answer_says_so(harness: Harness) -> None:
+def test_a_role_that_may_not_order_gets_analysis_but_no_order(harness: Harness) -> None:
     run = harness.run(PRIMARY, FINANCE_USER)
-    denied = [s for s in run.trace if s.tool == "prepare_purchase_order"]
-    assert denied and denied[0].error_code == "NOT_AUTHORIZED" and not denied[0].ok
+    # the planner knows the role and does not attempt the order (authorization would refuse it)
+    assert not [s for s in run.trace if s.tool == "prepare_purchase_order"]
     assert run.status == TaskStatus.COMPLETED and run.approval_id is None
     assert "cannot prepare purchase orders" in run.answer
     assert harness.approvals.pending() == []

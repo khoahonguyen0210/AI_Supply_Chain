@@ -1,5 +1,3 @@
-"""Headline results of the offline evaluations, read from saved artifacts."""
-
 from __future__ import annotations
 
 import json
@@ -82,12 +80,14 @@ def agent_quality(root: Path) -> dict[str, Any]:
         if isinstance(dimensions, dict)
         else {}
     )
+    # the newest unseen set counts only on its first scoring; later runs have seen it
+    first = _load(root / "agent" / "synthetic-rule-planner-v4-first-run.json") or {}
     return {
         "available": True,
         "planner": data.get("planner"),
         "cases": data.get("cases"),
         "workflowSuccess": data.get("workflow_success"),
-        "holdoutWorkflowSuccess": _dig(data, "by_split", "holdout", "workflow_success"),
+        "holdoutWorkflowSuccess": _dig(first, "by_split", "holdout-v4", "workflow_success"),
         "toolCorrectness": rates.get("tool_correctness"),
         "parameterCorrectness": rates.get("parameter_correctness"),
         "groundedNumbers": rates.get("grounded_numbers"),

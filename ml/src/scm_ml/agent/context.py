@@ -1,5 +1,3 @@
-"""Planning context shared by the agent's tools: data, forecasts, stored plans."""
-
 from __future__ import annotations
 
 from collections import defaultdict
@@ -25,13 +23,12 @@ from scm_ml.service.forecasting import ForecastService
 from scm_ml.sourcing import SourcingCatalog
 from scm_ml.synthetic import SyntheticWorld
 
+from .intents import IntentMatcher
 from .models import ToolError
 
 
 @dataclass(frozen=True)
 class PlanRecord:
-    """A solved plan kept so later tools (fulfillment, scenarios, PO preparation) reuse it."""
-
     plan_id: str
     owner: str
     sku_ids: tuple[str, ...]
@@ -49,12 +46,19 @@ class PlanningContext:
         answerer: GroundedAnswerer,
         plan_namespace: str = "",
     ) -> None:
-        """`plan_namespace` keeps plan (and recommendation) ids unique across process restarts."""
+        """`plan_namespace` keeps plan and recommendation ids unique across restarts."""
         self.world, self.service, self.answerer = world, service, answerer
         self._plan_namespace = plan_namespace
         self.as_of = world.as_of
         self.catalog = SourcingCatalog.from_world(world)
         self._plans: dict[str, PlanRecord] = {}
+        self._intents: IntentMatcher | None = None
+
+    def intents(self) -> IntentMatcher:
+        if self._intents is None:
+            names = tuple(s.name for s in self.catalog.suppliers.values())
+            self._intents = IntentMatcher(self.answerer.retriever.embedder, names)
+        return self._intents
 
     def require_sku(self, sku_id: str) -> None:
         if sku_id not in self.catalog.skus:
@@ -102,7 +106,6 @@ class PlanningContext:
         multiplier: float,
         params: ProcurementParams,
     ) -> PlanningInputs:
-        """Planning inputs restricted to the given SKUs, with demand from the forecast model."""
         chosen = set(sku_ids)
         catalog = replace(
             self.catalog,
@@ -148,7 +151,6 @@ class PlanningContext:
         return record
 
     def delivery_history(self) -> dict[str, tuple[int, int, int]]:
-        """Per supplier: (delivered orders, on-time orders, fully delivered orders)."""
         stats: dict[str, list[int]] = defaultdict(lambda: [0, 0, 0])
         for po in self.world.purchase_orders:
             if po.delivered_at is None:
@@ -169,7 +171,6 @@ def build_planning_context(
     plan_namespace: str = "",
     knowledge: KnowledgeStore | None = None,
 ) -> PlanningContext:
-    """Wires the knowledge base and the forecast model together."""
     embedder = embedder or HashingEmbedder()
     store = knowledge
     if store is None:

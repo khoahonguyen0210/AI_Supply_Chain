@@ -34,8 +34,15 @@ def outcome(
 def test_case_set_covers_every_scored_behaviour(small_context: PlanningContext) -> None:
     cases = build_cases(small_context)
     assert len({c.case_id for c in cases}) == len(cases)
-    assert {c.split for c in cases} == {"dev", "holdout"}
-    assert sum(c.split == "holdout" for c in cases) >= 8
+    assert {c.split for c in cases} == {
+        "dev",
+        "holdout-v1",
+        "holdout-v2",
+        "holdout-v3",
+        "holdout-v4",
+    }
+    assert sum(c.split == "holdout-v1" for c in cases) >= 8
+    assert sum(c.split == "holdout-v2" for c in cases) >= 20
     categories = {c.category for c in cases}
     assert {
         "primary workflow",
@@ -68,8 +75,8 @@ def test_development_cases_pass_and_safety_dimensions_hold_everywhere(
 
 def test_held_out_failures_are_reported_not_hidden(outcome: tuple[dict[str, Any], Path]) -> None:
     result, _ = outcome
-    holdout = result["by_split"]["holdout"]
-    assert holdout["cases"] >= 8
+    holdout = result["by_split"]["holdout-v4"]
+    assert holdout["cases"] >= 20
     assert set(holdout["failures"]) <= {r["case_id"] for r in result["results"]}
     assert result["workflow_success"] <= 1.0
 

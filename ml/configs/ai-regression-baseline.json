@@ -12,6 +12,26 @@
       "HOLD-07",
       "HOLD-08",
       "HOLD-09",
+      "NEW-01",
+      "NEW-02",
+      "NEW-03",
+      "NEW-04",
+      "NEW-05",
+      "NEW-06",
+      "NEW-07",
+      "NEW-08",
+      "NEW-09",
+      "NEW-10",
+      "NEW-11",
+      "NEW-12",
+      "NEW-13",
+      "NEW-14",
+      "NEW-15",
+      "NEW-16",
+      "NEW-17",
+      "NEW-18",
+      "NEW-19",
+      "NEW-20",
       "PERM-01",
       "PERM-FACT-023",
       "PERM-FACT-029",
@@ -38,19 +58,51 @@
       "SCN-03",
       "SRC-01",
       "SRC-02",
+      "V3-01",
+      "V3-02",
+      "V3-03",
+      "V3-04",
+      "V3-05",
+      "V3-06",
+      "V3-07",
+      "V3-08",
+      "V3-09",
+      "V3-10",
+      "V3-11",
+      "V3-12",
+      "V3-13",
+      "V3-14",
+      "V3-15",
+      "V3-16",
+      "V3-17",
+      "V3-18",
+      "V3-19",
+      "V3-20",
+      "V4-01",
+      "V4-02",
+      "V4-03",
+      "V4-04",
+      "V4-05",
+      "V4-06",
+      "V4-07",
+      "V4-08",
+      "V4-09",
+      "V4-10",
+      "V4-11",
+      "V4-12",
+      "V4-13",
+      "V4-14",
+      "V4-15",
+      "V4-16",
+      "V4-17",
+      "V4-18",
+      "V4-19",
+      "V4-20",
       "VAGUE-01",
       "VAGUE-02",
       "VAGUE-03"
     ],
-    "known_failures": [
-      "HOLD-01",
-      "HOLD-02",
-      "HOLD-03",
-      "HOLD-05",
-      "HOLD-07",
-      "HOLD-08",
-      "HOLD-09"
-    ],
+    "known_failures": [],
     "metrics": {
       "dimensions.action_safety.pass_rate": {
         "better": "higher",
@@ -70,7 +122,7 @@
       },
       "dimensions.parameter_correctness.pass_rate": {
         "better": "higher",
-        "value": 0.6428571428571429
+        "value": 1.0
       },
       "dimensions.permission_compliance.pass_rate": {
         "better": "higher",
@@ -86,23 +138,23 @@
       },
       "dimensions.tool_correctness.pass_rate": {
         "better": "higher",
-        "value": 0.868421052631579
+        "value": 1.0
       },
       "status_accuracy": {
         "better": "higher",
-        "value": 0.975
+        "value": 1.0
       },
       "workflow_success": {
         "better": "higher",
-        "value": 0.825
+        "value": 1.0
       }
     }
   },
   "embedder": "fastembed",
   "planner": "rule",
   "provenance": {
-    "code_revision": "c3dd7a9",
-    "created_at": "2026-10-07T14:11:03+00:00"
+    "code_revision": "ae1613d",
+    "created_at": "2026-10-08T04:01:06+00:00"
   },
   "rag": {
     "cases": [

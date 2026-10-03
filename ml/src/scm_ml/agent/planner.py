@@ -1,5 +1,3 @@
-"""Planners pick the next action: RulePlanner (offline, deterministic) or ClaudePlanner."""
-
 from __future__ import annotations
 
 import json
@@ -11,6 +9,7 @@ from typing import Any, Protocol
 from scm_common.domain import ScenarioType
 from scm_ml.llm import JsonLlm
 
+from . import language as lang
 from .answers import (
     Observations,
     approval_text,
@@ -26,7 +25,7 @@ from .answers import (
 )
 from .context import PlanningContext
 from .models import Actor, ToolSpec, TraceStep
-from .tools import MAX_HORIZON_WEEKS
+from .tools import MAX_HORIZON_WEEKS, PO_ROLES
 
 APPROVAL_QUESTION = "Above what order value is procurement manager approval required?"
 RELAXED_LEAD_TIME_DAYS = 90
@@ -98,39 +97,27 @@ class Intent:
     quantity: int | None = None
     scenario_type: ScenarioType | None = None
     scenario_params: dict[str, float | str] = field(default_factory=dict)
+    warehouse_id: str | None = None
+    max_lead_time_days: int | None = None
 
 
 _SKU = re.compile(r"\bsku[-\s]?(\d{1,3})\b", re.I)
 _SUPPLIER = re.compile(r"\bsup[-\s]?(\d{1,3})\b", re.I)
 _SUPPLIER_LETTER = re.compile(r"\bsupplier\s+([a-z])\b", re.I)
-_WEEKS = re.compile(r"(\d+)\s*(?:weeks?|wks?)\b", re.I)
-_MONTHS = re.compile(r"(\d+)\s*months?\b", re.I)
-_PERCENT = re.compile(r"(\d+(?:\.\d+)?)\s*%")
 _BUDGET = re.compile(
     r"(?:budget|spend|cap)(?:\s+(?:of|is|at|under))?\s*\$?\s*([\d,]+(?:\.\d+)?)\s*(k)?|"
     r"under\s*\$?\s*([\d,]+(?:\.\d+)?)\s*(k)?\b",
     re.I,
 )
-_UNITS = re.compile(r"([\d,]+)\s*units", re.I)
-_DAYS = re.compile(r"(\d+)\s*days?", re.I)
-_RISE = re.compile(
-    r"\b(rise|rises|rising|increase|increases|grow|grows|surge|surges|spike|jump)\b", re.I
-)
-_FALL = re.compile(r"\b(drop|drops|fall|falls|decline|declines|decrease|decreases)\b", re.I)
-_APPROVE = re.compile(r"^\s*(please\s+)?(approve|reject|sign off)\b", re.I)
+_UNITS = re.compile(r"([\d,]+)\s*(?:units|pieces|pcs|items)\b", re.I)
 _POLICY = re.compile(
     r"\b(policy|policies|contract|sla|terms|rebate|certif\w*|sop|allowed|permitted|budget|"
-    r"expire\w*|clause|threshold|incoterm|payment|penalty|approval|approve[sd]?)\b",
+    r"expire\w*|clause|threshold|incoterm|payment|penalty|approval|approve[sd]?|sign off)\b",
     re.I,
 )
-_ACTION = re.compile(
-    r"\b(what should (i|we)|should (i|we)|restock|replenish|recommend|reorder|"
-    r"what (do|should) (i|we) (order|buy)|place an order)\b",
-    re.I,
-)
-_INVENTORY_QUESTION = re.compile(
-    r"\b(how (much|many)|do we (have|need)|is there enough|are we (low|short)|what is the)\b",
-    re.I,
+_STOCK_QUESTION = re.compile(
+    r"\b(how (much|many)|do we have|is there enough|are we (going to )?(run|low|short)|"
+    r"will we run|going to run out|run(ning)? out|run(ning)? low|at the moment|right now)\b"
 )
 _QUESTION = re.compile(
     r"^\s*(what|which|who|when|where|how|does|do|is|are|can|may|must|should|am i)\b", re.I
@@ -146,8 +133,23 @@ def _first_number(match: re.Match[str] | None, *groups: int) -> float | None:
     return None
 
 
+def _supplier(text: str, lowered: str, context: PlanningContext) -> str | None:
+    if m := _SUPPLIER.search(text):
+        return f"SUP-{int(m.group(1)):03d}"
+    if m := _SUPPLIER_LETTER.search(text):
+        name = f"supplier {m.group(1).lower()}"
+        return next(
+            (s.supplier_id for s in context.catalog.suppliers.values() if s.name.lower() == name),
+            None,
+        )
+    return next(
+        (s.supplier_id for s in context.catalog.suppliers.values() if s.name.lower() in lowered),
+        None,
+    )
+
+
 def parse_intent(text: str, context: PlanningContext) -> Intent:
-    lowered = text.lower()
+    lowered = lang.normalize(text)
     sku_id = None
     if m := _SKU.search(text):
         sku_id = f"SKU-{int(m.group(1)):03d}"
@@ -155,30 +157,11 @@ def parse_intent(text: str, context: PlanningContext) -> Intent:
         sku_id = next(
             (s.sku_id for s in context.catalog.skus.values() if s.name.lower() in lowered), None
         )
-    supplier_id = None
-    if m := _SUPPLIER.search(text):
-        supplier_id = f"SUP-{int(m.group(1)):03d}"
-    elif m := _SUPPLIER_LETTER.search(text):
-        name = f"supplier {m.group(1).lower()}"
-        supplier_id = next(
-            (s.supplier_id for s in context.catalog.suppliers.values() if s.name.lower() == name),
-            None,
-        )
+    supplier_id = _supplier(text, lowered, context)
 
-    horizon = 4
-    if m := _WEEKS.search(text):
-        horizon = int(m.group(1))
-    elif m := _MONTHS.search(text):
-        horizon = 4 * int(m.group(1))
-    elif re.search(r"\b(next|this) quarter\b", lowered):
-        horizon = 12
-
-    percent = _first_number(_PERCENT.search(text), 1)
-    factor = None
-    if percent is not None and _RISE.search(text):
-        factor = round(1 + percent / 100, 4)
-    elif percent is not None and _FALL.search(text):
-        factor = round(1 - percent / 100, 4)
+    lead_limit, rest = lang.lead_time_limit(lowered)
+    horizon = lang.horizon_weeks(rest) or 4
+    factor = lang.change_factor(lowered)
 
     budget = None
     if m := _BUDGET.search(text):
@@ -187,32 +170,40 @@ def parse_intent(text: str, context: PlanningContext) -> Intent:
         budget = value * 1000 if value is not None and k else value
     quantity = int(_first_number(_UNITS.search(text), 1) or 0) or None
 
+    scenario_type, params = _scenario(lowered, factor, supplier_id)
+    hypothetical = bool(lang.HYPOTHETICAL.search(lowered))
+    stock_question = bool(lang.STOCK.search(lowered) and _STOCK_QUESTION.search(lowered))
     kind = Kind.UNKNOWN
-    scenario_type, params = _scenario(lowered, text, percent, supplier_id)
-    if _APPROVE.search(text):
+    if lang.SMALL_TALK.search(lowered) and sku_id is None and supplier_id is None:
+        kind = Kind.UNKNOWN
+    elif lang.is_approval_command(lowered):
         kind = Kind.APPROVE
-    elif re.search(r"\b(how reliable|track record|supplier performance|performance of)\b", lowered):
+    elif lang.PERFORMANCE.search(lowered):
         kind = Kind.PERFORMANCE
-    elif re.search(r"\b(what if|scenario|stress|disruption|outage|goes down)\b", lowered):
-        kind = Kind.SCENARIO if scenario_type else Kind.UNKNOWN
-    elif re.search(
-        r"\b(compare|which supplier|who can supply|supplier options|suppliers? for)\b", lowered
-    ):
+    elif sku_id is None and lang.DOCUMENT.search(lowered):
+        kind = Kind.POLICY
+    elif scenario_type is not None and (hypothetical or lang.OUTAGE.search(lowered)):
+        kind = Kind.SCENARIO
+    elif re.search(r"\b(scenario|stress|disruption)\b", lowered):
+        kind = Kind.UNKNOWN
+    elif lang.SOURCING.search(lowered):
         kind = Kind.SOURCING
-    elif (
-        re.search(r"\b(inventory|stock)\b", lowered)
-        and _INVENTORY_QUESTION.search(lowered)
-        and not _RISE.search(text)
-    ):
+    elif stock_question and factor is None:
         kind = Kind.INVENTORY
-    elif _RISE.search(text) and re.search(r"\bdemand\b", lowered) or _ACTION.search(text):
+    elif (factor is not None and lang.DEMAND.search(lowered)) or lang.ACTION.search(lowered):
         kind = Kind.PLAN
-    elif re.search(r"\b(forecast|expected demand|how much demand)\b", lowered):
+    elif lang.FORECAST.search(lowered):
         kind = Kind.FORECAST
-    elif re.search(r"\b(inventory|stock level|stock on hand|stockout|cover)\b", lowered):
+    elif lang.STOCK.search(lowered) or re.search(r"\b(stockout|cover)\b", lowered):
         kind = Kind.INVENTORY
     elif _POLICY.search(text) or (_QUESTION.search(text) and len(text.split()) >= 4):
         kind = Kind.POLICY
+    explicit_policy = bool(_POLICY.search(text) or lang.DOCUMENT.search(lowered))
+    unsure = (kind == Kind.UNKNOWN and not lang.SMALL_TALK.search(lowered)) or (
+        kind == Kind.POLICY and not explicit_policy and (sku_id or supplier_id)
+    )
+    if unsure and (match := context.intents().match(text)) is not None:
+        kind = Kind(match.intent)
     return Intent(
         kind,
         sku_id,
@@ -223,32 +214,35 @@ def parse_intent(text: str, context: PlanningContext) -> Intent:
         quantity,
         scenario_type,
         params,
+        lang.warehouse(lowered),
+        lead_limit,
     )
 
 
 def _scenario(
-    lowered: str, text: str, percent: float | None, supplier_id: str | None
+    lowered: str, factor: float | None, supplier_id: str | None
 ) -> tuple[ScenarioType | None, dict[str, float | str]]:
-    up = 1 + percent / 100 if percent is not None else None
-    if re.search(r"\b(outage|goes down|is down|fails|shuts down)\b", lowered):
-        return ScenarioType.SUPPLIER_OUTAGE, {"supplier_id": supplier_id} if supplier_id else {}
-    if "lead time" in lowered:
-        days = _first_number(_DAYS.search(text), 1)
-        return ScenarioType.LEAD_TIME_SHOCK, {"days": int(days) if days else 7}
-    if re.search(r"\b(transport|freight|shipping)\b", lowered):
+    scoped: dict[str, float | str] = {"supplier_id": supplier_id} if supplier_id else {}
+    if lang.OUTAGE.search(lowered):
+        return ScenarioType.SUPPLIER_OUTAGE, scoped
+    days = lang.delay_days(lowered)
+    if "lead time" in lowered or days is not None or lang.DELAY.search(lowered):
+        return ScenarioType.LEAD_TIME_SHOCK, {"days": days or 7, **scoped}
+    up = factor if factor is not None and factor > 1 else None
+    if lang.TRANSPORT.search(lowered):
         return ScenarioType.TRANSPORT_COST_SHOCK, {"factor": up or 1.25}
-    if "warehouse" in lowered and "capacity" in lowered:
-        return ScenarioType.WAREHOUSE_CAPACITY_REDUCTION, {
-            "factor": round(1 - percent / 100, 4) if percent is not None else 0.8
-        }
-    if "capacity" in lowered:
-        return ScenarioType.CAPACITY_REDUCTION, {
-            "factor": round(1 - percent / 100, 4) if percent is not None else 0.7
-        }
-    if "price" in lowered:
-        return ScenarioType.PRICE_SHOCK, {"factor": up or 1.15}
-    if "demand" in lowered:
-        return ScenarioType.DEMAND_SHOCK, {"factor": up or DEMAND_STRESS_FACTOR}
+    p = lang.percent(lowered)
+    reduction = round(1 - p / 100, 4) if p is not None and p < 100 else None
+    if share := lang.SHARE_OF_USUAL.search(lowered):  # "60% of their usual" leaves 60%
+        reduction = round(float(share.group(1)) / 100, 4)
+    if "warehouse" in lowered and ("capacity" in lowered or "space" in lowered):
+        return ScenarioType.WAREHOUSE_CAPACITY_REDUCTION, {"factor": reduction or 0.8}
+    if lang.CAPACITY.search(lowered):
+        return ScenarioType.CAPACITY_REDUCTION, {"factor": reduction or 0.7, **scoped}
+    if lang.PRICE.search(lowered):
+        return ScenarioType.PRICE_SHOCK, {"factor": up or 1.15, **scoped}
+    if lang.DEMAND.search(lowered):
+        return ScenarioType.DEMAND_SHOCK, {"factor": factor or DEMAND_STRESS_FACTOR}
     return None, {}
 
 
@@ -260,8 +254,10 @@ class RulePlanner:
 
     def __init__(self, context: PlanningContext) -> None:
         self._ctx = context
+        self._may_order = True
 
     def next_action(self, state: AgentState) -> Action:
+        self._may_order = state.actor.role in PO_ROLES
         intent = parse_intent(state.task, self._ctx)
         obs = Observations(state.observations)
         if intent.kind == Kind.APPROVE:
@@ -294,7 +290,6 @@ class RulePlanner:
 
     @staticmethod
     def _blocked(obs: Observations) -> Action | None:
-        """A failure that re-planning cannot fix ends the task with an explanation."""
         for step in reversed(obs.steps):
             if step.ok or step.error_code in {None, "INVALID_ARGUMENTS", "NOT_AUTHORIZED"}:
                 continue
@@ -310,8 +305,6 @@ class RulePlanner:
             for s in obs.steps
         )
         return MAX_HORIZON_WEEKS if capped else intent.horizon_weeks
-
-    # --- single-purpose tasks -------------------------------------------------------------
 
     def _policy(self, state: AgentState, obs: Observations) -> Action:
         answer = obs.ok("search_policies")
@@ -372,7 +365,9 @@ class RulePlanner:
             need = obs.ok("assess_inventory_need") or {}
             quantity = max(1, int(need["total_net_requirement"]))
             warehouse = need["neediest_warehouse"]
-        warehouse = warehouse or sorted(self._ctx.catalog.warehouses)[0]
+        # a warehouse or delivery deadline named in the request wins over the defaults
+        warehouse = intent.warehouse_id or warehouse or sorted(self._ctx.catalog.warehouses)[0]
+        lead_time = intent.max_lead_time_days or min(365, horizon * 7)
         searches = obs.all_ok("search_suppliers")
         if not searches:
             return CallTool(
@@ -381,7 +376,7 @@ class RulePlanner:
                     "sku_id": intent.sku_id,
                     "warehouse_id": warehouse,
                     "quantity": quantity,
-                    "max_lead_time_days": min(365, horizon * 7),
+                    "max_lead_time_days": lead_time,
                 },
                 "eligible, ranked suppliers",
             )
@@ -435,8 +430,6 @@ class RulePlanner:
             plan_text(obs) + " " + scenario_text(obs.ok("run_scenario") or {}),
             (self._model_assumption(obs),),
         )
-
-    # --- the full planning workflow ------------------------------------------------------
 
     def _plan(self, intent: Intent, obs: Observations) -> Action:
         sku, horizon = intent.sku_id, self._horizon(intent, obs)
@@ -557,7 +550,7 @@ class RulePlanner:
             )
             return CallTool("search_policies", {"question": question}, "check policy and contract")
         po_attempted = obs.ok("prepare_purchase_order") or obs.failed("prepare_purchase_order")
-        if po_attempted is None:
+        if po_attempted is None and self._may_order:
             return CallTool(
                 "prepare_purchase_order",
                 {
@@ -567,11 +560,15 @@ class RulePlanner:
                 "request human approval for the plan",
             )
         return Finish(
-            self._plan_answer(intent, obs, plan, scenarios, policies),
+            self._plan_answer(intent, obs, plan, scenarios, policies)
+            + (
+                ""
+                if self._may_order
+                else "\nYour role cannot prepare purchase orders, so this stays a recommendation; "
+                "ask a planner or procurement manager to prepare the order."
+            ),
             (self._model_assumption(obs), self._horizon_assumption(intent, obs)),
         )
-
-    # --- text ---------------------------------------------------------------------------------
 
     def _header(self, intent: Intent, obs: Observations) -> str:
         assert intent.sku_id is not None
@@ -602,7 +599,6 @@ class RulePlanner:
         return ""
 
     def _optimizer_note(self, obs: Observations, plan: dict[str, Any]) -> str:
-        """Why the plan's main supplier can differ from the top-ranked one."""
         search = obs.ok("search_suppliers")
         if not search or not search["ranked"]:
             return ""
@@ -721,8 +717,6 @@ the assumptions and the approval status.
 
 
 class ClaudePlanner:
-    """Language-model planner behind the `JsonLlm` protocol."""
-
     def __init__(self, llm: JsonLlm, tools: dict[str, ToolSpec]) -> None:
         self.name = llm.name
         self._llm, self._tools = llm, tools

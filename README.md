@@ -59,7 +59,10 @@ In plain words, compared with the simple way most teams plan today:
   compared with 94% if you keep the old plan.
 - **Right answers from documents.** For questions about policies and contracts, the right document comes up first
   94% of the time, every answer shows its source, and people never see documents they aren't allowed to read.
-- **Safe by design.** In all 40 test cases, the assistant never placed an order without approval.
+- **Understands new requests.** On 20 requests it had never seen (scored once, before any change), the
+  assistant handled 90% correctly.
+- **Safe by design.** In all 100 test requests, it never placed an order without approval and never used
+  a number that didn't come from real data.
 - **Fast.** Most pages load in about 10-60 ms, and a full assistant answer takes under 1 second.
 
 All results were measured on a made-up sample company, and every number comes from a saved result file in
@@ -227,7 +230,7 @@ bash scripts/ai-regression.sh         # checks the assistant and document search
 bash scripts/stack.sh smoke           # quick check of the running app, including the demo
 ```
 
-There are over 600 tests: 401 in Python, 131 in Java and 81 for the website, plus end-to-end and smoke tests.
+There are over 600 tests: 401 in Python, 135 in Java and 83 for the website, plus end-to-end and smoke tests.
 The CI pipeline runs all of them, builds the Docker images and scans them for known vulnerabilities
 ([`docs/ci.md`](docs/ci.md)).
 
@@ -315,8 +318,9 @@ backend. The ports are only open on your own machine. The demo accounts are for 
 
 - The company is made up. Real data is only used to test the forecast, and the "what really happened" data in
   the feedback loop is simulated.
-- The built-in assistant follows fixed rules and handles new kinds of requests poorly (2 of 9). A Claude-based
-  version exists but has NOT YET been measured, because no API key was used.
+- The built-in assistant combines keyword rules with matching by meaning. On sets of requests it had never
+  seen it scored between 50% and 90% (90% on the newest set of 20), so unusual wording can still confuse it.
+  A Claude-based version exists but has NOT YET been measured, because no API key was used.
 - On the sample company the forecast's likely range is a bit too wide, and on real data the forecast is only
   2.1% better than a simple 13-week average.
 - A plan treats the 4 weeks as one block, so it can miss timing problems inside them (planned 90.8% of demand

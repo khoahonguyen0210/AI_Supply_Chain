@@ -1,5 +1,3 @@
-"""Deterministic guardrails: validation, authorization, result checks and grounded numbers."""
-
 from __future__ import annotations
 
 import math
@@ -16,8 +14,18 @@ _CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 _UNSAFE: tuple[tuple[re.Pattern[str], str, str], ...] = (
     (
         re.compile(
-            r"\b(skip|bypass|avoid|waive|without|no need for)\b.{0,30}"
+            r"\b(skip|bypass|avoid|waive|without|no need for|forget( about)?|never mind|"
+            r"dispense with|(don't|do not|dont) (bother|wait|worry)( with| about| for)?)\b.{0,30}"
             r"\b(approval|approver|sign[- ]?off)",
+            re.I,
+        ),
+        "APPROVAL_BYPASS",
+        "I can't skip or bypass human approval; purchase orders need the approvers the policy "
+        "requires.",
+    ),
+    (
+        re.compile(
+            r"\b(sign(ed)?[- ]?off|approv(e|ed|al))\b.{0,20}\b(later|afterwards|after the fact)\b",
             re.I,
         ),
         "APPROVAL_BYPASS",
@@ -60,7 +68,6 @@ class GuardrailError(Exception):
 
 
 def clean_task_text(text: str) -> str:
-    """Strip control characters and bound the length; reject empty input."""
     cleaned = _CONTROL.sub(" ", text).strip()
     if not cleaned:
         raise GuardrailError("EMPTY_TASK", "Please describe what you want help with.")
@@ -107,7 +114,6 @@ def _numeric_leaves(value: Any, path: str = "") -> Iterable[tuple[str, float]]:
 
 
 def check_tool_result(tool: str, arguments: dict[str, Any], result: dict[str, Any]) -> list[str]:
-    """Problems that make a result unfit to report: non-finite or impossible values."""
     problems: list[str] = []
     for path, number in _numeric_leaves(result):
         leaf = path.rsplit(".", 1)[-1]
@@ -130,7 +136,6 @@ _NUMBER = re.compile(r"\d[\d,]*(?:\.\d+)?%?")
 
 
 def evidence_numbers(observations: Sequence[TraceStep], extra_text: str = "") -> list[float]:
-    """Every number a tool returned (or a policy answer quoted) plus those in the user's message."""
     values: list[float] = []
     texts = [extra_text]
     for step in observations:
@@ -140,7 +145,8 @@ def evidence_numbers(observations: Sequence[TraceStep], extra_text: str = "") ->
         texts.extend(_strings(step.result))
     for text in texts:
         values.extend(_parse_numbers(text))
-    return values
+    # a negative change may be reported as its size in words ("costs 1,208 less")
+    return values + [abs(v) for v in values if v < 0]
 
 
 def _strings(value: Any) -> Iterable[str]:
@@ -163,7 +169,7 @@ def _parse_numbers(text: str) -> list[float]:
 
 
 def unsupported_numbers(text: str, evidence: Sequence[float]) -> list[str]:
-    """Numbers in `text` that match no evidence value at the precision they are written."""
+    """Numbers in `text` that match no evidence value at the precision written."""
     cleaned = _MARKER.sub(" ", _DATE.sub(" ", _ID.sub(" ", text)))
     bad: list[str] = []
     for token in _NUMBER.findall(cleaned):

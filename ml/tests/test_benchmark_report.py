@@ -33,7 +33,7 @@ def test_report_quotes_the_saved_artifacts(tmp_path: Path) -> None:
     agent = json.loads(
         (EXPERIMENTS / "agent/synthetic-rule-planner.json").read_text(encoding="utf-8")
     )
-    assert f"{agent['by_split']['holdout']['workflow_success']:,.3f}" in text
+    assert f"{agent['by_split']['holdout-v4']['workflow_success']:,.3f}" in text
     for section in (
         "## Forecast",
         "## Sourcing",
@@ -61,5 +61,5 @@ def test_figure_is_drawn_from_the_artifacts(tmp_path: Path) -> None:
     ref = forecast["baselines"][forecast["selected_baseline"]]["test"]["overall"]["mae"]
     mae = forecast["model"]["test"]["overall"]["mae"]
     assert f"{100 * (1 - mae / ref):.0f}%" in svg
-    assert svg.count('class="tile"') == 4
+    assert svg.count('class="tile"') == 6
     assert draw(tmp_path).count('class="tile"') == 0  # no artifacts, no tiles

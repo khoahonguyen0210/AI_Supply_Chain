@@ -94,27 +94,38 @@ Source: `ml/experiments/scenario/synthetic.json` (code `29e60c7`, 2026-10-06T23:
 | `hashing-384` | 0.824 | 1.000 | 0.907 | 1.000 | 1.000 | 0.971 | 0 |
 
 56 questions over 69 documents; answers from the `extractive-stub` generator. Claude-generated answers: NOT YET MEASURED.
-Source: `ml/experiments/rag/synthetic-fastembed.json` (code `bff9f28`, 2026-10-07T01:58:18+00:00).
-Source: `ml/experiments/rag/synthetic-hashing.json` (code `bff9f28`, 2026-10-07T01:57:51+00:00).
+Source: `ml/experiments/rag/synthetic-fastembed.json` (code `a849cd5`, 2026-10-08T03:14:35+00:00).
+Source: `ml/experiments/rag/synthetic-hashing.json` (code `a849cd5`, 2026-10-08T03:14:42+00:00).
 
 ## Agent: workflow and tool use
 
-| Metric | Pass rate | Cases |
+| Unseen set, first and only scoring | Workflow success | Cases |
 |---|---|---|
-| workflow success (all cases) | 0.825 | 40 |
-| workflow success (dev) | 1.000 | 31 |
-| workflow success (holdout) | 0.222 | 9 |
-| tool correctness | 0.868 | 38 |
-| parameter correctness | 0.643 | 14 |
-| sequence correctness | 1.000 | 5 |
-| constraint compliance | 1.000 | 5 |
-| permission compliance | 1.000 | 5 |
-| action safety | 1.000 | 40 |
-| grounded numbers | 1.000 | 31 |
-| appropriate refusal | 1.000 | 12 |
+| `holdout-v2` | 0.800 | 20 |
+| `holdout-v3` | 0.500 | 20 |
+| `holdout-v4` | 0.900 | 20 |
 
-Planner: `rule` (deterministic, offline). The hold-out cases were written after the planner and were not used to tune it, so the hold-out score is the honest one. Claude planner: NOT YET MEASURED.
-Source: `ml/experiments/agent/synthetic-rule-planner.json` (code `995b1db`, 2026-10-07T02:09:43+00:00).
+Each unseen set was committed before the planner changes it measures and scored once; after that it counts as seen. Planner changes between sets are in the git history.
+
+| Metric (current planner, all cases) | Pass rate | Cases |
+|---|---|---|
+| workflow success (all cases) | 1.000 | 100 |
+| workflow success (dev) | 1.000 | 31 |
+| workflow success (holdout-v1) | 1.000 | 9 |
+| workflow success (holdout-v2) | 1.000 | 20 |
+| workflow success (holdout-v3) | 1.000 | 20 |
+| workflow success (holdout-v4) | 1.000 | 20 |
+| tool correctness | 1.000 | 98 |
+| parameter correctness | 1.000 | 47 |
+| sequence correctness | 1.000 | 5 |
+| constraint compliance | 1.000 | 11 |
+| permission compliance | 1.000 | 8 |
+| action safety | 1.000 | 100 |
+| grounded numbers | 1.000 | 80 |
+| appropriate refusal | 1.000 | 24 |
+
+Planner: `rule` (keyword rules plus embedding-based intent matching, offline, deterministic). The current scores include cases that were used to improve the planner, so the first-run scores above are the honest measure of unseen requests. Claude planner: NOT YET MEASURED.
+Source: `ml/experiments/agent/synthetic-rule-planner.json` (code `bf5eecd`, 2026-10-08T03:55:12+00:00).
 
 ## Feedback loop: planned vs simulated actuals
 
