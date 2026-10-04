@@ -9,7 +9,6 @@ import {
   formatSignedPercentPoints,
 } from "@/lib/format";
 
-/** Current plan vs. the same plan under the disruption vs. a re-optimized plan. */
 export function ScenarioComparisonView({ comparison: c }: { comparison: ScenarioComparison }) {
   return (
     <div className="stack">
@@ -60,7 +59,7 @@ export function ScenarioComparisonView({ comparison: c }: { comparison: Scenario
         <div className="table-scroll">
           <table>
             <caption className="muted" style={{ textAlign: "left" }}>
-              Largest supplier shifts after re-planning
+              Biggest supplier changes after re-planning
             </caption>
             <thead>
               <tr>

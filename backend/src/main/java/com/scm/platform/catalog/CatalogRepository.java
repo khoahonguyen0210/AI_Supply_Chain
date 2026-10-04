@@ -7,9 +7,11 @@ import java.util.Optional;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
-/** Read access to master data, demand history and inventory. Planning computations are not done here. */
 @Repository
 public class CatalogRepository {
+
+	public record Region(String regionId, String name) {
+	}
 
 	public record Sku(String skuId, String name, String category, double unitPrice, double unitVolume,
 			List<String> requiredCertifications) {
@@ -38,6 +40,11 @@ public class CatalogRepository {
 
 	public CatalogRepository(JdbcClient jdbc) {
 		this.jdbc = jdbc;
+	}
+
+	public List<Region> regions() {
+		return jdbc.sql("SELECT region_id, name FROM region ORDER BY region_id")
+				.query((rs, i) -> new Region(rs.getString(1), rs.getString(2))).list();
 	}
 
 	public List<Sku> skus() {
@@ -87,7 +94,6 @@ public class CatalogRepository {
 				.list();
 	}
 
-	/** Weekly demand, oldest first; {@code limitWeeks} keeps only the most recent weeks of each series. */
 	public List<DemandPoint> demand(String source, String skuId, String regionId, int limitWeeks) {
 		return jdbc.sql("""
 				SELECT sku_id, region_id, period_start, quantity FROM (
@@ -102,7 +108,6 @@ public class CatalogRepository {
 				.list();
 	}
 
-	/** The latest position of each warehouse for the SKU. */
 	public List<InventoryRow> inventory(String skuId) {
 		return jdbc.sql("""
 				SELECT DISTINCT ON (warehouse_id) sku_id, warehouse_id, as_of, on_hand, incoming, safety_stock

@@ -15,7 +15,7 @@ the engine's status and code.
 | --- | --- |
 | Auth | `POST /api/auth/login`, `POST /api/auth/register`, `GET /api/auth/me` |
 | Forecasts | `POST /api/forecasts` (synchronous), or a `FORECAST` job |
-| Data | `GET /api/skus`, `GET /api/demand?skuId&regionId&weeks`, `GET /api/inventory?skuId` |
+| Data | `GET /api/regions`, `GET /api/skus`, `GET /api/demand?skuId&regionId&weeks`, `GET /api/inventory?skuId` |
 | Suppliers | `GET /api/suppliers?regionId&certification&minReliability`, `GET /api/suppliers/{id}` (contracts, offers), `GET /api/suppliers/{id}/performance`, `POST /api/suppliers/search` (ranking; planning roles) |
 | Recommendations | `GET /api/recommendations?status`, `GET /api/recommendations/{id}` (lines, approval, decisions) |
 | Scenarios | `POST /api/scenarios`, `GET /api/scenarios`, `GET /api/scenarios/{id}`, `POST /api/scenarios/{id}/runs` (queues a `SCENARIO` job) |

@@ -34,17 +34,20 @@ display-only.
 * **Accessibility.** Charts have a text summary (`role="img"` with a label), forms use labelled fields,
   status never relies on colour alone (badges carry text), and animations are switched off under
   `prefers-reduced-motion`.
-* **Look.** One dark theme, defined as CSS variables at the top of `src/app/globals.css`: a near-black
-  canvas with a soft radial glow and a faint dot grid, Ubuntu for headings, Manrope for text, Geist Mono
-  for ids, white primary buttons beside outlined ones, rounded thin-bordered cards with hover states, and
-  a staggered fade-in when a page loads. Signed out, the sign-in form sits in a landing hero with an
-  example recommendation (numbers from the demo run of the synthetic company) and four feature cards.
-  Text is kept short: one-line page intros, and a long copilot answer shows its first line and its
-  conclusion, with the rest folded under "Show the full answer".
+* **Look.** One flat light theme, defined as CSS variables at the top of `src/app/globals.css`: solid
+  orange, black and white bands, Barlow Condensed for headlines, Barlow for text, Geist Mono for ids,
+  square corners, and heavy black rules instead of boxed cards, shadows or gradients. The logo is a
+  white K on a black square (`components/Logo.tsx`, also the browser-tab icon `src/app/icon.svg`).
+  Every page opens on a centered orange title band under the orange header. Signed out, the landing
+  is centered throughout: an orange hero whose tabs switch between four topics (each with a flat
+  drawing from `components/landing/HeroArt.tsx`), a black "how it works" band, the measured results
+  and an orange sign-in band. Text is kept short: a few words per heading, one-line page intros, and a
+  long assistant answer shows its first line and its conclusion, with the rest folded under "Show the
+  full answer".
 
 ## Tests and checks
 
-`node node_modules/vitest/vitest.mjs run` (64 tests: API client, job polling, data shaping, every page
+`node node_modules/vitest/vitest.mjs run` (83 tests: API client, job polling, data shaping, every page
 with a stubbed backend), `node node_modules/typescript/bin/tsc --noEmit`,
 `node node_modules/eslint/bin/eslint.js`, `node node_modules/next/dist/bin/next build`. On Windows the
 `&` in the repository folder name breaks the `npm run` shims, hence the direct `node` calls.

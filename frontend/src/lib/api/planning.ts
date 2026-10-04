@@ -3,12 +3,15 @@ import type {
   DemandPoint,
   ForecastResponse,
   InventoryRow,
+  Region,
   Sku,
   Supplier,
   SupplierDetail,
   SupplierSearchRequest,
   SupplierSearchResult,
 } from "./types";
+
+export const listRegions = (signal?: AbortSignal) => apiGet<Region[]>("/api/regions", signal);
 
 export const listSkus = (signal?: AbortSignal) => apiGet<Sku[]>("/api/skus", signal);
 
@@ -36,7 +39,6 @@ export const getForecast = (
   horizonWeeks: number,
 ) => apiPost<ForecastResponse>("/api/forecasts", { skuId, regionId, asOf, horizonWeeks });
 
-/** Monday of the first week after the last observed week: the first week to forecast. */
 export function nextWeekStart(lastObservedWeek: string): string {
   const date = new Date(`${lastObservedWeek}T00:00:00Z`);
   date.setUTCDate(date.getUTCDate() + 7);

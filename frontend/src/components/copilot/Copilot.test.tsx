@@ -77,12 +77,12 @@ describe("TaskCard", () => {
       "href",
       "/approvals?open=APR-0001",
     );
-    expect(screen.getByText(/Nothing has been ordered/)).toBeInTheDocument();
+    expect(screen.getByText(/Nothing is ordered until this is approved/)).toBeInTheDocument();
   });
 
   it("explains guardrail findings in plain words", () => {
     renderWithSession(<TaskCard task={task()} />);
-    expect(screen.getByText(/contained numbers that no tool had reported/)).toBeInTheDocument();
+    expect(screen.getByText(/numbers that did not come from the data/)).toBeInTheDocument();
     expect(guardrailText("APPROVAL_BYPASS")).toMatch(/skip approval was blocked/);
     expect(guardrailText("SOMETHING_NEW")).toBe("Something new");
   });
@@ -119,7 +119,7 @@ describe("TaskCard", () => {
     renderWithSession(
       <TaskCard task={task({ status: "COMPLETED", approvalId: null, recommendationId: null, violations: [] })} />,
     );
-    expect(screen.queryByText(/Nothing has been ordered/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Nothing is ordered until this is approved/)).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /Open recommendation/ })).not.toBeInTheDocument();
   });
 });

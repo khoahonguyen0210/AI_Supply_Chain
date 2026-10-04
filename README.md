@@ -1,8 +1,9 @@
 <div align="center">
 
-# AI Supply Chain Planner
+# Supply Chain Planner
 
-**Ask a planning question in plain English. Get a purchase plan with the numbers behind it. Nothing is bought until a manager approves it.**
+**Ask a planning question in plain English and get a purchase plan with the numbers behind it.<br>
+Nothing is bought until a manager approves it.**
 
 ![Java](https://img.shields.io/badge/Java-ED8B00?logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?logo=springboot&logoColor=white)
@@ -28,16 +29,16 @@
 ## What it does
 
 A planner has to decide how much to buy, from which supplier, and for which warehouse. This app does the
-analysis for them in four steps:
+work in four steps:
 
-1. **Predict demand.** How much of each product will likely sell in each region over the next weeks, with a
-   low-to-high range.
+1. **Forecast sales.** How much of each product will likely sell in each region over the next few weeks,
+   with a low and a high estimate.
 2. **Compare suppliers.** Price, delivery time and on-time record, side by side.
-3. **Build the plan.** The cheapest way to buy enough stock without breaking any limit (minimum order sizes,
-   supplier capacity, warehouse space, budget).
-4. **Get it approved.** The plan goes to the right managers. Nothing is bought until they approve it.
+3. **Build the plan.** The cheapest way to buy enough stock while staying within every limit (minimum order
+   sizes, supplier capacity, warehouse space and budget).
+4. **Get it approved.** The plan goes to the right managers, and nothing is bought until they approve it.
 
-It can also check what happens if something goes wrong (a supplier stops delivering, demand jumps), and it
+It can also show what happens if something goes wrong (a supplier stops delivering, or demand jumps), and it
 answers questions about company policies and supplier contracts, quoting the exact source.
 
 ## Results
@@ -48,26 +49,26 @@ answers questions about company policies and supplier contracts, quoting the exa
 
 </div>
 
-In plain words, compared with the simple way most teams plan today:
+Compared with the simple way most teams plan today:
 
-- **Better forecasts.** The app's sales forecasts are 11% more accurate than a simple 13-week average. On real
-  data from an online store the gain is smaller: 2%.
-- **Cheaper plans.** Its purchase plans cost 13% less than always buying from the cheapest supplier, without
-  breaking any limit (order sizes, supplier capacity, warehouse space). When the budget is cut by 15%, it still
-  stays within budget; the simple rules go over.
+- **Better forecasts.** Sales forecasts are 11% more accurate than a simple 13-week average. On real data from
+  an online store, the gain is smaller: 2.1%.
+- **Cheaper plans.** Purchase plans cost 13% less than always buying from the cheapest supplier, and they stay
+  within every limit (order sizes, supplier capacity, warehouse space). When the budget is cut by 15%, the plan
+  still stays within budget, while the simple rules go over it.
 - **Ready for problems.** If a supplier suddenly stops delivering, re-planning still covers 100% of demand,
   compared with 94% if you keep the old plan.
 - **Right answers from documents.** For questions about policies and contracts, the right document comes up first
-  94% of the time, every answer shows its source, and people never see documents they aren't allowed to read.
+  94% of the time. Every answer shows its source, and people never see documents they aren't allowed to read.
 - **Understands new requests.** On 20 requests it had never seen (scored once, before any change), the
   assistant handled 90% correctly.
 - **Safe by design.** In all 100 test requests, it never placed an order without approval and never used
   a number that didn't come from real data.
-- **Fast.** Most pages load in about 10-60 ms, and a full assistant answer takes under 1 second.
+- **Fast.** Most pages load in 10–60 ms, and a full assistant answer takes less than a second.
 
 All results were measured on a made-up sample company, and every number comes from a saved result file in
-`ml/experiments/`. What still doesn't work well is listed under [Limitations](#limitations). The detailed tables
-are in [`docs/benchmarks.md`](docs/benchmarks.md).
+`ml/experiments/`. What still doesn't work well is listed under [Limitations](#limitations), and the detailed
+tables are in [`docs/benchmarks.md`](docs/benchmarks.md).
 
 ## How it works
 
@@ -91,7 +92,7 @@ flowchart LR
 
 Three parts work together:
 
-- **Website** (Next.js): what planners and managers use.
+- **Website** (Next.js): the pages planners and managers use.
 - **Backend** (Java, Spring Boot): sign-in, permissions, approvals, background jobs and the audit log, all stored
   in PostgreSQL.
 - **Planning engine** (Python): forecasting, supplier ranking, plan building, what-if tests, document search and
@@ -108,9 +109,9 @@ Three parts work together:
 - **No made-up numbers.** The assistant only uses numbers that a tool returned. A safety check blocks any answer
   that contains a number no tool produced.
 - **It explains trade-offs.** For example, why the plan buys mostly from a supplier that isn't ranked first, or
-  how much a supplier outage would cost if you keep the plan versus re-plan.
-- **It asks when unsure.** A question without a product gets a follow-up question, not a guess.
-- **You can see every step.** "How this was worked out" lists each tool it used, with inputs and results.
+  how much a supplier outage would cost if you keep the plan instead of re-planning.
+- **It asks when unsure.** A question that names no product gets a follow-up question, not a guess.
+- **You can see every step.** "How this was worked out" lists each tool it used, with its inputs and results.
 
 Details: [`docs/agent.md`](docs/agent.md).
 
@@ -118,22 +119,22 @@ Details: [`docs/agent.md`](docs/agent.md).
 
 The assistant can only prepare an order. The company's approval policy decides who must sign off, for example a
 procurement manager for orders above $15,000. People can't approve their own requests, the assistant can't
-approve anything, and every decision is saved permanently along with who made it. Details:
+approve anything, and every decision is saved permanently with the name of the person who made it. Details:
 [`docs/security.md`](docs/security.md).
 
 ## Answers from policies and contracts
 
 Questions like "Who must approve an order above $20,000?" are answered from 69 company documents. Each answer
-names the document and its version. Old or expired versions are flagged, questions without an answer in the
-documents are declined, and people never see documents their role isn't allowed to read. Details:
+names the document and its version. Old or expired versions are flagged, questions the documents can't answer
+are declined, and people never see documents their role isn't allowed to read. Details:
 [`docs/knowledge-retrieval.md`](docs/knowledge-retrieval.md).
 
 ## It learns, but only if the new model is better
 
 When an order is approved, the app saves the forecast it was based on. Later, when real sales are recorded, it
 compares the two. A retraining command builds a new forecast model from the new data and tests both models on
-weeks neither has seen. The new model replaces the old one only if it is more accurate, and only after a named
-person approves the switch.
+weeks that neither has seen. The new model replaces the old one only if it is more accurate, and only after a
+named person approves the switch.
 
 ```bash
 uv run python -m scm_ml.feedback retrain
@@ -167,10 +168,10 @@ You need [Docker](https://www.docker.com/products/docker-desktop/), bash (Git Ba
 bash scripts/stack.sh up
 ```
 
-It prints the address and a password at the end. The password is also saved in `.env` as `SCM_DEMO_PASSWORD`.
+At the end, it prints the address and a password. The password is also saved in `.env` as `SCM_DEMO_PASSWORD`.
 
-**2. Open http://localhost:3000.** Click **Create an account** to make your own (it can plan and use the assistant),
-or sign in with one of the four demo accounts, which all use that password:
+**2. Open http://localhost:3000.** Click **Create an account** to make your own (it can make plans and use the
+assistant), or sign in with one of the four demo accounts, which all use that password:
 
 | User id | What they can do |
 |---|---|
@@ -183,7 +184,7 @@ or sign in with one of the four demo accounts, which all use that password:
 
 1. Sign in as `planner`, open **Assistant** and ask: *Demand for SKU-001 is expected to rise by 20%. What should I do?*
 2. Sign out, sign in as `manager`, open **Approvals** and approve the new request.
-3. Do the same as `finance`. Only now is the order placed.
+3. Do the same as `finance`. Only then is the order placed.
 
 Or run the same story as a script: `uv run python -m scm_ml.demo --password <password>` (a recorded run is in
 [`docs/demo.md`](docs/demo.md)).
@@ -216,7 +217,7 @@ cd frontend && npm ci && npm run dev                     # website on port 3000
 The backend needs `SCM_JWT_SECRET`, and the backend and engine share `SCM_ML_INTERNAL_TOKEN` (see
 [Configuration](#configuration)).
 
-On Windows, a `&` in the folder path breaks `npm run` and the Maven wrapper in bash. Run frontend tools as
+On Windows, an `&` in the folder path breaks `npm run` and the Maven wrapper in bash. Run frontend tools as
 `node node_modules/<package>/...` and Maven as `.\mvnw.cmd` in PowerShell.
 
 ## Testing
@@ -245,7 +246,7 @@ uv run python -m scm_ml.benchmark.latency --password <password>                 
 uv run python -m scm_ml.benchmark.scaling --replicas 1 2 4 --jobs 48 --repeats 3  # workers, needs kind
 ```
 
-Re-run from a fresh copy of the repository, it reproduced every saved result; only timings differ
+A re-run from a fresh copy of the repository reproduced every saved result; only the timings differed
 ([`docs/definition-of-done.md`](docs/definition-of-done.md)).
 
 ## API
@@ -308,10 +309,11 @@ each AWS piece is listed in [`docs/cloud.md`](docs/cloud.md).
 
 ## Security
 
-You sign in with a password and get a token that lasts 8 hours by default. Anyone can create an account, but new accounts only get the planner role; approval roles are given by an admin. Every request checks your role
+You sign in with a password and get a token that lasts 8 hours by default. Anyone can create an account, but new
+accounts only get the planner role; an admin gives out the approval roles. Every request checks your role
 (planner, procurement manager, finance or admin). Requests are rate-limited, every change and every refused
 request is written to an audit log that can't be edited, and the planning engine only accepts requests from the
-backend. The ports are only open on your own machine. The demo accounts are for local use. Details:
+backend. The ports are only open on your own machine, and the demo accounts are for local use only. Details:
 [`docs/security.md`](docs/security.md).
 
 ## Limitations
@@ -319,17 +321,16 @@ backend. The ports are only open on your own machine. The demo accounts are for 
 - The company is made up. Real data is only used to test the forecast, and the "what really happened" data in
   the feedback loop is simulated.
 - The built-in assistant combines keyword rules with matching by meaning. On sets of requests it had never
-  seen it scored between 50% and 90% (90% on the newest set of 20), so unusual wording can still confuse it.
+  seen, it scored between 50% and 90% (90% on the newest set of 20), so unusual wording can still confuse it.
   A Claude-based version exists but has NOT YET been measured, because no API key was used.
-- On the sample company the forecast's likely range is a bit too wide, and on real data the forecast is only
-  2.1% better than a simple 13-week average.
-- A plan treats the 4 weeks as one block, so it can miss timing problems inside them (planned 90.8% of demand
-  covered week by week, 80.3% in the simulated reality).
-- The planning engine keeps assistant state in one SQLite file, so it runs as a single copy; only the background
-  workers scale.
+- On real data, the forecast is only 2.1% better than a simple 13-week average.
+- The forecast's likely range is a bit too wide on the sample company: real sales fall inside it 88% of the time
+  instead of 80%. A model retrained on new data was slightly worse, so it was not used.
+- A plan treats the 4 weeks as one block, so it can miss timing problems inside them. On paper it covers 90.8% of
+  each week's demand, but in the simulation it covered 80.3%.
+- The planning engine keeps the assistant's state in one SQLite file, so it runs as a single copy; only the
+  background workers scale.
 - The CI pipeline has not run on GitHub yet, and the Terraform has not been deployed.
-- The forecast's "likely range" is a bit too wide on the sample company (real sales fall inside it 88% of the time
-  instead of 80%), and a retrained model on new data was slightly worse, so it was not used.
 
 ## Glossary
 
@@ -346,7 +347,7 @@ backend. The ports are only open on your own machine. The demo accounts are for 
 
 This is a personal project, built end to end by one person. Issues and suggestions are welcome.
 
-| Name | Role | Github |
+| Name | Role | GitHub |
 |---|---|---|
 | Khoa Ho Nguyen | Author and maintainer | [@khoahonguyen0210](https://github.com/khoahonguyen0210) |
 

@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { HeroArt } from "@/components/landing/HeroArt";
+import type { ArtKind } from "@/components/landing/HeroArt";
 import { Notice } from "@/components/ui";
 import { ApiError } from "@/lib/api/client";
 import { useAuth } from "@/lib/session";
 
-/** What to tell the person who could not sign in, without hinting at which part was wrong. */
+/** Never hints at which part of the sign-in was wrong. */
 export function loginMessage(error: unknown): string {
   if (error instanceof ApiError) {
     if (error.code === "RATE_LIMITED") return error.message;
@@ -16,7 +18,6 @@ export function loginMessage(error: unknown): string {
   return "Sign-in failed. Try again.";
 }
 
-/** What to tell someone whose new account could not be created. */
 export function signUpMessage(error: unknown): string {
   if (error instanceof ApiError) {
     if (error.code === "USER_ID_TAKEN") return "That user id is already taken. Pick another one.";
@@ -33,50 +34,59 @@ export function signUpMessage(error: unknown): string {
   return "The account could not be created. Try again.";
 }
 
-const STEPS: { title: string; text: string }[] = [
+const SLIDES: { tab: string; title: string; text: string; art: ArtKind }[] = [
   {
-    title: "Ask a question",
-    text: "Type it the way you would say it, for example “Demand for SKU-001 may rise 20%. What should I do?”",
+    tab: "Forecast",
+    title: "See what you will sell next.",
+    text: "Weekly sales forecasts for every product.",
+    art: "forecast",
   },
   {
-    title: "See the forecast",
-    text: "How much you will likely sell in each region over the next weeks, with a low-to-high range.",
+    tab: "Suppliers",
+    title: "Find the best supplier.",
+    text: "Compare price, speed and reliability.",
+    art: "suppliers",
   },
   {
-    title: "Get a purchase plan",
-    text: "Which suppliers to buy from, how much, and for which warehouse, at the lowest total cost.",
+    tab: "Plan",
+    title: "Get the cheapest plan.",
+    text: "What to buy, from whom, and where to send it.",
+    art: "plan",
   },
   {
-    title: "Approve it",
-    text: "A manager reviews the plan. Nothing is bought until the right people approve it.",
+    tab: "Assistant",
+    title: "Just ask.",
+    text: "Ask in plain English. A manager approves every order.",
+    art: "assistant",
   },
 ];
 
-const FEATURES: { title: string; text: string; icon: string }[] = [
-  {
-    title: "Predict demand",
-    text: "Expected sales for each product and region, week by week.",
-    icon: "M3 17l5-6 4 3 6-8 3 3",
-  },
-  {
-    title: "Compare suppliers",
-    text: "Price, delivery time and on-time record, side by side.",
-    icon: "M4 6h16M4 12h10M4 18h6",
-  },
-  {
-    title: "Prepare for problems",
-    text: "See what happens if a supplier stops delivering or demand jumps, and how to adjust.",
-    icon: "M12 4l9 16H3zM12 10v4M12 17v.5",
-  },
-  {
-    title: "Check the rules",
-    text: "Ask about policies and contracts and get the answer with its exact source.",
-    icon: "M6 3h9l4 4v14H6zM9 12h7M9 16h7",
-  },
+const STEPS: { title: string; text: string }[] = [
+  { title: "Ask", text: "“Will we run short next month?”" },
+  { title: "See the forecast", text: "How much will sell, by region." },
+  { title: "Get a plan", text: "What to buy and from whom." },
+  { title: "Approve", text: "Nothing is bought until a manager says yes." },
 ];
+
+const RESULTS: { value: string; title: string; text: string }[] = [
+  { value: "11%", title: "Better forecasts", text: "than a 13-week average" },
+  { value: "13%", title: "Lower cost", text: "than the cheapest supplier" },
+  { value: "100%", title: "Demand covered", text: "even if a supplier fails" },
+  { value: "0", title: "Unapproved orders", text: "in 100 test requests" },
+];
+
+function ArrowCircle() {
+  return (
+    <svg className="arrow-circle" viewBox="0 0 44 44" aria-hidden="true" focusable="false">
+      <circle cx="22" cy="22" r="20" />
+      <path d="M13 22h17M24 15l7 7-7 7" />
+    </svg>
+  );
+}
 
 export function LoginForm() {
   const { signIn, signUp } = useAuth();
+  const [slide, setSlide] = useState(0);
   const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-in");
   const [displayName, setDisplayName] = useState("");
   const [userId, setUserId] = useState("");
@@ -84,6 +94,7 @@ export function LoginForm() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const signingUp = mode === "sign-up";
+  const current = SLIDES[slide];
 
   function switchMode(next: "sign-in" | "sign-up") {
     setMode(next);
@@ -110,173 +121,136 @@ export function LoginForm() {
 
   return (
     <div className="landing">
-      <section className="hero">
-        <div className="hero-copy">
-          <h1 className="hero-title">
-            Plan what to buy <span className="gradient-text">before you run short.</span>
+      <section className="hero" aria-labelledby="hero-title">
+        <div className="band-inner hero-inner" key={current.art}>
+          <h1 id="hero-title" className="hero-title">
+            {current.title}
           </h1>
-          <p className="hero-lede">
-            See how much you will likely sell, compare suppliers, and get a purchase plan your manager can
-            approve. Every number shows where it came from.
-          </p>
-
-          <section id="sign-in" className="login-card" aria-labelledby="login-heading">
-            <h2 id="login-heading">{signingUp ? "Create an account" : "Sign in"}</h2>
-            <form className="login-form" onSubmit={submit}>
-              {signingUp ? (
-                <label className="field field-wide">
-                  <span>Your name</span>
-                  <input
-                    value={displayName}
-                    autoComplete="name"
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    required
-                  />
-                </label>
-              ) : null}
-              <label className="field">
-                <span>User id</span>
-                <input
-                  value={userId}
-                  autoComplete="username"
-                  onChange={(e) => setUserId(e.target.value)}
-                  required
-                />
-              </label>
-              <label className="field">
-                <span>Password</span>
-                <input
-                  type="password"
-                  value={password}
-                  autoComplete={signingUp ? "new-password" : "current-password"}
-                  minLength={signingUp ? 12 : undefined}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </label>
-              {signingUp ? (
-                <p className="field-hint">
-                  At least 12 characters. New accounts can plan and ask the assistant; approving orders needs a role
-                  from an administrator.
-                </p>
-              ) : null}
-              <div className="login-actions">
-                <button type="submit" className="primary" disabled={busy || !ready}>
-                  {signingUp ? (busy ? "Creating…" : "Create account") : busy ? "Signing in…" : "Sign in"}
-                  <span className="arrow" aria-hidden="true">
-                    →
-                  </span>
-                </button>
-                <a className="button-outline" href="#how">
-                  How it works
-                </a>
-              </div>
-              {error ? <Notice tone="bad">{error}</Notice> : null}
-            </form>
-            <p className="switch-mode">
-              {signingUp ? "Already have an account? " : "New here? "}
-              <button
-                type="button"
-                className="link-button"
-                onClick={() => switchMode(signingUp ? "sign-in" : "sign-up")}
-              >
-                {signingUp ? "Sign in instead" : "Create an account"}
-              </button>
-            </p>
-          </section>
+          <p className="hero-lede">{current.text}</p>
+          <a className="hero-cta" href="#sign-in" onClick={() => switchMode("sign-in")}>
+            <ArrowCircle />
+            Get started
+          </a>
+          <figure className="hero-art">
+            <HeroArt kind={current.art} />
+          </figure>
         </div>
+      </section>
 
-        <figure className="hero-visual" aria-hidden="true">
-          <div className="preview">
-            <div className="preview-head">
-              <span className="preview-dot" />
-              <span>Proposed order · SKU-001</span>
-              <span className="preview-badge">Waiting for approval</span>
-            </div>
-            <svg className="preview-chart" viewBox="0 0 320 120" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="preview-line" x1="0" x2="1">
-                  <stop offset="0%" stopColor="#a78bfa" />
-                  <stop offset="100%" stopColor="#38bdf8" />
-                </linearGradient>
-              </defs>
-              <path className="preview-band" d="M200,70 L320,40 L320,95 L200,92 Z" />
-              <path
-                className="preview-history"
-                d="M0,90 L20,60 L40,82 L60,48 L80,66 L100,58 L120,80 L140,52 L160,62 L180,44 L200,78"
+      <div className="hero-tabs-band">
+        <nav className="band-inner hero-tabs" aria-label="Topics">
+          {SLIDES.map((item, i) => (
+            <button
+              key={item.tab}
+              type="button"
+              className="hero-tab"
+              aria-pressed={i === slide}
+              onClick={() => setSlide(i)}
+            >
+              {item.tab}
+            </button>
+          ))}
+          <a className="hero-tab hero-tab-last" href="#sign-in" onClick={() => switchMode("sign-in")}>
+            Sign in <span aria-hidden="true">→</span>
+          </a>
+        </nav>
+      </div>
+
+      <section id="how" className="band band-black" aria-labelledby="how-heading">
+        <div className="band-inner">
+          <h2 id="how-heading" className="section-title">
+            How it works
+          </h2>
+          <ol className="steps">
+            {STEPS.map((step, i) => (
+              <li key={step.title} className="step">
+                <span className="step-number">{i + 1}</span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section id="results" className="band" aria-labelledby="results-heading">
+        <div className="band-inner">
+          <h2 id="results-heading" className="section-title">
+            Results
+          </h2>
+          <p className="section-note">Tested on sample data.</p>
+          <dl className="results">
+            {RESULTS.map((item) => (
+              <div key={item.title}>
+                <dt>
+                  <span className="result-value">{item.value}</span>
+                  <span className="result-title">{item.title}</span>
+                </dt>
+                <dd>{item.text}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      <section id="sign-in" className="band band-orange" aria-labelledby="login-heading">
+        <div className="band-inner signin">
+          <h2 id="login-heading" className="section-title">
+            {signingUp ? "Create an account" : "Sign in"}
+          </h2>
+          <p className="section-note">
+            {signingUp
+              ? "New accounts can plan. An admin can add approval rights."
+              : "Demo accounts: planner, manager, finance or admin."}
+          </p>
+          <form className="login-form" onSubmit={submit}>
+            {signingUp ? (
+              <label className="field field-wide">
+                <span>Your name</span>
+                <input
+                  value={displayName}
+                  autoComplete="name"
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  required
+                />
+              </label>
+            ) : null}
+            <label className="field">
+              <span>User id</span>
+              <input value={userId} autoComplete="username" onChange={(e) => setUserId(e.target.value)} required />
+            </label>
+            <label className="field">
+              <span>Password</span>
+              <input
+                type="password"
+                value={password}
+                autoComplete={signingUp ? "new-password" : "current-password"}
+                minLength={signingUp ? 12 : undefined}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
-              <path className="preview-forecast" d="M200,78 L230,70 L260,64 L290,58 L320,52" />
-            </svg>
-            <div className="preview-legend">
-              <span className="legend-past">Past sales</span>
-              <span className="legend-next">Forecast and likely range</span>
+            </label>
+            {signingUp ? <p className="field-hint">At least 12 characters.</p> : null}
+            <div className="login-actions">
+              <button type="submit" className="primary" disabled={busy || !ready}>
+                {signingUp ? (busy ? "Creating…" : "Create account") : busy ? "Signing in…" : "Sign in"}
+                <span className="arrow" aria-hidden="true">
+                  →
+                </span>
+              </button>
+              <span className="switch-mode">
+                {signingUp ? "Already have an account? " : "New here? "}
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={() => switchMode(signingUp ? "sign-in" : "sign-up")}
+                >
+                  {signingUp ? "Sign in instead" : "Create an account"}
+                </button>
+              </span>
             </div>
-            <dl className="preview-stats">
-              <div>
-                <dt>Sales, next 4 weeks</dt>
-                <dd>1,070</dd>
-              </div>
-              <div>
-                <dt>Total cost</dt>
-                <dd>$78.6k</dd>
-              </div>
-              <div>
-                <dt>Demand covered</dt>
-                <dd>100%</dd>
-              </div>
-            </dl>
-            <ul className="preview-lines">
-              <li>
-                <span>Buy from SUP-008 for 3 warehouses</span>
-                <span>657 units</span>
-              </li>
-              <li>
-                <span>Buy from SUP-003 for WH-3</span>
-                <span>283 units</span>
-              </li>
-              <li>
-                <span>Extra cost if SUP-008 stops delivering</span>
-                <span>+$957</span>
-              </li>
-            </ul>
-          </div>
-          <figcaption>Example with sample data</figcaption>
-        </figure>
-      </section>
-
-      <section id="how" className="section" aria-labelledby="how-heading">
-        <h2 id="how-heading" className="section-title">
-          How it works
-        </h2>
-        <ol className="steps">
-          {STEPS.map((step, i) => (
-            <li key={step.title} className="step-card">
-              <span className="step-number">{i + 1}</span>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section id="features" className="section" aria-labelledby="features-heading">
-        <h2 id="features-heading" className="section-title">
-          What you can do
-        </h2>
-        <div className="feature-grid">
-          {FEATURES.map((feature) => (
-            <article key={feature.title} className="feature-card">
-              <div className="feature-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d={feature.icon} />
-                </svg>
-              </div>
-              <div>
-                <h3>{feature.title}</h3>
-                <p className="feature-text">{feature.text}</p>
-              </div>
-            </article>
-          ))}
+            {error ? <Notice tone="bad">{error}</Notice> : null}
+          </form>
         </div>
       </section>
     </div>

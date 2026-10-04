@@ -41,12 +41,11 @@ const GUARDRAIL_TEXT: Record<string, string> = {
 export function guardrailText(violation: string): string {
   const code = violation.split(":")[0];
   if (code === "UNSUPPORTED_NUMBERS") {
-    return "An answer was held back because it contained numbers that no tool had reported.";
+    return "An answer was blocked because it had numbers that did not come from the data.";
   }
   return GUARDRAIL_TEXT[code] ?? humanize(code);
 }
 
-/** The steps the assistant took, one line each; arguments and detail are one click away. */
 export function ActionTrace({ steps }: { steps: TraceStep[] }) {
   const actions = steps.filter((s) => s.kind === "TOOL_CALL");
   if (actions.length === 0) return null;
@@ -74,7 +73,6 @@ export function ActionTrace({ steps }: { steps: TraceStep[] }) {
   );
 }
 
-/** Long answers show the first line and conclusion; the rest folds away. */
 function AnswerText({ answer }: { answer: string }) {
   const lines = answer.split("\n").filter((line) => line.trim() !== "");
   if (lines.length <= 3) return <div>{answer}</div>;
@@ -95,7 +93,6 @@ function AnswerText({ answer }: { answer: string }) {
   );
 }
 
-/** One request and the assistant's answer, with its status, assumptions, evidence, trace and next step. */
 export function TaskCard({ task }: { task: AgentTask }) {
   return (
     <article className="chat" aria-label={`Request: ${task.requestText}`}>
@@ -141,7 +138,7 @@ export function TaskCard({ task }: { task: AgentTask }) {
         ) : null}
 
         {task.status === "AWAITING_APPROVAL" ? (
-          <Notice tone="warn">Nothing has been ordered yet. This needs approval first.</Notice>
+          <Notice tone="warn">Nothing is ordered until this is approved.</Notice>
         ) : null}
 
         {task.violations.length > 0 ? (

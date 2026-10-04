@@ -206,9 +206,9 @@ class JobQueueTest {
 	void aJobHeldByACrashedWorkerIsTakenOverAfterItsLeaseExpires() throws Exception {
 		Job job = jobs.submit(PLANNER, JobType.OPTIMIZATION, null, optimizationPayload()).job();
 
-		assertThat(repository.claim("crashed-worker", Duration.ofMillis(100))).isPresent();
+		assertThat(repository.claim("crashed-worker", Duration.ofSeconds(2))).isPresent();
 		assertThat(repository.claim("other-worker", Duration.ofSeconds(60))).isEmpty(); // still leased
-		Thread.sleep(250);
+		Thread.sleep(2_500);
 
 		var takenOver = repository.claim("other-worker", Duration.ofSeconds(60));
 		assertThat(takenOver).isPresent();

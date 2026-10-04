@@ -8,7 +8,6 @@ import { PlanBuilder } from "./PlanBuilder";
 import type { SolvedPlan } from "./PlanBuilder";
 import { ScenarioPanel } from "./ScenarioPanel";
 
-/** Decision workspace: build a plan, inspect it, look at alternatives, stress it and check the evidence. */
 export function Workspace() {
   const [solved, setSolved] = useState<SolvedPlan | null>(null);
   const [alternatives, setAlternatives] = useState<PlanResult["lines"][number] | null>(null);
@@ -17,7 +16,7 @@ export function Workspace() {
     <div className="stack">
       <div>
         <h1>Plan builder</h1>
-        <p className="lede">Build a purchase plan and see how it holds up if something goes wrong.</p>
+        <p className="lede">Make a purchase plan and test what could go wrong.</p>
       </div>
       <PlanBuilder
         onSolved={(next) => {

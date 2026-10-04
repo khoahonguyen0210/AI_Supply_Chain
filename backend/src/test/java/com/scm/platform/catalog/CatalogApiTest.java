@@ -56,6 +56,15 @@ class CatalogApiTest {
 	}
 
 	@Test
+	void listsRegionsWithTheirNames() throws Exception {
+		mockMvc.perform(as(get("/api/regions"), "planner"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.length()").value(2))
+				.andExpect(jsonPath("$[0].regionId").value("R1"))
+				.andExpect(jsonPath("$[0].name").value("North"));
+	}
+
+	@Test
 	void listsSkus() throws Exception {
 		mockMvc.perform(as(get("/api/skus"), "planner"))
 				.andExpect(status().isOk())

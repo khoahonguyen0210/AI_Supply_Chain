@@ -23,8 +23,7 @@ export function RecommendationsPanel() {
         {(rows) =>
           rows.length === 0 ? (
             <EmptyState>
-              No recommendations yet. Ask the copilot what to do about a demand change and it will
-              prepare one for approval.
+              No recommendations yet. Ask the assistant for one.
             </EmptyState>
           ) : (
             <div className="table-scroll">
@@ -77,7 +76,7 @@ export function ScenariosPanel() {
         {(rows) =>
           rows.length === 0 ? (
             <EmptyState>
-              No what-if tests saved yet. Build a plan in the plan builder, then check what could go wrong.
+              No what-if tests saved yet. Make a plan first, then test it.
             </EmptyState>
           ) : (
             <ul className="stack" style={{ listStyle: "none", padding: 0, margin: 0 }}>

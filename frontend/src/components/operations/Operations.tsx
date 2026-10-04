@@ -221,7 +221,6 @@ export function QualitySection({ quality }: { quality: AiQuality }) {
   );
 }
 
-/** Operational and AI health for administrators. */
 export function Operations() {
   const { user, ready } = useSession();
   const system = useResource(ready ? user.userId : null, (signal) => getOpsSummary(signal));
@@ -230,7 +229,7 @@ export function Operations() {
     <div className="stack">
       <div>
         <h1>Monitoring</h1>
-        <p className="lede">How the system and its AI features are doing right now.</p>
+        <p className="lede">How the app and its AI features are doing right now.</p>
       </div>
       <Panel title="System" id="system">
         <ResourceView state={system.state} onRetry={system.reload}>

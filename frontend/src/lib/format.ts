@@ -17,11 +17,9 @@ export const formatNumber = (value: number) => number1.format(value);
 export const formatMoney = (value: number) => money0.format(value);
 export const formatUnitPrice = (value: number) => money2.format(value);
 
-/** A fraction as a percentage: 0.973 -> "97.3%". */
 export const formatPercent = (fraction: number, digits = 1) =>
   `${(fraction * 100).toFixed(digits)}%`;
 
-/** A signed money amount: positive values get a leading "+". */
 export function formatSignedMoney(value: number): string {
   const formatted = money0.format(Math.abs(value));
   if (value > 0) return `+${formatted}`;
@@ -39,13 +37,18 @@ export function formatSignedPercentPoints(fractionDelta: number): string {
 
 export const formatDate = (iso: string) => iso.slice(0, 10);
 
+export function formatDay(iso: string): string {
+  const date = new Date(`${iso.slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleDateString("en-US", { dateStyle: "medium", timeZone: "UTC" });
+}
+
 export function formatDateTime(iso: string): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
   return date.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
 }
 
-/** "procurement_manager" -> "Procurement manager". */
 export function humanize(value: string): string {
   const text = value.replace(/_/g, " ").toLowerCase();
   return text.charAt(0).toUpperCase() + text.slice(1);

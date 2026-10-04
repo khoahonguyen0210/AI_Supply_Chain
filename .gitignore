@@ -1,3 +1,17 @@
+# Project: local planning docs, editor and agent state, secrets, browser test output
+project-context/
+.vscode/
+.idea/
+.claude/
+.DS_Store
+Thumbs.db
+.env.*
+!.env.example
+*.pem
+*.key
+test-results/
+playwright-report/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

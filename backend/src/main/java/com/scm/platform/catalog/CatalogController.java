@@ -4,6 +4,7 @@ import com.scm.platform.catalog.CatalogRepository.Contract;
 import com.scm.platform.catalog.CatalogRepository.DemandPoint;
 import com.scm.platform.catalog.CatalogRepository.InventoryRow;
 import com.scm.platform.catalog.CatalogRepository.Offer;
+import com.scm.platform.catalog.CatalogRepository.Region;
 import com.scm.platform.catalog.CatalogRepository.Sku;
 import com.scm.platform.catalog.CatalogRepository.Supplier;
 import com.scm.platform.error.ApiException;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import tools.jackson.databind.JsonNode;
 
-/** Master data, demand history and inventory from the database; ranking and performance from the engine. */
 @RestController
 @RequestMapping("/api")
 public class CatalogController {
@@ -39,6 +39,11 @@ public class CatalogController {
 	}
 
 	public record SupplierDetail(Supplier supplier, List<Contract> contracts, List<Offer> offers) {
+	}
+
+	@GetMapping("/regions")
+	public List<Region> regions(Actor actor) {
+		return catalog.regions();
 	}
 
 	@GetMapping("/skus")
@@ -78,7 +83,6 @@ public class CatalogController {
 		return engine.supplierPerformance(actor, supplierId);
 	}
 
-	/** Eligible suppliers for a SKU, warehouse and quantity, ranked by the engine. */
 	@PostMapping("/suppliers/search")
 	public JsonNode search(Actor actor, @RequestBody JsonNode request) {
 		Roles.require(actor, Roles.PLANNING);

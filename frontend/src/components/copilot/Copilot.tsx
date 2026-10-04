@@ -78,7 +78,7 @@ export function Copilot() {
     <div className="stack">
       <div>
         <h1>Assistant</h1>
-        <p className="lede">Ask about demand, stock or suppliers. The assistant can draft an order, but a manager has to approve it before anything is bought.</p>
+        <p className="lede">Ask about sales, stock or suppliers. A manager approves every order.</p>
       </div>
       <div className="grid-2" style={{ gridTemplateColumns: "minmax(0, 260px) minmax(0, 1fr)" }}>
         <Panel

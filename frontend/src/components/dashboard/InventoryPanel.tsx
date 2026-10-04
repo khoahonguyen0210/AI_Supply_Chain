@@ -8,7 +8,7 @@ import { useSession } from "@/lib/session";
 import { useResource } from "@/lib/useResource";
 
 export function InventoryTable({ rows }: { rows: InventoryRow[] }) {
-  if (rows.length === 0) return <EmptyState>No inventory positions for this SKU.</EmptyState>;
+  if (rows.length === 0) return <EmptyState>No stock records for this product yet.</EmptyState>;
   const total = rows.reduce(
     (sum, r) => ({
       onHand: sum.onHand + r.onHand,

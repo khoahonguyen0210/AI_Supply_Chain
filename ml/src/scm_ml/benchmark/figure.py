@@ -1,8 +1,3 @@
-"""CLI: draw the README results card (SVG) from saved artifacts.
-
-uv run python -m scm_ml.benchmark.figure
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -22,28 +17,30 @@ GAP = 16
 TOP = 70
 
 STYLE = """
-.surface { fill: #fcfcfb; }
-.tile { fill: #f2f2ef; stroke: #e1e0d9; }
-.title { fill: #0b0b0b; font: 600 15px system-ui, -apple-system, 'Segoe UI', sans-serif; }
-.note { fill: #52514e; font: 12px system-ui, -apple-system, 'Segoe UI', sans-serif; }
-.big { fill: #2a78d6; font: 700 40px system-ui, -apple-system, 'Segoe UI', sans-serif; }
-.headline { fill: #0b0b0b; font: 600 15px system-ui, -apple-system, 'Segoe UI', sans-serif; }
-.compare { fill: #52514e; font: 13px system-ui, -apple-system, 'Segoe UI', sans-serif; }
+.surface { fill: #ffffff; }
+.tile { fill: #f3f3f3; }
+.tile-bar { fill: #000000; }
+.title { fill: #000000; font: 700 22px 'Barlow Condensed', 'Arial Narrow', sans-serif; }
+.note { fill: #595959; font: 12px system-ui, -apple-system, 'Segoe UI', sans-serif; }
+.big { fill: #c4380f; font: 700 44px 'Barlow Condensed', 'Arial Narrow', sans-serif; }
+.headline { fill: #000000; font: 700 17px 'Barlow Condensed', 'Arial Narrow', sans-serif; }
+.compare { fill: #3a3a3a; font: 13px system-ui, -apple-system, 'Segoe UI', sans-serif; }
 @media (prefers-color-scheme: dark) {
-  .surface { fill: #1a1a19; }
-  .tile { fill: #222220; stroke: #2c2c2a; }
+  .surface { fill: #000000; }
+  .tile { fill: #1a1a1a; }
+  .tile-bar { fill: #ef512e; }
   .title, .headline { fill: #ffffff; }
-  .note, .compare { fill: #c3c2b7; }
-  .big { fill: #3987e5; }
+  .note, .compare { fill: #c8c8c8; }
+  .big { fill: #ef512e; }
 }
 """
 
 
 @dataclass(frozen=True)
 class Tile:
-    big: str  # the headline number, e.g. "11%"
-    headline: str  # what it means, in plain words
-    compare: str  # what it was compared with
+    big: str
+    headline: str
+    compare: str
 
 
 def forecast(root: Path) -> Tile | None:
@@ -140,7 +137,8 @@ TILES: tuple[Callable[[Path], Tile | None], ...] = (
 
 def _tile_svg(tile: Tile, x: int, y: int) -> list[str]:
     return [
-        f'<rect class="tile" x="{x}" y="{y}" width="{TILE_W}" height="{TILE_H}" rx="12"/>',
+        f'<rect class="tile" x="{x}" y="{y}" width="{TILE_W}" height="{TILE_H}"/>',
+        f'<rect class="tile-bar" x="{x}" y="{y}" width="{TILE_W}" height="6"/>',
         f'<text class="big" x="{x + 22}" y="{y + 56}">{escape(tile.big)}</text>',
         f'<text class="headline" x="{x + 22}" y="{y + 86}">{escape(tile.headline)}</text>',
         f'<text class="compare" x="{x + 22}" y="{y + 110}">{escape(tile.compare)}</text>',
@@ -152,7 +150,7 @@ def render(root: Path) -> str:
     rows = max(1, -(-len(tiles) // 2))
     height = TOP + rows * (TILE_H + GAP) + 4
     body = [
-        f'<rect class="surface" width="{WIDTH}" height="{height}" rx="12"/>',
+        f'<rect class="surface" width="{WIDTH}" height="{height}"/>',
         '<text class="title" x="16" y="32">What the app achieved</text>',
         '<text class="note" x="16" y="52">Tested on a made-up sample company; every number comes'
         " from a saved result in ml/experiments.</text>",

@@ -91,7 +91,7 @@ export function RecommendationBody({ detail }: { detail: RecommendationDetail })
         }
       >
         {approval === null ? (
-          <p className="muted">No approval has been requested for this recommendation.</p>
+          <p className="muted">No approval has been requested yet.</p>
         ) : (
           <div className="stack">
             <p style={{ margin: 0 }}>

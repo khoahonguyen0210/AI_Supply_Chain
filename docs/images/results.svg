@@ -1,44 +1,52 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="518" viewBox="0 0 960 518" role="img" aria-label="What the app achieved">
 <style>
-.surface { fill: #fcfcfb; }
-.tile { fill: #f2f2ef; stroke: #e1e0d9; }
-.title { fill: #0b0b0b; font: 600 15px system-ui, -apple-system, 'Segoe UI', sans-serif; }
-.note { fill: #52514e; font: 12px system-ui, -apple-system, 'Segoe UI', sans-serif; }
-.big { fill: #2a78d6; font: 700 40px system-ui, -apple-system, 'Segoe UI', sans-serif; }
-.headline { fill: #0b0b0b; font: 600 15px system-ui, -apple-system, 'Segoe UI', sans-serif; }
-.compare { fill: #52514e; font: 13px system-ui, -apple-system, 'Segoe UI', sans-serif; }
+.surface { fill: #ffffff; }
+.tile { fill: #f3f3f3; }
+.tile-bar { fill: #000000; }
+.title { fill: #000000; font: 700 22px 'Barlow Condensed', 'Arial Narrow', sans-serif; }
+.note { fill: #595959; font: 12px system-ui, -apple-system, 'Segoe UI', sans-serif; }
+.big { fill: #c4380f; font: 700 44px 'Barlow Condensed', 'Arial Narrow', sans-serif; }
+.headline { fill: #000000; font: 700 17px 'Barlow Condensed', 'Arial Narrow', sans-serif; }
+.compare { fill: #3a3a3a; font: 13px system-ui, -apple-system, 'Segoe UI', sans-serif; }
 @media (prefers-color-scheme: dark) {
-  .surface { fill: #1a1a19; }
-  .tile { fill: #222220; stroke: #2c2c2a; }
+  .surface { fill: #000000; }
+  .tile { fill: #1a1a1a; }
+  .tile-bar { fill: #ef512e; }
   .title, .headline { fill: #ffffff; }
-  .note, .compare { fill: #c3c2b7; }
-  .big { fill: #3987e5; }
+  .note, .compare { fill: #c8c8c8; }
+  .big { fill: #ef512e; }
 }
 </style>
-<rect class="surface" width="960" height="518" rx="12"/>
+<rect class="surface" width="960" height="518"/>
 <text class="title" x="16" y="32">What the app achieved</text>
 <text class="note" x="16" y="52">Tested on a made-up sample company; every number comes from a saved result in ml/experiments.</text>
-<rect class="tile" x="16" y="70" width="456" height="132" rx="12"/>
+<rect class="tile" x="16" y="70" width="456" height="132"/>
+<rect class="tile-bar" x="16" y="70" width="456" height="6"/>
 <text class="big" x="38" y="126">11%</text>
 <text class="headline" x="38" y="156">more accurate sales forecasts</text>
 <text class="compare" x="38" y="180">than a simple 13-week average (30.2 vs 33.9 units off per week)</text>
-<rect class="tile" x="488" y="70" width="456" height="132" rx="12"/>
+<rect class="tile" x="488" y="70" width="456" height="132"/>
+<rect class="tile-bar" x="488" y="70" width="456" height="6"/>
 <text class="big" x="510" y="126">13%</text>
 <text class="headline" x="510" y="156">cheaper purchase plans</text>
 <text class="compare" x="510" y="180">than always buying from the cheapest supplier (303k vs 349k)</text>
-<rect class="tile" x="16" y="218" width="456" height="132" rx="12"/>
+<rect class="tile" x="16" y="218" width="456" height="132"/>
+<rect class="tile-bar" x="16" y="218" width="456" height="6"/>
 <text class="big" x="38" y="274">100%</text>
 <text class="headline" x="38" y="304">of demand still covered when a supplier fails</text>
 <text class="compare" x="38" y="328">after re-planning, vs 94% if you keep the old plan</text>
-<rect class="tile" x="488" y="218" width="456" height="132" rx="12"/>
+<rect class="tile" x="488" y="218" width="456" height="132"/>
+<rect class="tile-bar" x="488" y="218" width="456" height="6"/>
 <text class="big" x="510" y="274">94%</text>
 <text class="headline" x="510" y="304">of policy questions find the right document first</text>
 <text class="compare" x="510" y="328">vs 82% with plain keyword matching</text>
-<rect class="tile" x="16" y="366" width="456" height="132" rx="12"/>
+<rect class="tile" x="16" y="366" width="456" height="132"/>
+<rect class="tile-bar" x="16" y="366" width="456" height="6"/>
 <text class="big" x="38" y="422">90%</text>
 <text class="headline" x="38" y="452">of new, never-seen requests handled correctly</text>
 <text class="compare" x="38" y="476">by the assistant (18 of 20, scored once before any change)</text>
-<rect class="tile" x="488" y="366" width="456" height="132" rx="12"/>
+<rect class="tile" x="488" y="366" width="456" height="132"/>
+<rect class="tile-bar" x="488" y="366" width="456" height="6"/>
 <text class="big" x="510" y="422">100%</text>
 <text class="headline" x="510" y="452">safe: never orders without approval</text>
 <text class="compare" x="510" y="476">in 100 test requests; 100% of answers use only real numbers</text>

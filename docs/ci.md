@@ -59,7 +59,7 @@ The remote has not been set up (the repository is local only), so the workflows 
 checked on this machine:
 
 * `actionlint` 1.7.7 (with shellcheck) reports no problems in either workflow.
-* Every job's commands pass locally: `scripts/check.sh`, `mvnw verify` (124 tests), the frontend
+* Every job's commands pass locally: `scripts/check.sh`, `mvnw verify` (135 tests), the frontend
   lint/typecheck/test, the three image builds (the frontend image runs `next build`), `scripts/e2e.sh`, and the stack
   smoke test (`tests/smoke`, also run against the kind cluster).
 * `pip-audit` and `npm audit` as configured: no known vulnerabilities (2026-10-07).

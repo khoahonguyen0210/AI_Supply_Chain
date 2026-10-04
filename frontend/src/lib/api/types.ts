@@ -1,4 +1,3 @@
-/** Wire types shared with the Spring backend (docs/backend-api.md, docs/contracts/engine-api.md). */
 
 export interface FieldViolation {
   field: string;
@@ -21,7 +20,11 @@ export interface HealthResponse {
   timestamp: string;
 }
 
-// ---- master data -------------------------------------------------------------------------------
+
+export interface Region {
+  regionId: string;
+  name: string;
+}
 
 export interface Sku {
   skuId: string;
@@ -83,7 +86,6 @@ export interface InventoryRow {
   safetyStock: number;
 }
 
-// ---- forecasts ---------------------------------------------------------------------------------
 
 export interface ForecastPoint {
   weekStart: string;
@@ -105,7 +107,6 @@ export interface ForecastResponse {
   points: ForecastPoint[];
 }
 
-// ---- jobs --------------------------------------------------------------------------------------
 
 export type JobType = "FORECAST" | "OPTIMIZATION" | "SCENARIO" | "BATCH_EVALUATION";
 export type JobStatus = "QUEUED" | "RUNNING" | "SUCCEEDED" | "FAILED";
@@ -125,7 +126,6 @@ export interface Job<R = unknown> {
   finishedAt: string | null;
 }
 
-// ---- engine results ----------------------------------------------------------------------------
 
 export interface PlanSpec {
   skuIds: string[];
@@ -248,7 +248,6 @@ export interface DocumentAnswer {
   citations: PolicyCitation[];
 }
 
-// ---- documents ---------------------------------------------------------------------------------
 
 export interface DocumentSummary {
   documentId: string;
@@ -267,7 +266,6 @@ export interface DocumentDetail {
   content: string;
 }
 
-// ---- scenarios ---------------------------------------------------------------------------------
 
 export type ScenarioType =
   | "DEMAND_SHOCK"
@@ -286,7 +284,6 @@ export interface ScenarioDefinition {
   createdAt: string;
 }
 
-// ---- recommendations and approvals -------------------------------------------------------------
 
 export type ApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
 export type RecommendationStatus = "PROPOSED" | "PENDING_APPROVAL" | "APPROVED" | "REJECTED";
@@ -350,7 +347,6 @@ export interface ApprovalDetail {
   decisions: Decision[];
 }
 
-// ---- copilot -----------------------------------------------------------------------------------
 
 export type AgentStatus =
   | "COMPLETED"
@@ -398,7 +394,6 @@ export interface ConversationView {
   tasks: AgentTask[];
 }
 
-// ---- operations --------------------------------------------------------------------------------
 
 export interface OpsSummary {
   api: {

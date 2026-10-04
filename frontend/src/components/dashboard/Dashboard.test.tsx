@@ -88,6 +88,10 @@ const SEARCH = {
 function backend(overrides: Record<string, unknown> = {}) {
   return stubBackend({
     "/api/skus": SKUS,
+    "/api/regions": [
+      { regionId: "R1", name: "North" },
+      { regionId: "R2", name: "South" },
+    ],
     "/api/demand": (url: string) => demand(new URL(url, "http://x").searchParams.get("skuId") ?? ""),
     "/api/forecasts": (_url: string, init: RequestInit) => {
       const body = JSON.parse(init.body as string) as { regionId: string };
@@ -142,7 +146,8 @@ describe("Dashboard", () => {
     renderWithSession(<Dashboard />);
 
     expect(await screen.findByRole("heading", { name: "Sales and forecast" })).toBeInTheDocument();
-    expect(await screen.findByText(/Model lgbm-test/)).toBeInTheDocument();
+    expect(await screen.findByText("Forecast from Dec 30, 2024")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "North" })).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /forecast to 2025-01-06/ })).toBeInTheDocument();
     expect(await screen.findByText("Buy 100 widgets from Acme")).toBeInTheDocument();
     expect(screen.getByText("PENDING APPROVAL")).toBeInTheDocument();
@@ -155,7 +160,7 @@ describe("Dashboard", () => {
   it("sends the signed-in user's token with every request", async () => {
     const { calls } = backend();
     renderWithSession(<Dashboard />);
-    await screen.findByText(/Model lgbm-test/);
+    await screen.findByText(/Forecast from/);
     for (const call of calls) {
       const headers = call.init.headers as Record<string, string>;
       expect(headers.Authorization).toBe("Bearer test-access-token");
@@ -168,7 +173,8 @@ describe("Dashboard", () => {
     renderWithSession(<Dashboard />);
     expect(await screen.findByText(/Choose a region to see the forecast range/)).toBeInTheDocument();
 
-    await userEvent.selectOptions(screen.getByLabelText("Region"), "R1");
+    await userEvent.click(screen.getByRole("button", { name: "North" }));
+    expect(screen.getByRole("button", { name: "North" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.queryByText(/Choose a region to see the forecast range/)).not.toBeInTheDocument();
     expect(await screen.findByText("Likely range (80%)")).toBeInTheDocument();
   });

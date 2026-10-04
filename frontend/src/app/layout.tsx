@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Manrope, Ubuntu } from "next/font/google";
+import { Barlow, Barlow_Condensed, Geist_Mono } from "next/font/google";
 import { AppShell } from "@/components/AppShell";
 import { SessionProvider } from "@/lib/session";
 import "./globals.css";
 
-// Ubuntu for headings (rounded, geometric), Manrope for reading text, Geist Mono for ids and numbers.
-const display = Ubuntu({
+// Barlow Condensed for headlines, tabs and buttons, Barlow for reading text, Geist Mono for ids and numbers.
+const display = Barlow_Condensed({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["400", "500", "700"],
+  weight: ["500", "600", "700"],
 });
 
-const body = Manrope({
+const body = Barlow({
   variable: "--font-body",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const mono = Geist_Mono({
@@ -22,8 +23,8 @@ const mono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: { default: "AI Supply Chain Platform", template: "%s | AI Supply Chain Platform" },
-  description: "AI Supply Chain Decision Intelligence Platform",
+  title: { default: "Supply Chain Planner", template: "%s | Supply Chain Planner" },
+  description: "Forecasts, purchase plans and approvals for supply chain teams",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

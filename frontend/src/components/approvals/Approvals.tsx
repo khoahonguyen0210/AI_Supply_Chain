@@ -75,7 +75,7 @@ export function ApprovalBody({
       </div>
       <p>
         <Link href={`/workspace/${encodeURIComponent(approval.recommendationId)}`}>
-          Assumptions, evidence and full recommendation
+          Full details
         </Link>
       </p>
 
@@ -144,7 +144,7 @@ export function Approvals() {
     <div className="stack">
       <div>
         <h1>Approvals</h1>
-        <p className="lede">Orders are only placed once the right people approve them.</p>
+        <p className="lede">No order is placed until the right people approve it.</p>
       </div>
       <div className="grid-2" style={{ gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1.4fr)" }}>
         <Panel
@@ -215,7 +215,7 @@ export function Approvals() {
           {chosen ? (
             <Detail key={chosen} id={chosen} onChanged={reload} />
           ) : (
-            <EmptyState>Choose an approval from the queue.</EmptyState>
+            <EmptyState>Pick a request from the list.</EmptyState>
           )}
         </Panel>
       </div>

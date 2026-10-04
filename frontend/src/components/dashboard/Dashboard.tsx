@@ -7,9 +7,17 @@ import { RecommendationsPanel, ScenariosPanel } from "@/components/dashboard/Dec
 import { InventoryPanel } from "@/components/dashboard/InventoryPanel";
 import { SupplierOptionsPanel } from "@/components/dashboard/SupplierOptionsPanel";
 import { listSkus } from "@/lib/api/planning";
-import type { InventoryRow } from "@/lib/api/types";
+import type { InventoryRow, Sku } from "@/lib/api/types";
+import { humanize } from "@/lib/format";
 import { useSession } from "@/lib/session";
 import { useResource } from "@/lib/useResource";
+
+/** Products grouped by category, so the list reads in sections rather than one long run of codes. */
+function byCategory(skus: Sku[]): [string, Sku[]][] {
+  const groups = new Map<string, Sku[]>();
+  for (const sku of skus) groups.set(sku.category, [...(groups.get(sku.category) ?? []), sku]);
+  return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b));
+}
 
 export function Dashboard() {
   const { user, ready } = useSession();
@@ -21,7 +29,7 @@ export function Dashboard() {
     <div className="stack">
       <div>
         <h1>Overview</h1>
-        <p className="lede">Demand, stock and supplier options for one product.</p>
+        <p className="lede">Sales, stock and suppliers for one product.</p>
       </div>
       <ResourceView state={state} onRetry={reload} loadingLabel="Loading products…">
         {(skus) => {
@@ -33,9 +41,9 @@ export function Dashboard() {
           return (
             <>
               <Panel title="Product" id="product">
-                <div className="row">
-                  <label className="field">
-                    <span>SKU</span>
+                <div className="picker">
+                  <label className="field picker-select">
+                    <span>Choose a product</span>
                     <select
                       value={sku.skuId}
                       onChange={(e) => {
@@ -43,19 +51,24 @@ export function Dashboard() {
                         setInventory([]);
                       }}
                     >
-                      {skus.map((s) => (
-                        <option key={s.skuId} value={s.skuId}>
-                          {s.skuId} — {s.name}
-                        </option>
+                      {byCategory(skus).map(([category, items]) => (
+                        <optgroup key={category} label={humanize(category)}>
+                          {items.map((s) => (
+                            <option key={s.skuId} value={s.skuId}>
+                              {s.name} ({s.skuId})
+                            </option>
+                          ))}
+                        </optgroup>
                       ))}
                     </select>
                   </label>
-                  <span className="muted">
-                    {sku.category} · list price ${sku.unitPrice.toFixed(2)}
-                    {sku.requiredCertifications.length > 0
-                      ? ` · requires ${sku.requiredCertifications.join(", ")}`
-                      : ""}
-                  </span>
+                  <ul className="facts">
+                    <li>{humanize(sku.category)}</li>
+                    <li>${sku.unitPrice.toFixed(2)} each</li>
+                    {sku.requiredCertifications.length > 0 ? (
+                      <li>Needs {sku.requiredCertifications.join(", ")}</li>
+                    ) : null}
+                  </ul>
                 </div>
               </Panel>
               <DemandForecastPanel skuId={sku.skuId} />

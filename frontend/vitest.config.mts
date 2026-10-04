@@ -12,5 +12,7 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.ts"],
     include: ["src/**/*.test.{ts,tsx}"],
     css: false,
+    // userEvent types character by character; with the Docker stack running, 5 s was not always enough.
+    testTimeout: 20_000,
   },
 });
