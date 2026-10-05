@@ -525,8 +525,8 @@
   },
   "note": "Actuals are SIMULATED by continuing the synthetic world's generative process past as_of with the same seed; the approval of the plan is simulated (all lines approved).",
   "provenance": {
-    "code_revision": "c32a885",
-    "created_at": "2026-10-07T21:47:35+00:00"
+    "code_revision": "92ad28c",
+    "created_at": "2026-10-08T19:21:03+00:00"
   },
   "seed": 42
 }

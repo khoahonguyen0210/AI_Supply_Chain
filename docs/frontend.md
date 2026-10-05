@@ -47,7 +47,7 @@ display-only.
 
 ## Tests and checks
 
-`node node_modules/vitest/vitest.mjs run` (83 tests: API client, job polling, data shaping, every page
+`node node_modules/vitest/vitest.mjs run` (85 tests: API client, job polling, data shaping, every page
 with a stubbed backend), `node node_modules/typescript/bin/tsc --noEmit`,
 `node node_modules/eslint/bin/eslint.js`, `node node_modules/next/dist/bin/next build`. On Windows the
 `&` in the repository folder name breaks the `npm run` shims, hence the direct `node` calls.

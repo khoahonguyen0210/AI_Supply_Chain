@@ -13,7 +13,7 @@
             "fill_rate": 1.0,
             "mean_transit_days": 1.37597016866843,
             "objective": 25093.269,
-            "runtime_seconds": 0.04302429989911616,
+            "runtime_seconds": 0.07119329999841284,
             "shipping_cost": 25093.269,
             "stockout_penalty": 0.0,
             "unmet_units": 0
@@ -26,7 +26,7 @@
             "fill_rate": 1.0,
             "mean_transit_days": 1.3777045484108745,
             "objective": 25116.39000000001,
-            "runtime_seconds": 0.0019021001644432545,
+            "runtime_seconds": 0.0034709000028669834,
             "shipping_cost": 25116.39000000001,
             "stockout_penalty": 0.0,
             "unmet_units": 0
@@ -50,7 +50,7 @@
         "fill_rate": 0.9966840529584791,
         "objective": 348674.66498800006,
         "orders": 96,
-        "runtime_seconds": 0.0012452001683413982,
+        "runtime_seconds": 0.003265200008172542,
         "spend": 282863.72800000006,
         "units_ordered": 10311,
         "unmet_demand": 76.14699999999989
@@ -65,7 +65,7 @@
             "fill_rate": 1.0,
             "mean_transit_days": 1.3743658674066688,
             "objective": 25065.692000000003,
-            "runtime_seconds": 0.04290639981627464,
+            "runtime_seconds": 0.0741062999877613,
             "shipping_cost": 25065.692000000003,
             "stockout_penalty": 0.0,
             "unmet_units": 0
@@ -78,7 +78,7 @@
             "fill_rate": 1.0,
             "mean_transit_days": 1.37479946234228,
             "objective": 25071.42700000001,
-            "runtime_seconds": 0.0018591000698506832,
+            "runtime_seconds": 0.004918199992971495,
             "shipping_cost": 25071.42700000001,
             "stockout_penalty": 0.0,
             "unmet_units": 0
@@ -102,7 +102,7 @@
         "fill_rate": 0.9986623774373987,
         "objective": 357383.90923,
         "orders": 92,
-        "runtime_seconds": 0.05299220001325011,
+        "runtime_seconds": 0.06355120000080206,
         "spend": 323283.19899999996,
         "units_ordered": 10374,
         "unmet_demand": 30.717000000000013
@@ -117,7 +117,7 @@
             "fill_rate": 1.0,
             "mean_transit_days": 1.3731518015869575,
             "objective": 25048.266,
-            "runtime_seconds": 0.043174799997359514,
+            "runtime_seconds": 0.06302309999591671,
             "shipping_cost": 25048.266,
             "stockout_penalty": 0.0,
             "unmet_units": 0
@@ -130,7 +130,7 @@
             "fill_rate": 1.0,
             "mean_transit_days": 1.3731518015869575,
             "objective": 25048.26600000001,
-            "runtime_seconds": 0.0018937999848276377,
+            "runtime_seconds": 0.0026729999954113737,
             "shipping_cost": 25048.26600000001,
             "stockout_penalty": 0.0,
             "unmet_units": 0
@@ -153,7 +153,7 @@
         "mip_gap": 9.028889997635624e-05,
         "objective": 302532.0568719998,
         "orders": 91,
-        "runtime_seconds": 4.579466100083664,
+        "runtime_seconds": 7.593629099996178,
         "solver_status": "OPTIMAL",
         "spend": 298335.95299999986,
         "units_ordered": 10422,
@@ -172,7 +172,7 @@
             "fill_rate": 1.0,
             "mean_transit_days": 1.37597016866843,
             "objective": 25093.269,
-            "runtime_seconds": 0.04368690005503595,
+            "runtime_seconds": 0.05731400000513531,
             "shipping_cost": 25093.269,
             "stockout_penalty": 0.0,
             "unmet_units": 0
@@ -185,7 +185,7 @@
             "fill_rate": 1.0,
             "mean_transit_days": 1.3777045484108745,
             "objective": 25116.39000000001,
-            "runtime_seconds": 0.0023910999298095703,
+            "runtime_seconds": 0.002731899992795661,
             "shipping_cost": 25116.39000000001,
             "stockout_penalty": 0.0,
             "unmet_units": 0
@@ -210,7 +210,7 @@
         "fill_rate": 0.9966840529584791,
         "objective": 348674.66498800006,
         "orders": 96,
-        "runtime_seconds": 0.0012678999919444323,
+        "runtime_seconds": 0.0018577000009827316,
         "spend": 282863.72800000006,
         "units_ordered": 10311,
         "unmet_demand": 76.14699999999989
@@ -225,7 +225,7 @@
             "fill_rate": 1.0,
             "mean_transit_days": 1.3743658674066688,
             "objective": 25065.692000000003,
-            "runtime_seconds": 0.04658009996637702,
+            "runtime_seconds": 0.05239520000759512,
             "shipping_cost": 25065.692000000003,
             "stockout_penalty": 0.0,
             "unmet_units": 0
@@ -238,7 +238,7 @@
             "fill_rate": 1.0,
             "mean_transit_days": 1.37479946234228,
             "objective": 25071.42700000001,
-            "runtime_seconds": 0.0020300999749451876,
+            "runtime_seconds": 0.00392989999090787,
             "shipping_cost": 25071.42700000001,
             "stockout_penalty": 0.0,
             "unmet_units": 0
@@ -263,7 +263,7 @@
         "fill_rate": 0.9986623774373987,
         "objective": 357383.90923,
         "orders": 92,
-        "runtime_seconds": 0.02632499998435378,
+        "runtime_seconds": 0.0349617999891052,
         "spend": 323283.19899999996,
         "units_ordered": 10374,
         "unmet_demand": 30.717000000000013
@@ -278,7 +278,7 @@
             "fill_rate": 0.9997832025321944,
             "mean_transit_days": 1.3737965131407754,
             "objective": 25192.484999999997,
-            "runtime_seconds": 0.047312699956819415,
+            "runtime_seconds": 0.07031400001142174,
             "shipping_cost": 25052.244999999995,
             "stockout_penalty": 140.24,
             "unmet_units": 5
@@ -291,7 +291,7 @@
             "fill_rate": 0.9997832025321944,
             "mean_transit_days": 1.3743169398907105,
             "objective": 25199.633000000013,
-            "runtime_seconds": 0.0018892001826316118,
+            "runtime_seconds": 0.002794899992295541,
             "shipping_cost": 25059.39300000001,
             "stockout_penalty": 140.24,
             "unmet_units": 5
@@ -314,7 +314,7 @@
         "mip_gap": 8.88125305096342e-05,
         "objective": 326463.5212239999,
         "orders": 76,
-        "runtime_seconds": 3.396354699973017,
+        "runtime_seconds": 4.831699000002118,
         "solver_status": "OPTIMAL",
         "spend": 253585.21599999993,
         "units_ordered": 8541,
@@ -338,8 +338,8 @@
     "time_limit_seconds": 60.0
   },
   "provenance": {
-    "code_revision": "5cf6e1a",
-    "created_at": "2026-10-06T23:16:13+00:00"
+    "code_revision": "92ad28c",
+    "created_at": "2026-10-08T19:13:32+00:00"
   },
   "tight_budget_fraction": 0.85,
   "total_forecast_demand_units": 22963.877

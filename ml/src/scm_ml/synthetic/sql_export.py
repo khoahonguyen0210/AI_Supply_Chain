@@ -1,5 +1,3 @@
-"""Writes the synthetic world as an idempotent PostgreSQL seed script."""
-
 from __future__ import annotations
 
 import argparse
@@ -21,7 +19,6 @@ BATCH_ROWS = 400
 
 
 def literal(value: Any) -> str:
-    """A SQL literal for a Python value."""
     if value is None:
         return "NULL"
     if isinstance(value, bool):
@@ -37,18 +34,28 @@ def literal(value: Any) -> str:
     return "'" + str(value).replace("'", "''") + "'"
 
 
-def insert(table: str, columns: Sequence[str], rows: Iterable[Sequence[Any]]) -> list[str]:
-    """Multi-row INSERT statements (``ON CONFLICT DO NOTHING``), BATCH_ROWS rows at a time."""
+def insert(
+    table: str,
+    columns: Sequence[str],
+    rows: Iterable[Sequence[Any]],
+    refresh: tuple[str, Sequence[str]] | None = None,
+) -> list[str]:
+    """Multi-row INSERTs; existing rows are kept unless `refresh` names columns to update."""
     statements: list[str] = []
     batch: list[str] = []
     header = f"INSERT INTO {table} ({', '.join(columns)}) VALUES\n"
+    conflict = "\nON CONFLICT DO NOTHING;"
+    if refresh is not None:
+        key, updated = refresh
+        sets = ", ".join(f"{c} = EXCLUDED.{c}" for c in updated)
+        conflict = f"\nON CONFLICT ({key}) DO UPDATE SET {sets};"
     for row in rows:
         batch.append("  (" + ", ".join(literal(v) for v in row) + ")")
         if len(batch) == BATCH_ROWS:
-            statements.append(header + ",\n".join(batch) + "\nON CONFLICT DO NOTHING;")
+            statements.append(header + ",\n".join(batch) + conflict)
             batch = []
     if batch:
-        statements.append(header + ",\n".join(batch) + "\nON CONFLICT DO NOTHING;")
+        statements.append(header + ",\n".join(batch) + conflict)
     return statements
 
 
@@ -68,6 +75,7 @@ def seed_statements(world: SyntheticWorld) -> list[str]:
             (s.sku_id, s.name, s.category, s.unit_price, s.unit_volume, s.required_certifications)
             for s in world.skus
         ],
+        refresh=("sku_id", ["name"]),
     )
     statements += insert(
         "supplier",

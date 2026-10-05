@@ -78,7 +78,7 @@ def test_primary_workflow_ends_awaiting_human_approval(harness: Harness) -> None
 def test_every_number_in_the_answer_is_backed_by_a_tool_result(harness: Harness) -> None:
     run = harness.run(PRIMARY)
     observations = [s for s in run.trace if s.tool]
-    evidence = evidence_numbers(observations, PRIMARY + " Electronics item 01")
+    evidence = evidence_numbers(observations, PRIMARY + " Wireless earbuds")
     assert unsupported_numbers(run.answer, evidence) == []
     assert unsupported_numbers(run.answer + " Savings of 98,765 units.", evidence) == ["98,765"]
 
@@ -193,9 +193,6 @@ def test_supplier_performance_question(harness: Harness) -> None:
     assert "not in force" in run.answer
 
 
-# --- guardrail units ---------------------------------------------------------------------------
-
-
 def test_input_validation() -> None:
     assert clean_task_text("  hello\x00 world ") == "hello  world"
     with pytest.raises(GuardrailError) as empty:
@@ -233,9 +230,6 @@ def test_numbers_are_matched_at_the_precision_they_are_written() -> None:
     assert unsupported_numbers("Spend 298,336, fill rate 99.9%, 31.8% dearer", evidence) == []
     assert unsupported_numbers("Spend 298,000", evidence) == ["298,000"]
     assert unsupported_numbers("see SKU-007, PLAN-001 on 2024-12-30 [S1]", evidence) == []
-
-
-# --- runner safety with scripted planners ------------------------------------------------------
 
 
 class Scripted:
@@ -330,9 +324,6 @@ def test_step_limit_stops_a_planner_that_never_finishes(small_context: PlanningC
     harness.runner._max_steps = 3
     run = harness.run("forecast")
     assert run.status == TaskStatus.FAILED and "MAX_STEPS" in run.violations
-
-
-# --- model planner -----------------------------------------------------------------------------
 
 
 class FakeLlm:

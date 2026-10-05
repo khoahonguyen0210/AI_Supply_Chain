@@ -19,7 +19,7 @@ All planning results use the deterministic synthetic world (seed 42, as of 2024-
 | **LightGBM** `lgbm-1f6789b06e` | 30.158 | 47.887 | 0.933 | -1.524 | 0.876 |
 
 Test MAE improvement over the selected baseline (`moving_average_13`, chosen on validation): **11.1%**.
-Source: `ml/experiments/forecast/synthetic.json` (code `2552598`, 2026-10-06T19:24:22+00:00).
+Source: `ml/experiments/forecast/synthetic.json` (code `92ad28c`, 2026-10-08T19:12:37+00:00).
 
 ### Real data (Online Retail II)
 
@@ -45,8 +45,8 @@ Demand: lightgbm point forecast summed over the planning horizon (22,963.9 units
 | Policy | Total cost (objective) | Spend | Fill rate | Unmet units | Constraint violations | Runtime (s) |
 |---|---|---|---|---|---|---|
 | cheapest supplier | 348,675 | 282,864 | 0.997 | 76.1 | 4 | 0.00 |
-| weighted ranking | 357,384 | 323,283 | 0.999 | 30.7 | 1 | 0.05 |
-| MILP optimizer | 302,532 | 298,336 | 1.000 | 0.0 | 0 | 4.58 |
+| weighted ranking | 357,384 | 323,283 | 0.999 | 30.7 | 1 | 0.06 |
+| MILP optimizer | 302,532 | 298,336 | 1.000 | 0.0 | 0 | 7.59 |
 
 ### Tight budget (253,586)
 
@@ -54,7 +54,7 @@ Demand: lightgbm point forecast summed over the planning horizon (22,963.9 units
 |---|---|---|---|---|---|---|
 | cheapest supplier | 348,675 | 282,864 | 0.997 | 76.1 | 5 | 0.00 |
 | weighted ranking | 357,384 | 323,283 | 0.999 | 30.7 | 2 | 0.03 |
-| MILP optimizer | 326,464 | 253,585 | 1.000 | 0.0 | 0 | 3.40 |
+| MILP optimizer | 326,464 | 253,585 | 1.000 | 0.0 | 0 | 4.83 |
 
 ## Inventory: nearest-warehouse rule vs optimized allocation
 
@@ -69,7 +69,7 @@ Base case: the stock each procurement plan produces, shipped to regional demand.
 | MILP optimizer | optimized (MILP) | 1.000 | 0 | 25,048 | 1.37 | 0 |
 | MILP optimizer | nearest warehouse rule | 1.000 | 0 | 25,048 | 1.37 | 0 |
 
-Source: `ml/experiments/optimization/synthetic.json` (code `5cf6e1a`, 2026-10-06T23:16:13+00:00).
+Source: `ml/experiments/optimization/synthetic.json` (code `92ad28c`, 2026-10-08T19:13:32+00:00).
 
 ## Scenarios: baseline vs disrupted vs optimized response
 
@@ -84,7 +84,7 @@ Source: `ml/experiments/optimization/synthetic.json` (code `5cf6e1a`, 2026-10-06
 | Transport cost +25% | 1.000 | 1.000 | 1.000 | 302,532 | 303,936 | 303,886 | 50 |
 
 Disrupted plan = the baseline plan kept unchanged under the scenario; re-optimized = the optimizer re-run with the scenario's changes. Costs include stockout penalties.
-Source: `ml/experiments/scenario/synthetic.json` (code `29e60c7`, 2026-10-06T23:24:01+00:00).
+Source: `ml/experiments/scenario/synthetic.json` (code `92ad28c`, 2026-10-08T19:15:32+00:00).
 
 ## RAG: retrieval, citations, groundedness
 
@@ -94,8 +94,8 @@ Source: `ml/experiments/scenario/synthetic.json` (code `29e60c7`, 2026-10-06T23:
 | `hashing-384` | 0.824 | 1.000 | 0.907 | 1.000 | 1.000 | 0.971 | 0 |
 
 56 questions over 69 documents; answers from the `extractive-stub` generator. Claude-generated answers: NOT YET MEASURED.
-Source: `ml/experiments/rag/synthetic-fastembed.json` (code `a849cd5`, 2026-10-08T03:14:35+00:00).
-Source: `ml/experiments/rag/synthetic-hashing.json` (code `a849cd5`, 2026-10-08T03:14:42+00:00).
+Source: `ml/experiments/rag/synthetic-fastembed.json` (code `92ad28c`, 2026-10-08T19:16:41+00:00).
+Source: `ml/experiments/rag/synthetic-hashing.json` (code `92ad28c`, 2026-10-08T19:17:06+00:00).
 
 ## Agent: workflow and tool use
 
@@ -125,7 +125,7 @@ Each unseen set was committed before the planner changes it measures and scored 
 | appropriate refusal | 1.000 | 24 |
 
 Planner: `rule` (keyword rules plus embedding-based intent matching, offline, deterministic). The current scores include cases that were used to improve the planner, so the first-run scores above are the honest measure of unseen requests. Claude planner: NOT YET MEASURED.
-Source: `ml/experiments/agent/synthetic-rule-planner.json` (code `bf5eecd`, 2026-10-08T03:55:12+00:00).
+Source: `ml/experiments/agent/synthetic-rule-planner.json` (code `92ad28c`, 2026-10-08T19:19:48+00:00).
 
 ## Feedback loop: planned vs simulated actuals
 
@@ -145,7 +145,7 @@ Decision at 2024-12-30: forecast 8 weeks for 200 series, plan with the MILP. App
 
 Supplier deliveries for the plan's 91 orders: on-time rate 0.857, in-full rate 0.923, unit fill rate 0.984.
 Actuals are simulated by continuing the synthetic world's own process past `as_of`; they are not real outcomes ([feedback-loop.md](feedback-loop.md)).
-Source: `ml/experiments/feedback/synthetic.json` (code `c32a885`, 2026-10-07T21:47:35+00:00).
+Source: `ml/experiments/feedback/synthetic.json` (code `92ad28c`, 2026-10-08T19:21:03+00:00).
 
 ### Retraining gate
 
@@ -156,7 +156,7 @@ Source: `ml/experiments/feedback/synthetic.json` (code `c32a885`, 2026-10-07T21:
 | 13-week moving average | 32.826 | -2.043 | n/a |
 
 Gate status: `REJECTED_BY_GATE` (candidate MAE 31.2787 is not below 31.1761 (current 31.1761, required improvement 0.0%)). Nothing is deployed without the gate and a named approval.
-Source: `ml/experiments/feedback/retraining-synthetic.json` (code `a0c3686`, 2026-10-07T15:24:58+00:00).
+Source: `ml/experiments/feedback/retraining-synthetic.json` (code `92ad28c`, 2026-10-08T19:23:33+00:00).
 
 ## Systems: latency, throughput, worker scaling
 

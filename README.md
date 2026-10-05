@@ -1,45 +1,39 @@
 <div align="center">
 
-# Supply Chain Planner
+# AI Supply Chain Planning & Optimization
 
-**Ask a planning question in plain English and get a purchase plan with the numbers behind it.<br>
-Nothing is bought until a manager approves it.**
+**Forecast demand, choose suppliers and build the cheapest purchase plan, with people approving every order.**
 
 ![Java](https://img.shields.io/badge/Java-ED8B00?logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?logo=springboot&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-000000?logo=nextdotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-000000?logo=nextdotjs&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?logo=postgresql&logoColor=white)
+![LightGBM](https://img.shields.io/badge/LightGBM-2C8EBB)
+![RAG](https://img.shields.io/badge/RAG_+_AI_agent-7C3AED)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?logo=kubernetes&logoColor=white)
 ![Terraform](https://img.shields.io/badge/Terraform-844FBA?logo=terraform&logoColor=white)
-![AWS](https://img.shields.io/badge/AWS-232F3E?logo=amazonaws&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-232F3E)
+![CI](https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ![Sign-in page](docs/images/home.png)
 
 </div>
 
-```text
-"I'm worried we will run short on something next month. What should I do?"
-"Demand for SKU-001 is expected to rise by 20%. What should I do?"
-```
-
 ## What it does
 
-A planner has to decide how much to buy, from which supplier, and for which warehouse. This app does the
-work in four steps:
-
-1. **Forecast sales.** How much of each product will likely sell in each region over the next few weeks,
-   with a low and a high estimate.
-2. **Compare suppliers.** Price, delivery time and on-time record, side by side.
-3. **Build the plan.** The cheapest way to buy enough stock while staying within every limit (minimum order
-   sizes, supplier capacity, warehouse space and budget).
-4. **Get it approved.** The plan goes to the right managers, and nothing is bought until they approve it.
-
-It can also show what happens if something goes wrong (a supplier stops delivering, or demand jumps), and it
-answers questions about company policies and supplier contracts, quoting the exact source.
+Deciding what to buy for a supply chain usually means a pile of spreadsheets: guessing next month's sales,
+comparing supplier quotes, checking whether the warehouses have room, and then waiting for someone to sign off.
+This app brings all of that into one place. You ask a question in plain English, for example "Demand for
+wireless earbuds is expected to rise by 20%. What should I do?", and it forecasts sales for each product and region,
+compares suppliers on price, delivery time and reliability, and works out the cheapest purchase plan that still
+respects every limit, from minimum order sizes to warehouse space and budget. It can also show what happens when
+something goes wrong, such as a supplier that stops delivering, and it answers questions about company policies
+and contracts by quoting the exact source. Every number it shows is looked up, never made up, and nothing is
+ordered until the right managers approve it.
 
 ## Results
 
@@ -149,13 +143,13 @@ Details: [`docs/feedback-loop.md`](docs/feedback-loop.md).
 |---|---|
 | Languages | Java, Python, TypeScript, SQL, HCL (Terraform), CSS |
 | Backend | Java 21, Spring Boot 4 (web, security with JWT, JDBC, validation, actuator), Flyway, Maven |
-| Website | Next.js 16, React 19, TypeScript, Vitest, Testing Library |
+| Website | Next.js 16, React 19, TypeScript, Vitest, Testing Library, Playwright (screenshots) |
 | Forecasting and planning | Python 3.12, LightGBM, NumPy, pandas, SciPy (HiGHS solver), FastAPI, Pydantic |
 | Document search and assistant | fastembed (bge-small-en-v1.5), pgvector, BM25; optional Claude API |
 | Data | PostgreSQL 16 with pgvector, a generated sample company, the Online Retail II dataset |
 | Deployment | Docker Compose, Kubernetes (kind), Terraform for AWS (ECS Fargate, RDS, S3, EFS, ECR) |
 | Monitoring | Micrometer, Prometheus endpoint, assistant usage stats, audit log |
-| CI and quality | GitHub Actions, Trivy, pip-audit, npm audit, Ruff, mypy, pytest, JUnit, Testcontainers, actionlint, tflint |
+| CI and quality | GitHub Actions (images pushed to GHCR), Trivy, pip-audit, npm audit, Ruff, mypy, pytest, JUnit, Testcontainers, actionlint, tflint, uv |
 
 ## Quick start
 
@@ -182,7 +176,7 @@ assistant), or sign in with one of the four demo accounts, which all use that pa
 
 **3. Try the main flow:**
 
-1. Sign in as `planner`, open **Assistant** and ask: *Demand for SKU-001 is expected to rise by 20%. What should I do?*
+1. Sign in as `planner`, open **Assistant** and ask: *Demand for wireless earbuds is expected to rise by 20%. What should I do?*
 2. Sign out, sign in as `manager`, open **Approvals** and approve the new request.
 3. Do the same as `finance`. Only then is the order placed.
 
@@ -231,7 +225,7 @@ bash scripts/ai-regression.sh         # checks the assistant and document search
 bash scripts/stack.sh smoke           # quick check of the running app, including the demo
 ```
 
-There are over 600 tests: 401 in Python, 135 in Java and 83 for the website, plus end-to-end and smoke tests.
+There are over 600 tests: 402 in Python, 136 in Java and 85 for the website, plus end-to-end and smoke tests.
 The CI pipeline runs all of them, builds the Docker images and scans them for known vulnerabilities
 ([`docs/ci.md`](docs/ci.md)).
 

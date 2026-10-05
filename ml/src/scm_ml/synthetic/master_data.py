@@ -1,5 +1,3 @@
-"""Master data: regions, SKUs, suppliers, offers, contracts and fulfillment lanes."""
-
 from __future__ import annotations
 
 from datetime import date, timedelta
@@ -28,6 +26,59 @@ CATEGORIES: tuple[tuple[str, str | None], ...] = (
     ("industrial", "ISO9001"),
 )
 CERTIFICATIONS = ("RoHS", "HACCP", "ISO9001")
+# No digits (the guardrail reads them as numbers) and no names hidden in common words.
+PRODUCT_NAMES: dict[str, tuple[str, ...]] = {
+    "electronics": (
+        "Wireless earbuds",
+        "USB-C charger",
+        "Bluetooth speaker",
+        "Smart watch",
+        "Power bank",
+        "HDMI cable",
+        "LED desk lamp",
+        "Wireless mouse",
+    ),
+    "apparel": (
+        "Cotton T-shirt",
+        "Denim jeans",
+        "Running shoes",
+        "Wool sweater",
+        "Rain jacket",
+        "Baseball cap",
+        "Leather belt",
+        "Sports socks",
+    ),
+    "home": (
+        "Coffee mug",
+        "Bath towel",
+        "Bed sheet set",
+        "Cooking pot",
+        "Glass vase",
+        "Throw pillow",
+        "Wall clock",
+        "Storage box",
+    ),
+    "food": (
+        "Basmati rice",
+        "Olive oil",
+        "Ground coffee",
+        "Spaghetti pasta",
+        "Green tea",
+        "Dark chocolate",
+        "Peanut butter",
+        "Canned tomatoes",
+    ),
+    "industrial": (
+        "Safety gloves",
+        "Steel bolts",
+        "Hard hat",
+        "Duct tape",
+        "Cable ties",
+        "Safety goggles",
+        "Wood screws",
+        "Work boots",
+    ),
+}
 COST_TO_PRICE_RATIO = 0.55
 MOQ_CHOICES = (10, 25, 50, 100)
 OFFER_PROBABILITY = 0.6
@@ -82,6 +133,13 @@ def build_lanes(
     return lanes
 
 
+def product_name(category: str, index: int) -> str:
+    names = PRODUCT_NAMES.get(category, ())
+    if index < len(names):
+        return names[index]
+    return f"{category.title()} product {chr(ord('A') + index % 26)}{index // 26 or ''}"
+
+
 def build_skus(cfg: SyntheticConfig, rng: np.random.Generator) -> list[Sku]:
     skus = []
     for i in range(cfg.n_skus):
@@ -91,7 +149,7 @@ def build_skus(cfg: SyntheticConfig, rng: np.random.Generator) -> list[Sku]:
         skus.append(
             Sku(
                 sku_id=f"SKU-{i + 1:03d}",
-                name=f"{category.title()} item {i + 1:02d}",
+                name=product_name(category, i // len(CATEGORIES)),
                 category=category,
                 unit_price=round(price, 2),
                 unit_volume=round(volume, 3),
@@ -104,7 +162,6 @@ def build_skus(cfg: SyntheticConfig, rng: np.random.Generator) -> list[Sku]:
 def build_suppliers(
     cfg: SyntheticConfig, rng: np.random.Generator, regions: list[Region]
 ) -> tuple[list[Supplier], dict[str, float]]:
-    """Cheaper suppliers are slower and less reliable, which creates real trade-offs."""
     n = cfg.n_suppliers
     price_factor = np.linspace(0.85, 1.15, n)
     rng.shuffle(price_factor)
@@ -136,7 +193,6 @@ def build_suppliers(
 
 
 def build_contracts(suppliers: list[Supplier], as_of: date) -> list[SupplierContract]:
-    """All contracts are active except the last two suppliers (expired, suspended)."""
     contracts = []
     for i, supplier in enumerate(suppliers):
         status = ContractStatus.ACTIVE

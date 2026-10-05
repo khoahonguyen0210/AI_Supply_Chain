@@ -1,29 +1,22 @@
-/* Flat editorial theme: solid orange, black and white bands, condensed bold headlines, square corners,
-   heavy black rules instead of boxes and shadows. Every colour is a variable defined here. */
-
 :root {
   color-scheme: light;
 
-  /* brand */
   --orange: #ef512e;
   --orange-ink: #c4380f; /* orange that stays readable as small text on white */
   --orange-tint: #fdeae4;
   --black: #000000;
   --white: #ffffff;
 
-  /* neutrals */
   --gray-bg: #f3f3f3;
   --rule: #cccccc;
   --muted: #595959;
   --faint: #808080;
 
-  /* status */
   --ok: #1e7b34;
   --warn: #a65200;
   --error: #c22f0f;
   --info: #0062b8;
 
-  /* charts */
   --series-history: #000000;
   --series-forecast: var(--orange);
   --band: rgba(239, 81, 46, 0.2);
@@ -132,7 +125,6 @@ code,
   color: var(--black);
 }
 
-/* ---- shell ------------------------------------------------------------------------------- */
 
 .band-inner,
 .shell-header-inner,
@@ -273,7 +265,7 @@ code,
   padding: 40px var(--gutter);
 }
 
-/* each page opens with its title centered on a full-width orange band, continuing the header */
+/* each page title sits on a full-width orange band */
 .shell-main > .stack > :first-child:has(> h1) {
   padding: 40px 0 44px;
   background: var(--orange);
@@ -326,7 +318,6 @@ code,
   margin: 0;
 }
 
-/* ---- layout helpers ---------------------------------------------------------------------- */
 
 .grid-2 {
   display: grid;
@@ -347,7 +338,6 @@ code,
   gap: 8px 12px;
 }
 
-/* a panel is a heavy black rule with a condensed title under it, not a box */
 .panel {
   min-width: 0;
   padding-top: 14px;
@@ -411,7 +401,6 @@ tr.row-selected:hover td {
   background: var(--orange-tint);
 }
 
-/* ---- stats and badges -------------------------------------------------------------------- */
 
 .stats {
   display: grid;
@@ -493,7 +482,6 @@ tr.row-selected:hover td {
   color: var(--error);
 }
 
-/* ---- forms ------------------------------------------------------------------------------- */
 
 .field {
   display: grid;
@@ -651,7 +639,6 @@ summary:focus-visible {
   align-items: end;
 }
 
-/* ---- pickers: product list and region buttons --------------------------------------------- */
 
 .picker {
   display: flex;
@@ -669,6 +656,21 @@ summary:focus-visible {
   font-weight: 600;
 }
 
+.stack.product-picker {
+  gap: 18px;
+}
+
+.product-picker > p {
+  margin: -6px 0 0;
+}
+
+.picker-search input {
+  width: 240px;
+  max-width: 100%;
+  padding: 11px 14px;
+  font-size: 1.05rem;
+}
+
 .picker-select select {
   min-width: min(100%, 340px);
   padding: 11px 14px;
@@ -680,7 +682,6 @@ summary:focus-visible {
   color: var(--muted);
 }
 
-/* the facts sit on the select's baseline, separated by thin rules instead of dots */
 .facts {
   display: flex;
   flex-wrap: wrap;
@@ -722,7 +723,6 @@ summary:focus-visible {
   color: var(--white);
 }
 
-/* ---- chart ------------------------------------------------------------------------------- */
 
 .chart {
   margin: 0;
@@ -789,7 +789,6 @@ summary:focus-visible {
   vertical-align: baseline;
 }
 
-/* ---- copilot ----------------------------------------------------------------------------- */
 
 .chat {
   display: grid;
@@ -855,7 +854,6 @@ details > summary:hover {
   margin: 0;
 }
 
-/* ---- status page ------------------------------------------------------------------------- */
 
 .status-ok,
 .status-error {
@@ -883,7 +881,6 @@ details > summary:hover {
   color: var(--error);
 }
 
-/* ---- landing: hero ----------------------------------------------------------------------- */
 
 .landing {
   display: flex;
@@ -1061,7 +1058,6 @@ details > summary:hover {
   animation: grow 0.6s var(--ease) both;
 }
 
-/* tab strip: five equal white tabs under one heavy black rule, lifted over the edge of the hero */
 .hero-tabs-band {
   background: var(--black);
 }
@@ -1096,7 +1092,7 @@ details > summary:hover {
   color: var(--orange-ink);
 }
 
-/* the chosen tab gets an orange bar along its bottom, so every tab keeps the same top edge */
+/* a bottom bar, so every tab keeps the same top edge */
 .hero-tab[aria-pressed="true"],
 .hero-tab[aria-pressed="true"]:hover:not(:disabled) {
   color: var(--orange-ink);
@@ -1113,7 +1109,6 @@ details > summary:hover {
   color: var(--white);
 }
 
-/* ---- landing: sections ------------------------------------------------------------------- */
 
 .band-black {
   background: var(--black);
@@ -1216,7 +1211,6 @@ details > summary:hover {
   line-height: 1.2;
 }
 
-/* ---- landing: sign-in -------------------------------------------------------------------- */
 
 .band-orange .section-title {
   color: var(--white);
@@ -1280,7 +1274,7 @@ details > summary:hover {
   color: var(--black);
 }
 
-/* until both fields are filled the button is an outline, so it never looks like a faded brown block */
+/* an outline until both fields are filled */
 .login-actions .primary:disabled {
   opacity: 1;
   background: transparent;
@@ -1307,7 +1301,6 @@ details > summary:hover {
   border-left-color: var(--black);
 }
 
-/* ---- motion ------------------------------------------------------------------------------ */
 
 @keyframes rise {
   from {
@@ -1352,7 +1345,6 @@ details > summary:hover {
   }
 }
 
-/* ---- small screens ----------------------------------------------------------------------- */
 
 @media (max-width: 960px) {
   .steps,
@@ -1369,7 +1361,7 @@ details > summary:hover {
     grid-column: 1 / -1;
   }
 
-  /* on the black band the black tab would disappear, so it turns orange */
+  /* the black tab would vanish on the black band */
   .hero-tab.hero-tab-last {
     background: var(--orange);
     border-top-color: var(--orange);

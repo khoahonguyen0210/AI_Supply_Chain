@@ -270,7 +270,7 @@ def world_problem() -> tuple[ProcurementProblem, SourcingCatalog]:
         for warehouse_id in warehouses:
             weekly[CellKey(sku_id, warehouse_id)] = units / n_weeks / len(warehouses)
     demand = {key: value * 4 for key, value in weekly.items()}
-    # Solves in well under a minute on an idle machine; the headroom keeps it OPTIMAL under CI or build load.
+    # Solves in under a minute when idle; the headroom keeps it OPTIMAL under CI or build load.
     problem = problem_from_world(world, demand, ProcurementParams(time_limit_seconds=180))
     return problem, SourcingCatalog.from_world(world)
 

@@ -901,8 +901,8 @@
   },
   "model_version": "lgbm-1f6789b06e",
   "provenance": {
-    "code_revision": "2552598",
-    "created_at": "2026-10-06T19:24:22+00:00"
+    "code_revision": "92ad28c",
+    "created_at": "2026-10-08T19:12:37+00:00"
   },
   "selected_baseline": "moving_average_13",
   "test_mae_improvement_vs_selected_baseline": 0.11074860974108461

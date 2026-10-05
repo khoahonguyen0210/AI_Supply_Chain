@@ -10,7 +10,7 @@ from pathlib import Path
 
 from playwright.sync_api import Page, sync_playwright
 
-QUESTION = "Demand for SKU-001 is expected to rise by 20%. What should I do?"
+QUESTION = "Demand for wireless earbuds is expected to rise by 20%. What should I do?"
 PAGES = {
     "dashboard": "/",
     "workspace": "/workspace",

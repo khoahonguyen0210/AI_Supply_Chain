@@ -5,6 +5,7 @@ import { errorResponse, renderWithSession, stubBackend } from "@/test/render";
 import type { DemandPoint, ForecastResponse } from "@/lib/api/types";
 import { Dashboard } from "./Dashboard";
 import { forecastBand, weeklyHistory } from "./DemandForecastPanel";
+import { filterProducts } from "./ProductPicker";
 
 const SKUS = [
   {
@@ -140,6 +141,15 @@ describe("dashboard data shaping", () => {
   });
 });
 
+describe("product picker", () => {
+  it("filters by category and by part of the name or code", () => {
+    expect(filterProducts(SKUS, "ALL", "gad").map((s) => s.skuId)).toEqual(["SKU-002"]);
+    expect(filterProducts(SKUS, "ALL", "sku-001").map((s) => s.name)).toEqual(["Widget"]);
+    expect(filterProducts(SKUS, "food", "")).toEqual([]);
+    expect(filterProducts(SKUS, "home", "  ")).toHaveLength(2);
+  });
+});
+
 describe("Dashboard", () => {
   it("shows demand, forecast, inventory, recommendations and scenarios for the first SKU", async () => {
     backend();
@@ -215,6 +225,21 @@ describe("Dashboard", () => {
     fail = false;
     await userEvent.click(screen.getByRole("button", { name: "Retry" }));
     await waitFor(() => expect(screen.getByText("Below safety buffer")).toBeInTheDocument());
+  });
+
+  it("searching for a product switches the page to the first match", async () => {
+    const { calls } = backend();
+    renderWithSession(<Dashboard />);
+    await screen.findByText(/Forecast from/);
+
+    await userEvent.type(screen.getByLabelText("Search"), "gadget");
+    expect(screen.getByLabelText("Product")).toHaveValue("SKU-002");
+    expect(screen.getByText("Code SKU-002")).toBeInTheDocument();
+    await waitFor(() => expect(calls.some((c) => c.url.includes("skuId=SKU-002"))).toBe(true));
+
+    await userEvent.clear(screen.getByLabelText("Search"));
+    await userEvent.type(screen.getByLabelText("Search"), "nothing like this");
+    expect(screen.getByText(/No product matches/)).toBeInTheDocument();
   });
 
   it("explains an empty database instead of rendering broken panels", async () => {
