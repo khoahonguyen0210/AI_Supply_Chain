@@ -1,4 +1,3 @@
-# ECS Fargate services, same layout as the kind deployment: frontend, backend, engine, worker, seed.
 resource "aws_ecs_cluster" "main" {
   name = local.name
 
@@ -94,8 +93,6 @@ locals {
   }
 }
 
-# --- load balancer ------------------------------------------------------------------------------
-
 resource "aws_lb" "main" {
   name                       = local.name
   load_balancer_type         = "application"
@@ -156,8 +153,6 @@ resource "aws_lb_listener" "https" {
     target_group_arn = aws_lb_target_group.frontend.arn
   }
 }
-
-# --- task definitions ---------------------------------------------------------------------------
 
 resource "aws_ecs_task_definition" "frontend" {
   family                   = "${local.name}-frontend"
@@ -256,8 +251,7 @@ resource "aws_ecs_task_definition" "engine" {
   }])
 }
 
-# Backend with the job worker on, talking to its own engine sidecar over localhost (awsvpc tasks
-# share one network namespace). Stateless: the sidecar keeps agent state in memory.
+# Job worker with its own engine sidecar on localhost; stateless, the sidecar keeps state in memory.
 resource "aws_ecs_task_definition" "worker" {
   family                   = "${local.name}-worker"
   requires_compatibilities = ["FARGATE"]
@@ -329,8 +323,6 @@ resource "aws_ecs_task_definition" "seed" {
     logConfiguration = local.log["seed"]
   }])
 }
-
-# --- services -----------------------------------------------------------------------------------
 
 resource "aws_ecs_service" "backend" {
   name                   = "backend"

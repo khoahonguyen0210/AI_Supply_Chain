@@ -1,5 +1,3 @@
-# Least-privilege roles: the execution role starts tasks (pull, logs, secrets), each task role is
-# what the application itself may call, and the optional CI role pushes images through GitHub OIDC.
 data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "ecs_tasks_assume" {
@@ -49,7 +47,6 @@ resource "aws_iam_role" "backend" {
   assume_role_policy = data.aws_iam_policy_document.ecs_tasks_assume.json
 }
 
-# Engine: reads and writes model and evaluation artifacts, mounts its state through the access point.
 resource "aws_iam_role" "engine" {
   name               = "${local.name}-engine"
   assume_role_policy = data.aws_iam_policy_document.ecs_tasks_assume.json

@@ -1,5 +1,4 @@
-# The whole stack in namespace `scm`. Secrets come from secrets.env (git-ignored), which
-# scripts/kind.sh generates with random values on first use.
+# secrets.env is git-ignored; scripts/kind.sh generates it with random values.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: scm

@@ -1,5 +1,3 @@
-# Spring backend: API, job workers and the database migrations (Flyway runs at startup).
-# Build context: backend/
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /src
 COPY .mvn .mvn
@@ -10,9 +8,10 @@ RUN --mount=type=cache,target=/root/.m2 ./mvnw -q -B package -DskipTests \
     && cp target/scm-backend-*.jar /src/app.jar
 
 FROM eclipse-temurin:21-jre
+# pebble ships with the Ubuntu base, is never run here, and carries Go stdlib CVEs
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/lib/apt/lists/* /usr/bin/pebble \
     && useradd --system --uid 10001 --no-create-home scm
 COPY --from=build /src/app.jar /app/app.jar
 USER 10001

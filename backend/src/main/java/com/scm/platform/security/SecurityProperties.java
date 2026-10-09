@@ -16,6 +16,13 @@ public record SecurityProperties(String jwtSecret, @DefaultValue("8h") Duration 
 
 	public static final int MIN_PASSWORD_CHARS = 12;
 
+	/** BCrypt reads only the first 72 bytes, so longer passwords are refused rather than cut. */
+	public static final int MAX_PASSWORD_BYTES = 72;
+
+	public static boolean passwordTooLong(String password) {
+		return password != null && password.getBytes(StandardCharsets.UTF_8).length > MAX_PASSWORD_BYTES;
+	}
+
 	public SecurityProperties {
 		if (jwtSecret == null || jwtSecret.getBytes(StandardCharsets.UTF_8).length < MIN_SECRET_BYTES) {
 			throw new IllegalStateException("scm.security.jwt-secret must be at least " + MIN_SECRET_BYTES
@@ -49,9 +56,9 @@ public record SecurityProperties(String jwtSecret, @DefaultValue("8h") Duration 
 			if (userId == null || userId.isBlank() || role == null || role.isBlank()) {
 				throw new IllegalStateException("a bootstrap user needs a user-id and a role");
 			}
-			if (password == null || password.length() < MIN_PASSWORD_CHARS) {
+			if (password == null || password.length() < MIN_PASSWORD_CHARS || passwordTooLong(password)) {
 				throw new IllegalStateException("the password of bootstrap user " + userId + " must be at least "
-						+ MIN_PASSWORD_CHARS + " characters");
+						+ MIN_PASSWORD_CHARS + " characters and at most " + MAX_PASSWORD_BYTES + " bytes");
 			}
 		}
 

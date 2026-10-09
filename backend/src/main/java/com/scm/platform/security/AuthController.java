@@ -2,7 +2,9 @@ package com.scm.platform.security;
 
 import com.scm.platform.audit.AuditService;
 import com.scm.platform.audit.AuditService.Outcome;
+import com.scm.platform.error.ApiError;
 import com.scm.platform.error.ApiException;
+import com.scm.platform.error.RequestValidationException;
 import com.scm.platform.security.TokenService.IssuedToken;
 import com.scm.platform.security.UserRepository.UserRow;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +13,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.Instant;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -75,14 +78,18 @@ public class AuthController {
 			@NotBlank @Pattern(regexp = "^[A-Za-z0-9._-]{3,64}$",
 					message = "use 3 to 64 letters, digits, dots, dashes or underscores") String userId,
 			@NotBlank @Size(max = 80) String displayName,
-			@NotBlank @Size(min = SecurityProperties.MIN_PASSWORD_CHARS, max = 200,
-					message = "use at least 12 characters") String password) {
+			@NotBlank @Size(min = SecurityProperties.MIN_PASSWORD_CHARS, max = SecurityProperties.MAX_PASSWORD_BYTES,
+					message = "use 12 to 72 characters") String password) {
 	}
 
 	/** Always a planner account; approval roles are only given by an admin. */
 	@PostMapping("/register")
 	@ResponseStatus(HttpStatus.CREATED)
 	public LoginResponse register(@Valid @RequestBody SignUpRequest request, HttpServletRequest http) {
+		if (SecurityProperties.passwordTooLong(request.password())) {
+			throw new RequestValidationException("Request validation failed",
+					List.of(new ApiError.FieldViolation("password", "use 12 to 72 characters")));
+		}
 		String ip = ClientAddress.of(http, properties.trustForwardedFor());
 		if (!properties.allowSignUp()) {
 			audit.record(request.userId(), null, "SIGN_UP", "/api/auth/register", Outcome.DENIED, 403, ip,

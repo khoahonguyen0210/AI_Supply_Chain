@@ -1,7 +1,5 @@
 name: AI regression
 
-# Fixed RAG and agent cases, offline (rule planner, extractive generator, no API key), gated
-# against ml/configs/ai-regression-baseline.json. Any regression fails the run.
 on:
   push:
     branches: [main]

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Deterministic Python quality gate: tests, lint, type check.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 uv run pytest

@@ -1,5 +1,4 @@
-# One-shot, idempotent seed of the synthetic company (master data, history, documents) once the
-# backend has migrated the schema.
+# Idempotent; runs once the backend has migrated the schema.
 apiVersion: batch/v1
 kind: Job
 metadata:

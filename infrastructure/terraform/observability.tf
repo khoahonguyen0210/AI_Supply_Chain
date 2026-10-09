@@ -1,5 +1,3 @@
-# Logs per service, Container Insights (set on the cluster) and alarms on the signals that need a
-# person: errors at the edge, missing tasks, a struggling database.
 resource "aws_cloudwatch_log_group" "service" {
   for_each          = toset(["frontend", "backend", "engine", "worker", "seed"])
   name              = "/ecs/${local.name}/${each.key}"

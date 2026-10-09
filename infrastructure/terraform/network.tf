@@ -1,4 +1,3 @@
-# Two AZs. Public subnets: load balancer and NAT. Private subnets: tasks, database, EFS.
 data "aws_availability_zones" "available" {
   state = "available"
 }
@@ -87,8 +86,7 @@ resource "aws_vpc_endpoint" "s3" {
   route_table_ids   = aws_route_table.private[*].id
 }
 
-# Security groups: the load balancer reaches the frontend only; tasks reach each other through
-# Service Connect; only tasks reach the database and EFS.
+# Only the load balancer reaches the frontend; only tasks reach the database and EFS.
 resource "aws_security_group" "alb" {
   name        = "${local.name}-alb"
   description = "Load balancer"

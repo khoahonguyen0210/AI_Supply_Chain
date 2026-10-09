@@ -1,8 +1,4 @@
-# PostgreSQL (records, job queue, audit log, pgvector knowledge base), secrets, artifact storage
-# and the engine's state volume.
-
-# Generated during apply and written only to write-only arguments, so no secret lands in the
-# Terraform state. Bump var.credentials_version to rotate.
+# Write-only arguments keep generated secrets out of state; bump var.credentials_version to rotate.
 ephemeral "random_password" "db" {
   length  = 32
   special = false
@@ -40,8 +36,7 @@ resource "aws_secretsmanager_secret_version" "app" {
   secret_string_wo_version = var.credentials_version
 }
 
-# Only read when var.planner = "claude"; its value is set outside Terraform:
-#   aws secretsmanager put-secret-value --secret-id scm-<env>/anthropic --secret-string <key>
+# Only read when var.planner = "claude"; set it with aws secretsmanager put-secret-value.
 resource "aws_secretsmanager_secret" "anthropic" {
   name                    = "${local.name}/anthropic"
   description             = "ANTHROPIC_API_KEY for the Claude planner (optional)"
@@ -95,7 +90,6 @@ resource "aws_db_instance" "postgres" {
   auto_minor_version_upgrade   = true
 }
 
-# Model and evaluation artifacts (ml/artifacts, ml/experiments locally), and source documents.
 resource "aws_s3_bucket" "artifacts" {
   bucket_prefix = "${local.name}-artifacts-"
 }
@@ -136,7 +130,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "artifacts" {
   }
 }
 
-# The engine's SQLite state (agent tasks, approvals, decisions): the engine-state volume locally.
 resource "aws_efs_file_system" "engine_state" {
   encrypted = true
   tags      = { Name = "${local.name}-engine-state" }

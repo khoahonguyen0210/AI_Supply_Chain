@@ -1,6 +1,5 @@
 name: CI
 
-# Lint, type checks, tests, e2e, image build + smoke + scans; pushes images on main and v* tags.
 on:
   push:
     branches: [main]
@@ -37,7 +36,6 @@ jobs:
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run mypy src ml/src ml/tests tests
-      # Docker is available on the runner, so the pgvector integration tests run too
       - run: uv run pytest
 
   java:
@@ -54,7 +52,6 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
-      # unit and Testcontainers integration tests, then the jar
       - run: ./mvnw -B -ntp verify
       - uses: actions/upload-artifact@v4
         with:

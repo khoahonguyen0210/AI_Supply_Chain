@@ -1,4 +1,3 @@
-# Job workers: each pod is a queue worker plus its own engine sidecar. Scale with `scripts/kind.sh scale N`.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -33,8 +32,7 @@ spec:
               value: "host=postgres port=5432 dbname=scm user=scm password=$(POSTGRES_PASSWORD)"
             - { name: SCM_ML_HOST, value: "127.0.0.1" }
             - { name: SCM_ML_STATE_PATH, value: ":memory:" }
-            # one CPU per engine: native thread pools (LightGBM/OpenMP, BLAS) sized to match,
-            # otherwise every engine starts one thread per node core and replicas fight
+            # one CPU per engine, or native thread pools (OpenMP, BLAS) size to every node core
             - { name: OMP_NUM_THREADS, value: "1" }
             - { name: OPENBLAS_NUM_THREADS, value: "1" }
             - { name: MKL_NUM_THREADS, value: "1" }
@@ -60,8 +58,7 @@ spec:
               valueFrom: { secretKeyRef: { name: scm-secrets, key: SCM_ML_INTERNAL_TOKEN } }
             - { name: ML_SERVICE_URL, value: "http://127.0.0.1:8001" }
             - { name: SCM_JOBS_WORKER_ENABLED, value: "true" }
-            # a crashed worker's job is taken over after the lease; jobs here last seconds,
-            # so 2 minutes (default 5) keeps recovery visible without double runs
+            # jobs here last seconds, so a 2-minute lease (default 5) shows recovery without double runs
             - { name: SCM_JOBS_LEASE, value: "120s" }
           ports:
             - { name: management, containerPort: 8081 }

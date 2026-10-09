@@ -1,4 +1,3 @@
-# One ECR repository per image; CI pushes the same tags it pushes to GHCR (docs/ci.md).
 locals {
   images = toset(["scm-backend", "scm-ml", "scm-frontend"])
 }

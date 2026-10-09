@@ -1,5 +1,4 @@
-# The stateful planning engine: agent tasks, approvals and decisions live in its SQLite file, so it
-# runs as exactly one pod with its own volume. It serves the API backend.
+# Exactly one pod: agent tasks, approvals and decisions live in its SQLite file.
 apiVersion: v1
 kind: ConfigMap
 metadata:

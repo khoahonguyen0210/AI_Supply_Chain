@@ -20,12 +20,13 @@ browser --(bearer token)--> Spring backend --(shared secret + actor)--> Python p
   issuer `scm-backend`, expiry `scm.security.token-ttl`, 8 h by default). Everything under `/api`
   except `/api/health`, `/api/auth/login` and `/api/auth/register` needs `Authorization: Bearer <token>`;
   sessions and cookies are not used (so there is no CSRF surface).
-* `POST /api/auth/register` (user id, display name, password of 12+ characters) creates an account and
+* `POST /api/auth/register` (user id, display name, password of 12 to 72 characters) creates an account and
   signs it in. Self sign-up always gives the `planner` role; approval roles only come from an admin
   (bootstrap users). A user id that already exists in any letter case is refused (`409 USER_ID_TAKEN`),
   sign-ups are limited per client address (`rate-limit.sign-up-per-ip`, 5 per minute), every attempt is
   audited (`SIGN_UP`), and `scm.security.allow-sign-up=false` turns it off (`403 SIGN_UP_DISABLED`).
-* Passwords are stored as BCrypt hashes. A wrong password, an unknown user and a deactivated account
+* Passwords are stored as BCrypt hashes. BCrypt reads only 72 bytes, so longer passwords are refused at
+  sign-up instead of being silently cut. A wrong password, an unknown user and a deactivated account
   produce the identical response, and an unknown user costs the same time to reject as a wrong
   password.
 * Forged, tampered, expired, wrong-issuer and `alg: none` tokens are rejected (tests). A token whose
@@ -33,6 +34,11 @@ browser --(bearer token)--> Spring backend --(shared secret + actor)--> Python p
   Authorization uses the role in the token; callers cannot choose their own identity with headers.
 * The frontend keeps the token in `sessionStorage` (this tab only, gone on close) and signs the user
   out when the backend answers 401. `localStorage` is not used for credentials.
+* Every page is served with a Content-Security-Policy (`connect-src 'self'`, so a token cannot be sent to
+  another site; no framing, no plugins), `X-Frame-Options: DENY`, `nosniff`, a strict referrer policy,
+  HSTS and a Permissions-Policy (`frontend/next.config.ts`).
+* The AWS mapping will not deploy without an ACM certificate (HTTPS) unless `allow_plain_http = true` is
+  set on purpose, so passwords never cross the internet unencrypted by accident.
 
 ## Authorization (RBAC)
 
@@ -67,7 +73,7 @@ Roles: `planner`, `procurement_manager`, `finance`, `admin`.
 | --- | --- | --- |
 | JWT signing key | `SCM_JWT_SECRET` | at least 32 bytes; the backend refuses to start without it |
 | backend ↔ engine token | `SCM_ML_INTERNAL_TOKEN` (both sides) | at least 16 characters; the engine refuses to start without it unless `SCM_ML_INSECURE_NO_AUTH=1` |
-| first accounts | `SCM_SECURITY_BOOTSTRAPUSERS_0_USERID`, `_DISPLAYNAME`, `_ROLE`, `_PASSWORD`, ... | passwords of at least 12 characters, created or refreshed at startup |
+| first accounts | `SCM_SECURITY_BOOTSTRAPUSERS_0_USERID`, `_DISPLAYNAME`, `_ROLE`, `_PASSWORD`, ... | passwords of 12 characters to 72 bytes, created or refreshed at startup |
 | Claude API key | `ANTHROPIC_API_KEY` | read by the SDK only; never logged or committed |
 
 No secret has a default value. Nothing secret is written to logs (login failures are audited without

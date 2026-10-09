@@ -23,7 +23,7 @@ export function signUpMessage(error: unknown): string {
     if (error.code === "USER_ID_TAKEN") return "That user id is already taken. Pick another one.";
     if (error.code === "VALIDATION_FAILED") {
       const fields = new Set(error.body?.violations.map((v) => v.field) ?? []);
-      if (fields.has("password")) return "Use a password of at least 12 characters.";
+      if (fields.has("password")) return "Use a password of 12 to 72 characters.";
       if (fields.has("userId")) return "Use 3 to 64 letters, digits, dots, dashes or underscores for the user id.";
       return "Fill in your name, a user id and a password.";
     }
@@ -226,11 +226,12 @@ export function LoginForm() {
                 value={password}
                 autoComplete={signingUp ? "new-password" : "current-password"}
                 minLength={signingUp ? 12 : undefined}
+                maxLength={signingUp ? 72 : undefined}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </label>
-            {signingUp ? <p className="field-hint">At least 12 characters.</p> : null}
+            {signingUp ? <p className="field-hint">12 to 72 characters.</p> : null}
             <div className="login-actions">
               <button type="submit" className="primary" disabled={busy || !ready}>
                 {signingUp ? (busy ? "Creating…" : "Create account") : busy ? "Signing in…" : "Sign in"}

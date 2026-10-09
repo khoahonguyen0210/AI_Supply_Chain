@@ -1,4 +1,3 @@
-# Planning engine image. The forecast model and embedding model are built in, so it runs offline.
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS build
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy UV_PROJECT_ENVIRONMENT=/opt/venv UV_PYTHON_DOWNLOADS=0
 RUN apt-get update \
@@ -9,8 +8,7 @@ COPY pyproject.toml uv.lock README.md LICENSE ./
 RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev --no-install-project
 COPY src src
 COPY ml/src ml/src
-# uv rebuilds a cached local project only when pyproject.toml changes, so force it: otherwise the
-# image can silently ship the previous build's code
+# Force a reinstall: uv's cache would otherwise ship the previous build's code.
 RUN --mount=type=cache,target=/root/.cache/uv     uv sync --frozen --no-dev --no-editable --reinstall-package ai-scm-platform
 COPY ml/experiments ml/experiments
 ENV PATH=/opt/venv/bin:$PATH FASTEMBED_CACHE_PATH=/opt/fastembed

@@ -1,4 +1,3 @@
-# Context: repository root. Only the Python sources, lock file and experiment summaries are needed.
 *
 !pyproject.toml
 !uv.lock

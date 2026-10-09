@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# Regenerates every offline benchmark artifact, then docs/benchmarks.md.
-# Usage: bash scripts/benchmark.sh [--real|--report]
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

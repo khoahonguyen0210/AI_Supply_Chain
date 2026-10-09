@@ -29,9 +29,20 @@ variable "single_nat_gateway" {
 }
 
 variable "certificate_arn" {
-  description = "ACM certificate for HTTPS on the load balancer. Empty: HTTP only (demo)."
+  description = "ACM certificate for HTTPS on the load balancer. Required unless allow_plain_http is set."
   type        = string
   default     = ""
+
+  validation {
+    condition     = var.certificate_arn != "" || var.allow_plain_http
+    error_message = "Set certificate_arn so sign-ins use HTTPS, or allow_plain_http = true for a throwaway demo."
+  }
+}
+
+variable "allow_plain_http" {
+  description = "Serve plain HTTP without a certificate. Passwords and tokens would travel unencrypted."
+  type        = bool
+  default     = false
 }
 
 variable "allowed_cidrs" {

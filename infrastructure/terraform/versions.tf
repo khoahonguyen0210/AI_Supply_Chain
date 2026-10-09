@@ -1,5 +1,3 @@
-# AWS mapping of the local stack. Validated with `terraform validate`; never applied by this
-# project (no AWS account is needed to build, test or run it). See docs/cloud.md.
 terraform {
   required_version = ">= 1.11"
 

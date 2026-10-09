@@ -1,4 +1,3 @@
-# Context: frontend/
 node_modules/
 .next/
 tsconfig.tsbuildinfo

@@ -81,4 +81,17 @@ class SignUpTest {
 		mockMvc.perform(signUp("x", "Too short id", "a-long-new-password")).andExpect(status().isBadRequest());
 	}
 
+	@Test
+	void passwordsLongerThanBcryptCanReadAreRefusedNotCut() throws Exception {
+		mockMvc.perform(signUp("long.pw", "Long", "a".repeat(73)))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.violations[0].field").value("password"));
+		mockMvc.perform(signUp("wide.pw", "Wide", "\u00e9".repeat(40)))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.violations[0].field").value("password"));
+		mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+				.content("{\"userId\":\"pat\",\"password\":\"" + "a".repeat(100) + "\"}"))
+				.andExpect(status().isUnauthorized());
+	}
+
 }

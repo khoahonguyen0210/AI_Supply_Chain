@@ -25,7 +25,8 @@ public class UserService {
 	public Optional<UserRow> authenticate(String userId, String password) {
 		Optional<UserRow> user = users.find(userId == null ? "" : userId);
 		String hash = user.map(UserRow::passwordHash).orElse(decoyHash);
-		boolean matches = passwords.matches(password == null ? "" : password, hash);
+		boolean matches = !SecurityProperties.passwordTooLong(password)
+				&& passwords.matches(password == null ? "" : password, hash);
 		if (user.isPresent() && matches && user.get().active()) {
 			users.recordLogin(userId);
 			return user;

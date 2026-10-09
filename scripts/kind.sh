@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Local Kubernetes: `scripts/kind.sh up|scale N|smoke|status|down`.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

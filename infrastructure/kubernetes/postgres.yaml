@@ -1,4 +1,3 @@
-# PostgreSQL with pgvector: the system of record, the job queue and the knowledge base.
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:

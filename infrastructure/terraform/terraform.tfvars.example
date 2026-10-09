@@ -1,10 +1,11 @@
-# Copy to terraform.tfvars (git-ignored) and adjust. Every variable has a default; see variables.tf.
+# Copy to terraform.tfvars (git-ignored).
 region      = "us-east-1"
 environment = "demo"
 image_tag   = "0.1.0"
 
-# HTTPS: an ACM certificate in the same region. Empty serves HTTP only.
-certificate_arn = ""
+# HTTPS: an ACM certificate in the same region. Without one, plain HTTP must be allowed explicitly.
+certificate_arn  = ""
+allow_plain_http = false
 allowed_cidrs   = ["203.0.113.0/24"]
 
 worker_min = 1

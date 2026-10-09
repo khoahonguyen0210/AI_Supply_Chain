@@ -1,4 +1,3 @@
-# Local stack: `bash scripts/stack.sh up`. Ports bind to 127.0.0.1; the engine is never published.
 name: scm
 
 x-db-conninfo: &db-conninfo "host=postgres port=5432 dbname=${POSTGRES_DB:-scm} user=${POSTGRES_USER:-scm} password=${POSTGRES_PASSWORD:?run scripts/stack.sh up or copy .env.example to .env}"
@@ -40,7 +39,6 @@ services:
       SCM_JOBS_WORKER_ENABLED: "true"
       # requests arrive through the Next.js proxy, which sets X-Forwarded-For
       SCM_SECURITY_TRUSTFORWARDEDFOR: "true"
-      # demo accounts, one per role, sharing the generated demo password
       SCM_SECURITY_BOOTSTRAPUSERS_0_USERID: planner
       SCM_SECURITY_BOOTSTRAPUSERS_0_DISPLAYNAME: Pat Planner
       SCM_SECURITY_BOOTSTRAPUSERS_0_ROLE: planner

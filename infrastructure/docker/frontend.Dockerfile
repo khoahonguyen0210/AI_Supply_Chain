@@ -1,4 +1,3 @@
-# Next.js frontend (standalone server). Build context: frontend/
 # BACKEND_URL is where /api/* is proxied; Next resolves rewrites at build time, so it is a build arg.
 FROM node:24-alpine AS build
 WORKDIR /src
